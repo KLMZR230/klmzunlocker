@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ Unlocker - Admin Access</title>
+    <title>KLMZ Unlocker - Acceso de Cliente</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Variáveis de Cor */
+        /* Variables de Color */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -19,7 +19,7 @@
             --whatsapp-green: #25d366; 
         }
 
-        /* Estilos Globais */
+        /* Estilos Globales */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -43,11 +43,11 @@
             color: var(--accent-pink);
         }
 
-        /* 1. Barra Superior (Preta com Links/Info) */
+        /* 1. Barra Superior (Preta con Links/Info) */
         .top-info-bar {
             background-color: var(--header-bg);
             display: flex;
-            justify-content: flex-end; /* Conteúdo alinhado à direita */
+            justify-content: flex-end; 
             align-items: center;
             padding: 8px 30px;
             font-size: 12px;
@@ -69,7 +69,7 @@
             margin-right: 20px;
         }
         
-        /* 2. Navegação Principal */
+        /* 2. Navegación Principal */
         .main-nav {
             background-color: var(--header-bg);
             display: flex;
@@ -85,7 +85,7 @@
         }
         
         .logo .klmz {
-            color: #4dc2f2; /* Cor azul claro para 'KLMZ' */
+            color: #4dc2f2; 
         }
         
         .nav-links {
@@ -111,7 +111,7 @@
             margin-left: 5px;
         }
 
-        /* Botão de Login/Logout */
+        /* Botón de Login/Logout/Registrar */
         #loginLogoutBtn {
             background-color: #3b3b3b; 
             padding: 5px 15px; 
@@ -125,20 +125,20 @@
         .hero-section {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; /* Alinha o conteúdo à parte inferior */
-            padding: 60px 50px 0px 50px; /* Padding inferior reduzido para alinhar a imagem */
+            align-items: flex-end; 
+            padding: 60px 50px 0px 50px; 
             min-height: 500px;
             position: relative;
-            background-color: #161a20; /* Fundo sólido para as imagens ficarem em cima */
-            overflow: hidden; /* Para garantir que as imagens internas não saiam */
+            background-color: #161a20; 
+            overflow: hidden; 
         }
 
         .services-content {
             flex-basis: 40%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Alinha o conteúdo à parte inferior */
-            padding-bottom: 80px; /* Espaço para o rodapé */
+            justify-content: flex-end; 
+            padding-bottom: 80px; 
             z-index: 10;
         }
 
@@ -201,23 +201,23 @@
             margin-right: 5px;
         }
 
-        /* Imagem de Fundo/Central - AGORA É UM ELEMENTO `img` PARA MELHOR CONTROLE */
+        /* Imagem de Dispositivos */
         #mainDevicesImage {
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 60%; /* Ajuste a largura conforme necessário */
-            max-width: 900px; /* Largura máxima para a imagem */
+            width: 60%; 
+            max-width: 900px; 
             height: auto;
-            object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
-            z-index: 1; /* Para estar acima do fundo, mas abaixo do chaveiro */
+            object-fit: contain; 
+            z-index: 1; 
         }
         
         .keychain-image {
             position: absolute;
-            top: 20%; /* Ajuste a posição conforme a imagem de dispositivos */
-            left: 55%; /* Ajuste a posição */
-            width: 120px; /* Tamanho do chaveiro */
+            top: 20%; 
+            left: 55%; 
+            width: 120px; 
             height: 120px;
             border-radius: 50%;
             background-color: var(--accent-pink); 
@@ -325,7 +325,7 @@
             margin-left: 10px;
         }
 
-        /* Botões de Chat Flutuantes (Direita) */
+        /* Botones de Chat Flotantes */
         .chat-buttons {
             position: fixed;
             bottom: 60px; 
@@ -358,12 +358,12 @@
             background-color: #4dc2f2; 
         }
 
-        /* Estilos para Formulários (Login/Admin) */
+        /* Estilos para Formularios (Login/Admin) */
         .admin-section, .login-section {
             background-color: #22252a; 
             border-radius: 8px; 
             padding: 30px; 
-            margin: 50px auto; /* Centraliza e adiciona margem */
+            margin: 50px auto; 
             max-width: 500px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             text-align: center;
@@ -375,7 +375,7 @@
         }
         .admin-section input, .login-section input {
             display: block;
-            width: calc(100% - 20px); /* Ajuste de padding */
+            width: calc(100% - 20px); 
             padding: 12px;
             margin: 15px auto;
             border-radius: 5px;
@@ -396,14 +396,6 @@
             transition: background-color 0.2s;
             margin-top: 15px;
         }
-        .admin-section button:hover, .login-section button:hover {
-            background-color: #c93a8e;
-        }
-        .form-message {
-            margin-top: 15px; 
-            font-size: 14px;
-            color: yellow;
-        }
         .admin-options {
             text-align: left;
             margin-top: 30px;
@@ -415,19 +407,21 @@
             margin-bottom: 15px;
             color: var(--text-light);
         }
-        .admin-options .form-container { /* Reutiliza o estilo do container, mas sem margin-top para não duplicar */
+        .admin-options .form-container { 
             margin-top: 20px;
-            background-color: #1c2025; /* Um pouco mais escuro para diferenciar */
+            background-color: #1c2025; 
             padding: 20px;
             border-radius: 8px;
         }
         .admin-options .form-container button {
-             background-color: #4c4e97; /* Cor do botão roxo para admin actions */
+             background-color: #4c4e97; 
         }
-        .admin-options .form-container button:hover {
-            background-color: #404281;
+        .form-message {
+            margin-top: 15px; 
+            font-size: 14px;
+            color: yellow;
         }
-        /* Esconder seções por padrão */
+        /* Esconder secciones por defecto */
         .hidden {
             display: none;
         }
@@ -457,8 +451,8 @@
             <div class="dropdown">Historial de pedidos</div>
             <a href="#">KLMZ-Firmware.com File Server</a>
             <a href="#">Auto Add Money Video</a>
-            <span id="adminNameDisplay" style="margin-left: 25px; font-weight: bold;"></span>
-            <a href="#" id="loginLogoutBtn">Login</a>
+            <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
+            <a href="#" id="loginLogoutBtn">Login / Register</a>
         </div>
     </nav>
 
@@ -478,7 +472,7 @@
                         <span class="icon">📞</span> +503 68957466 (Whatsapp)
                     </span>
                     <span style="display: flex; align-items: center;">
-                        <span class="icon">✉️</span> klmzr230@gmail.com
+                        <span class="icon">✉️</span> **klmzr230@gmail.com**
                     </span>
                 </div>
             </div>
@@ -488,19 +482,20 @@
         </section>
 
         <section class="login-section" id="loginSection">
-            <h3>Iniciar Sesión Administrador</h3>
+            <h3>Iniciar Sesión / Registrarse</h3>
             <input type="email" id="loginEmail" placeholder="Email">
             <input type="password" id="loginPassword" placeholder="Contraseña">
             <button onclick="signInWithEmail()">Iniciar Sesión</button>
+            <button onclick="signUpWithEmail()" style="background-color: #4c4e97;">Registrarse</button>
             <p id="loginMessage" class="form-message" style="color: red;"></p>
         </section>
 
         <section class="admin-section hidden" id="adminSection">
             <h3>Panel de Administración</h3>
-            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold;">Admin</span>!</p>
+            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold; color: yellow;">Admin</span>! (klmzr230@gmail.com)</p>
 
             <div class="admin-options">
-                <h4>Gestión de Órdenes</h4>
+                <h4>Gestión de Órdenes (Solo Admin)</h4>
                 <div class="form-container">
                     <h3>✍️ Enviar Nueva Orden</h3>
                     <input type="text" id="deviceName" placeholder="Nombre del Dispositivo (iPhone X, etc.)">
@@ -511,16 +506,16 @@
             </div>
 
             <div class="admin-options" style="margin-top: 30px;">
-                <h4>Gestión de Imágenes de Fondo</h4>
+                <h4>Gestión de Imágenes (Solo Admin)</h4>
                 <div class="form-container">
-                    <h3>📸 Subir Imagen de Fondo</h3>
+                    <h3>📸 Subir Imagen de Fondo (Hero)</h3>
                     <input type="file" id="backgroundImageFile" accept="image/*">
                     <button onclick="uploadBackgroundImage()">Subir Fondo</button>
                     <p id="backgroundResponseMessage" class="form-message"></p>
                     <button onclick="clearBackgroundImage()" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
                 </div>
                  <div class="form-container" style="margin-top: 20px;">
-                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero Section)</h3>
+                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
                     <input type="file" id="devicesImageFile" accept="image/*">
                     <button onclick="uploadDevicesImage()">Subir Imagen de Dispositivos</button>
                     <p id="devicesImageResponseMessage" class="form-message"></p>
@@ -557,7 +552,7 @@
                 <h3>Conéctate con nosotros</h3>
                 <div class="contact-footer-info">
                     +503 68957466 (Whatsapp)<br>
-                    klmzr230@gmail.com
+                    **klmzr230@gmail.com**
                 </div>
             </div>
         </div>
@@ -576,11 +571,14 @@
     </div>
 
     <script>
+        // 🔑 TUS CLAVES SUPABASE
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
-
+        const ADMIN_EMAIL = 'klmzr230@gmail.com'; // 🔑 CORREO DEL ADMINISTRADOR
+        
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // Elementos UI
         const heroSection = document.getElementById('heroSection');
         const mainDevicesImage = document.getElementById('mainDevicesImage');
         const loginSection = document.getElementById('loginSection');
@@ -594,11 +592,16 @@
         const devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
         const loginMessage = document.getElementById('loginMessage');
 
+        // Nombres de Buckets (Asegúrese de que existan en Supabase Storage)
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
-        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; // Novo bucket para a imagem de dispositivos
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; // Substitua por uma URL de imagem padrão real se tiver
+        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; // URL de la imagen inicial
 
-        // --- Funções de Autenticação ---
+        // --- Funciones de Autenticación ---
+
+        /**
+         * Maneja el inicio de sesión del usuario.
+         */
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -606,232 +609,236 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
 
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
-                console.error('Erro ao fazer login:', error);
+                console.error('Error al hacer login:', error);
                 loginMessage.style.color = 'red';
-                loginMessage.textContent = `Erro: ${error.message}`;
+                loginMessage.textContent = `Error: ${error.message}`;
             } else {
                 loginMessage.style.color = '#25d366';
-                loginMessage.textContent = '✅ Sesión iniciada con éxito!';
-                checkUser(); // Verifica o usuário após o login
+                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                // Esperamos un momento para que Supabase actualice el estado
+                setTimeout(checkUser, 1000); 
+            }
+        }
+        
+        /**
+         * Maneja el registro de nuevos usuarios.
+         */
+        async function signUpWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Registrando usuario...';
+            
+            // Nota: Por defecto, Supabase requiere confirmación de correo
+            const { error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                console.error('Error al registrar:', error);
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = `Error: ${error.message}`;
+            } else {
+                loginMessage.style.color = '#4dc2f2'; 
+                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta.';
             }
         }
 
+        /**
+         * Cierra la sesión del usuario.
+         */
         async function signOut() {
             const { error } = await supabase.auth.signOut();
             if (error) {
-                console.error('Erro ao fazer logout:', error);
+                console.error('Error al hacer logout:', error);
             } else {
-                checkUser(); // Atualiza a UI após o logout
+                checkUser(); 
             }
         }
 
+        /**
+         * Verifica el estado del usuario y actualiza la UI.
+         */
         async function checkUser() {
             const { data: { user } } = await supabase.auth.getUser();
+            
             if (user) {
-                loginSection.classList.add('hidden');
-                adminSection.classList.remove('hidden');
+                const isAdmin = user.email === ADMIN_EMAIL;
+                
+                // Configuración de la barra de navegación para usuario logueado
                 loginLogoutBtn.textContent = 'Logout';
                 loginLogoutBtn.onclick = signOut;
-                loggedInUserName.textContent = user.email; // Mostra o email do usuário
-                adminNameDisplay.textContent = `Admin: ${user.email.split('@')[0]}`; // Nome de admin na barra superior
-                console.log('Usuário logado:', user);
+                
+                if (isAdmin) {
+                    // MODO ADMINISTRADOR: Mostrar panel de administración
+                    loginSection.classList.add('hidden');
+                    adminSection.classList.remove('hidden');
+                    adminNameDisplay.classList.remove('hidden');
+                    loggedInUserName.textContent = user.email;
+                    adminNameDisplay.textContent = `Admin: ${user.email.split('@')[0]}`;
+                } else {
+                    // MODO CLIENTE: Ocultar todo lo de administración
+                    loginSection.classList.remove('hidden'); // Permitir ver el formulario, pero mostrar mensaje
+                    adminSection.classList.add('hidden');
+                    adminNameDisplay.classList.add('hidden');
+                    loginMessage.style.color = 'red';
+                    loginMessage.textContent = `Acceso denegado. Este correo (${user.email}) no es un administrador.`;
+                }
+
             } else {
+                // No hay usuario logueado: Mostrar formulario de Login
                 loginSection.classList.remove('hidden');
                 adminSection.classList.add('hidden');
-                loginLogoutBtn.textContent = 'Login';
+                adminNameDisplay.classList.add('hidden');
+                loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
-                    // Se estiver na main page, rola para a seção de login
-                    if (window.location.hash !== '#admin') {
-                        loginSection.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    loginSection.scrollIntoView({ behavior: 'smooth' });
                 };
-                loggedInUserName.textContent = '';
-                adminNameDisplay.textContent = '';
-                console.log('Nenhum usuário logado.');
+                loginMessage.textContent = ''; // Limpiar mensaje de login al iniciar
             }
         }
 
-        // --- Funções de Gestão de Ordens ---
+        // --- Funciones de Gestión de Órdenes (Solo Admin) ---
         async function submitNewOrder() {
+            if (document.getElementById('loginEmail').value !== ADMIN_EMAIL) {
+                orderResponseMessage.style.color = 'red';
+                orderResponseMessage.textContent = 'Función restringida a administradores.';
+                return;
+            }
+            
             const deviceName = document.getElementById('deviceName').value;
             const imeiNumber = document.getElementById('imeiNumber').value;
 
             if (!deviceName || !imeiNumber) {
                 orderResponseMessage.style.color = 'red';
-                orderResponseMessage.textContent = 'Por favor, preencha o nome do dispositivo e o IMEI.';
+                orderResponseMessage.textContent = 'Por favor, complete ambos campos.';
                 return;
             }
 
             orderResponseMessage.style.color = 'yellow';
-            orderResponseMessage.textContent = 'Enviando ordem...';
+            orderResponseMessage.textContent = 'Enviando orden...';
 
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('orders') 
-                .insert([
-                    { 
-                        device_name: deviceName, 
-                        imei: imeiNumber, 
-                        status: 'Pending',
-                        created_at: new Date().toISOString()
-                    },
-                ])
-                .select(); 
+                .insert([{ device_name: deviceName, imei: imeiNumber, status: 'Pending', created_at: new Date().toISOString() }]);
 
             if (error) {
-                console.error('Erro ao inserir dados:', error);
+                console.error('Error al insertar datos:', error);
                 orderResponseMessage.style.color = 'red';
-                orderResponseMessage.textContent = `Erro ao enviar a ordem: ${error.message}`;
+                orderResponseMessage.textContent = `Error: ${error.message}`;
             } else {
-                console.log('Ordem enviada com sucesso:', data);
                 orderResponseMessage.style.color = '#25d366'; 
                 orderResponseMessage.textContent = '✅ Ordem enviada com sucesso!';
-                
                 document.getElementById('deviceName').value = '';
                 document.getElementById('imeiNumber').value = '';
             }
         }
 
-        // --- Funções de Upload de Imagens ---
+        // --- Funciones de Upload de Imágenes (Solo Admin) ---
 
-        // Upload da Imagem de Fundo (hero-section background-image)
         async function uploadBackgroundImage() {
+            // Se asume que checkUser ya ha verificado que el usuario es admin
             const fileInput = document.getElementById('backgroundImageFile');
             const file = fileInput.files[0];
-
             if (!file) {
                 backgroundResponseMessage.style.color = 'red';
-                backgroundResponseMessage.textContent = 'Por favor, selecione um arquivo de imagem para fazer upload.';
+                backgroundResponseMessage.textContent = 'Seleccione una imagen.';
                 return;
             }
-
             backgroundResponseMessage.style.color = 'yellow';
-            backgroundResponseMessage.textContent = 'Subindo imagem de fundo...';
-
+            backgroundResponseMessage.textContent = 'Subiendo imagen de fondo...';
             const filePath = `hero_background_${Date.now()}_${file.name}`; 
 
-            const { data, error } = await supabase.storage
-                .from(BACKGROUND_BUCKET_NAME)
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false 
-                });
+            const { data, error } = await supabase.storage.from(BACKGROUND_BUCKET_NAME).upload(filePath, file);
 
             if (error) {
-                console.error('Erro ao fazer upload da imagem de fundo:', error);
                 backgroundResponseMessage.style.color = 'red';
-                backgroundResponseMessage.textContent = `Erro no upload: ${error.message}`;
+                backgroundResponseMessage.textContent = `Error: ${error.message}`;
             } else {
-                const { data: publicURLData } = supabase.storage
-                    .from(BACKGROUND_BUCKET_NAME)
-                    .getPublicUrl(filePath);
-
+                const { data: publicURLData } = supabase.storage.from(BACKGROUND_BUCKET_NAME).getPublicUrl(filePath);
                 if (publicURLData && publicURLData.publicUrl) {
                     const publicUrl = publicURLData.publicUrl;
                     heroSection.style.backgroundImage = `url('${publicUrl}')`;
                     heroSection.style.backgroundColor = 'transparent'; 
                     localStorage.setItem('heroBackgroundImage', publicUrl); 
                     backgroundResponseMessage.style.color = '#25d366';
-                    backgroundResponseMessage.textContent = '✅ Imagem de fundo subida e aplicada com sucesso!';
+                    backgroundResponseMessage.textContent = '✅ Fondo subido y aplicado!';
                 } else {
                     backgroundResponseMessage.style.color = 'red';
-                    backgroundResponseMessage.textContent = 'Erro ao obter URL pública da imagem de fundo.';
+                    backgroundResponseMessage.textContent = 'Error al obtener URL pública.';
                 }
             }
         }
 
-        // Limpar a Imagem de Fundo
         function clearBackgroundImage() {
-            heroSection.style.backgroundImage = 'none'; // Remove a imagem de fundo
-            heroSection.style.backgroundColor = '#161a20'; // Restaura a cor de fundo sólida
+            heroSection.style.backgroundImage = 'none'; 
+            heroSection.style.backgroundColor = '#161a20'; 
             localStorage.removeItem('heroBackgroundImage'); 
             backgroundResponseMessage.style.color = 'lightgray';
-            backgroundResponseMessage.textContent = 'Fundo limpo e restaurado para cor padrão.';
+            backgroundResponseMessage.textContent = 'Fondo limpiado.';
         }
 
-        // Upload da Imagem dos Dispositivos (a imagem grande no lado direito)
         async function uploadDevicesImage() {
             const fileInput = document.getElementById('devicesImageFile');
             const file = fileInput.files[0];
-
             if (!file) {
                 devicesImageResponseMessage.style.color = 'red';
-                devicesImageResponseMessage.textContent = 'Por favor, selecione um arquivo de imagem para fazer upload.';
+                devicesImageResponseMessage.textContent = 'Seleccione una imagen de dispositivos.';
                 return;
             }
 
             devicesImageResponseMessage.style.color = 'yellow';
-            devicesImageResponseMessage.textContent = 'Subindo imagem de dispositivos...';
-
+            devicesImageResponseMessage.textContent = 'Subiendo imagen de dispositivos...';
             const filePath = `devices_main_${Date.now()}_${file.name}`; 
 
-            const { data, error } = await supabase.storage
-                .from(DEVICES_IMAGE_BUCKET_NAME) // Usa o novo bucket
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: true // Pode ser true para substituir a imagem anterior
-                });
+            const { data, error } = await supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).upload(filePath, file);
 
             if (error) {
-                console.error('Erro ao fazer upload da imagem de dispositivos:', error);
                 devicesImageResponseMessage.style.color = 'red';
-                devicesImageResponseMessage.textContent = `Erro no upload: ${error.message}`;
+                devicesImageResponseMessage.textContent = `Error: ${error.message}`;
             } else {
-                const { data: publicURLData } = supabase.storage
-                    .from(DEVICES_IMAGE_BUCKET_NAME)
-                    .getPublicUrl(filePath);
-
+                const { data: publicURLData } = supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).getPublicUrl(filePath);
                 if (publicURLData && publicURLData.publicUrl) {
                     const publicUrl = publicURLData.publicUrl;
                     mainDevicesImage.src = publicUrl;
                     localStorage.setItem('mainDevicesImage', publicUrl); 
                     devicesImageResponseMessage.style.color = '#25d366';
-                    devicesImageResponseMessage.textContent = '✅ Imagem de dispositivos subida e aplicada com sucesso!';
+                    devicesImageResponseMessage.textContent = '✅ Imagen de dispositivos subida y aplicada!';
                 } else {
                     devicesImageResponseMessage.style.color = 'red';
-                    devicesImageResponseMessage.textContent = 'Erro ao obter URL pública da imagem de dispositivos.';
+                    devicesImageResponseMessage.textContent = 'Error al obtener URL pública.';
                 }
             }
         }
 
-        // Limpar a Imagem de Dispositivos (restaurar padrão)
         function clearDevicesImage() {
-            mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; // Restaura a imagem padrão
+            mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
             localStorage.removeItem('mainDevicesImage'); 
             devicesImageResponseMessage.style.color = 'lightgray';
-            devicesImageResponseMessage.textContent = 'Imagem de dispositivos restaurada para o padrão.';
+            devicesImageResponseMessage.textContent = 'Imagen de dispositivos restaurada.';
         }
 
 
-        // --- Carregar Imagens Salvas e Verificar Autenticação ao Iniciar ---
+        // --- Inicialización ---
         window.onload = async () => {
-             // Carregar imagem de fundo salva no LocalStorage
+             // Cargar imágenes de localStorage
              const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
              if (savedBackgroundImage) {
                  heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
                  heroSection.style.backgroundColor = 'transparent';
              }
 
-             // Carregar imagem de dispositivos salva no LocalStorage
              const savedDevicesImage = localStorage.getItem('mainDevicesImage');
              if (savedDevicesImage) {
                  mainDevicesImage.src = savedDevicesImage;
              } else {
-                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; // Garante que a imagem padrão seja carregada
+                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
              }
 
-             // Verificar se o usuário já está logado
+             // Verificar si el usuario ya está logueado
              await checkUser();
-
-             // Mensagem inicial de Supabase
-             if(SUPABASE_URL !== 'https://suedecrtpmfgblzfcdhv.supabase.co') { // Verificação para o dev
-                 console.warn('⚠️ Por favor, substitua [URL_DO_SEU_PROJETO] e [CHAVE_ANON_PUBLICA] no código JavaScript se ainda não o fez.');
-             }
         };
     </script>
 </body>
