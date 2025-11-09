@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ Unlocker - Conexión Supabase</title>
+    <title>KLMZ Unlocker - Admin Access</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Variáveis de Cor */
@@ -17,8 +17,6 @@
             --button-bg: #4a4a58; 
             --cookie-bar-bg: #333;
             --whatsapp-green: #25d366; 
-            --elsalvador-number: '+503 68957466'; 
-            --new-email: 'klmzr230@gmail.com'; 
         }
 
         /* Estilos Globais */
@@ -90,19 +88,48 @@
             color: #4dc2f2; /* Cor azul claro para 'KLMZ' */
         }
         
-        /* 3. Seção Principal/Hero */
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links > a, .dropdown {
+            margin-left: 25px;
+            font-weight: 500;
+            padding: 10px 0;
+            text-transform: uppercase;
+        }
+        
+        .dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .dropdown::after {
+            content: ' ▼';
+            font-size: 8px;
+            margin-left: 5px;
+        }
+
+        /* Botão de Login/Logout */
+        #loginLogoutBtn {
+            background-color: #3b3b3b; 
+            padding: 5px 15px; 
+            border-radius: 5px; 
+            margin-left: 30px; 
+            border: 1px solid #454545;
+            cursor: pointer;
+        }
+
+        /* Seção Principal/Hero - Layout original */
         .hero-section {
             display: flex;
             justify-content: space-between;
-            padding: 60px 50px 80px 50px;
+            align-items: flex-end; /* Alinha o conteúdo à parte inferior */
+            padding: 60px 50px 0px 50px; /* Padding inferior reduzido para alinhar a imagem */
             min-height: 500px;
             position: relative;
-            /* Fundo padrão, será substituído por JS se houver upload */
-            background-color: #161a20; 
-            background-image: radial-gradient(circle at center, #1c2025 0%, #161a20 80%); /* Gradiente como fallback/inicial */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-color: #161a20; /* Fundo sólido para as imagens ficarem em cima */
             overflow: hidden; /* Para garantir que as imagens internas não saiam */
         }
 
@@ -110,7 +137,8 @@
             flex-basis: 40%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end; /* Alinha o conteúdo à parte inferior */
+            padding-bottom: 80px; /* Espaço para o rodapé */
             z-index: 10;
         }
 
@@ -121,9 +149,8 @@
             margin-bottom: 30px;
             width: 90%;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            /* Simulação do contorno oval */
             border: 3px solid var(--accent-pink); 
-            border-radius: 50px / 10px; /* Borda mais arredondada na horizontal */
+            border-radius: 50px / 10px; 
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -135,7 +162,7 @@
             font-size: 20px;
             font-weight: bold;
             padding: 10px 20px;
-            margin-top: -45px; /* Posição sobreposta */
+            margin-top: -45px; 
             border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -153,7 +180,7 @@
         }
 
         .service-item::before {
-            content: ''; /* Ícone Apple */
+            content: ''; 
             font-size: 18px;
             color: var(--accent-pink);
             margin-right: 10px;
@@ -174,51 +201,38 @@
             margin-right: 5px;
         }
 
-        /* Imagem de Fundo/Central - Placeholder */
-        .image-placeholder {
-            flex-basis: 60%;
-            position: relative;
-        }
-
-        .devices-image {
+        /* Imagem de Fundo/Central - AGORA É UM ELEMENTO `img` PARA MELHOR CONTROLE */
+        #mainDevicesImage {
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 100%;
-            max-width: 800px; /* Simulação do tamanho da imagem */
-            height: 400px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: right bottom;
-            /* Placeholder Visual da Imagem - ou imagem real */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%2322252a'/%3E%3Ctext x='400' y='200' font-family='Arial' font-size='30' fill='%23d9429c' text-anchor='middle' alignment-baseline='middle'%3EIMAGEM DE DISPOSITIVOS APPLE (Placeholder)%3C/text%3E%3C/svg%3E");
+            width: 60%; /* Ajuste a largura conforme necessário */
+            max-width: 900px; /* Largura máxima para a imagem */
+            height: auto;
+            object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
             z-index: 1; /* Para estar acima do fundo, mas abaixo do chaveiro */
         }
-
+        
         .keychain-image {
             position: absolute;
-            top: 20%;
-            left: 30%;
-            width: 150px;
-            height: 150px;
+            top: 20%; /* Ajuste a posição conforme a imagem de dispositivos */
+            left: 55%; /* Ajuste a posição */
+            width: 120px; /* Tamanho do chaveiro */
+            height: 120px;
             border-radius: 50%;
-            background-color: var(--accent-pink); /* Simulação do chaveiro rosa */
+            background-color: var(--accent-pink); 
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            z-index: 2;
-        }
-        
-        .keychain-image::before {
-            content: '';
+            font-size: 35px;
             color: white;
+            z-index: 2;
         }
         
         /* 4. Rodapé */
         .site-footer {
             background-color: #1a1e25;
-            padding: 50px 30px 20px 30px; /* Ajuste para o rodapé inferior */
+            padding: 50px 30px 20px 30px; 
             display: flex;
             flex-direction: column;
             border-top: 1px solid #292d34;
@@ -269,7 +283,7 @@
         }
         
         .subscribe-button {
-            background-color: #4c4e97; /* Cor do botão roxo */
+            background-color: #4c4e97; 
             color: var(--text-light);
             padding: 10px 20px;
             border: none;
@@ -284,7 +298,6 @@
             line-height: 1.8;
         }
 
-        /* Rodapé Inferior de Direitos Autorais */
         .footer-bottom {
             border-top: 1px solid #292d34;
             padding-top: 20px;
@@ -315,7 +328,7 @@
         /* Botões de Chat Flutuantes (Direita) */
         .chat-buttons {
             position: fixed;
-            bottom: 60px; /* Acima da barra de cookies */
+            bottom: 60px; 
             right: 20px;
             z-index: 101;
             display: flex;
@@ -336,50 +349,87 @@
             cursor: pointer;
         }
         
-        /* Estilo para o botão de WhatsApp (usando o ícone de telefone para o segundo botão) */
         .chat-button.whatsapp {
-            background-color: var(--whatsapp-green); /* Verde do WhatsApp */
-            text-decoration: none; /* Assegura que links não tenham sublinhado */
+            background-color: var(--whatsapp-green); 
+            text-decoration: none; 
         }
         
         .chat-button.phone {
-            background-color: #4dc2f2; /* Azul claro */
+            background-color: #4dc2f2; 
         }
 
-        /* Estilos adicionais para o formulário de exemplo e upload */
-        .form-container { 
-            margin-top: 20px; 
-            padding: 20px; 
+        /* Estilos para Formulários (Login/Admin) */
+        .admin-section, .login-section {
             background-color: #22252a; 
             border-radius: 8px; 
-            max-width: 400px;
+            padding: 30px; 
+            margin: 50px auto; /* Centraliza e adiciona margem */
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
-        .form-container input, .form-container button {
+        .admin-section h3, .login-section h3 {
+            margin-bottom: 25px;
+            color: var(--text-light);
+            font-size: 24px;
+        }
+        .admin-section input, .login-section input {
             display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
+            width: calc(100% - 20px); /* Ajuste de padding */
+            padding: 12px;
+            margin: 15px auto;
             border-radius: 5px;
             border: 1px solid #444;
             background-color: #333;
             color: white;
+            font-size: 16px;
         }
-        .form-container button {
+        .admin-section button, .login-section button {
             background-color: var(--accent-pink);
+            color: white;
+            padding: 12px 25px;
+            border: none;
             cursor: pointer;
             font-weight: bold;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.2s;
             margin-top: 15px;
         }
-        .form-container h3 {
+        .admin-section button:hover, .login-section button:hover {
+            background-color: #c93a8e;
+        }
+        .form-message {
+            margin-top: 15px; 
+            font-size: 14px;
+            color: yellow;
+        }
+        .admin-options {
+            text-align: left;
+            margin-top: 30px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+        .admin-options h4 {
+            font-size: 20px;
             margin-bottom: 15px;
             color: var(--text-light);
         }
-        .form-container input[type="file"] {
-            padding: 8px; /* Ajuste para inputs de arquivo */
+        .admin-options .form-container { /* Reutiliza o estilo do container, mas sem margin-top para não duplicar */
+            margin-top: 20px;
+            background-color: #1c2025; /* Um pouco mais escuro para diferenciar */
+            padding: 20px;
+            border-radius: 8px;
         }
-        .form-container p.message {
-            margin-top: 10px; 
-            font-size: 12px;
+        .admin-options .form-container button {
+             background-color: #4c4e97; /* Cor do botão roxo para admin actions */
+        }
+        .admin-options .form-container button:hover {
+            background-color: #404281;
+        }
+        /* Esconder seções por padrão */
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -407,51 +457,77 @@
             <div class="dropdown">Historial de pedidos</div>
             <a href="#">KLMZ-Firmware.com File Server</a>
             <a href="#">Auto Add Money Video</a>
-            <a href="#">FREDDY GRANADOS</a>
-            <a href="#" style="background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545;">Join / Login</a>
+            <span id="adminNameDisplay" style="margin-left: 25px; font-weight: bold;"></span>
+            <a href="#" id="loginLogoutBtn">Login</a>
         </div>
     </nav>
 
-    <main class="hero-section" id="heroSection">
-        <div class="services-content">
-            <div class="services-box">
-                <div class="services-title">IPHONE SERVICES</div>
-                <div class="service-item">IPHONE CARRIER UNLOCK</div>
-                <div class="service-item">IPHONE ICLOUD UNLOCK</div>
-                <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
-                <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
-            </div>
-            
-            <div class="contact-info-hero">
-                <span style="display: flex; align-items: center;">
-                    <span class="icon">📞</span> +503 68957466 (Whatsapp)
-                </span>
-                <span style="display: flex; align-items: center;">
-                    <span class="icon">✉️</span> klmzr230@gmail.com
-                </span>
-            </div>
-            
-            <div class="form-container">
-                <h3>✍️ Enviar Nueva Orden</h3>
-                <input type="text" id="deviceName" placeholder="Nombre del Dispositivo (iPhone X, etc.)">
-                <input type="text" id="imeiNumber" placeholder="Número IMEI/Serie">
-                <button onclick="submitNewOrder()">Enviar Orden</button>
-                <p id="orderResponseMessage" class="message" style="color: yellow;"></p>
+    <main>
+        <section class="hero-section" id="heroSection">
+            <div class="services-content">
+                <div class="services-box">
+                    <div class="services-title">IPHONE SERVICES</div>
+                    <div class="service-item">IPHONE CARRIER UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
+                    <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
+                </div>
+                
+                <div class="contact-info-hero">
+                    <span style="display: flex; align-items: center;">
+                        <span class="icon">📞</span> +503 68957466 (Whatsapp)
+                    </span>
+                    <span style="display: flex; align-items: center;">
+                        <span class="icon">✉️</span> klmzr230@gmail.com
+                    </span>
+                </div>
             </div>
 
-            <div class="form-container" style="margin-top: 30px;">
-                <h3>📸 Subir Imagen de Fondo</h3>
-                <input type="file" id="backgroundImageFile" accept="image/*">
-                <button onclick="uploadBackgroundImage()">Subir Fondo</button>
-                <p id="backgroundResponseMessage" class="message" style="color: yellow;"></p>
-                <button onclick="clearBackgroundImage()" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
-            </div>
-        </div>
+            <img id="mainDevicesImage" src="https://i.imgur.com/your-devices-image-placeholder.png" alt="Dispositivos Apple">
+            <div class="keychain-image"></div>
+        </section>
 
-        <div class="image-placeholder">
-            <div class="keychain-image"></div>
-            <div class="devices-image"></div>
-        </div>
+        <section class="login-section" id="loginSection">
+            <h3>Iniciar Sesión Administrador</h3>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Contraseña">
+            <button onclick="signInWithEmail()">Iniciar Sesión</button>
+            <p id="loginMessage" class="form-message" style="color: red;"></p>
+        </section>
+
+        <section class="admin-section hidden" id="adminSection">
+            <h3>Panel de Administración</h3>
+            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold;">Admin</span>!</p>
+
+            <div class="admin-options">
+                <h4>Gestión de Órdenes</h4>
+                <div class="form-container">
+                    <h3>✍️ Enviar Nueva Orden</h3>
+                    <input type="text" id="deviceName" placeholder="Nombre del Dispositivo (iPhone X, etc.)">
+                    <input type="text" id="imeiNumber" placeholder="Número IMEI/Serie">
+                    <button onclick="submitNewOrder()">Enviar Orden</button>
+                    <p id="orderResponseMessage" class="form-message"></p>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>Gestión de Imágenes de Fondo</h4>
+                <div class="form-container">
+                    <h3>📸 Subir Imagen de Fondo</h3>
+                    <input type="file" id="backgroundImageFile" accept="image/*">
+                    <button onclick="uploadBackgroundImage()">Subir Fondo</button>
+                    <p id="backgroundResponseMessage" class="form-message"></p>
+                    <button onclick="clearBackgroundImage()" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
+                </div>
+                 <div class="form-container" style="margin-top: 20px;">
+                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero Section)</h3>
+                    <input type="file" id="devicesImageFile" accept="image/*">
+                    <button onclick="uploadDevicesImage()">Subir Imagen de Dispositivos</button>
+                    <p id="devicesImageResponseMessage" class="form-message"></p>
+                     <button onclick="clearDevicesImage()" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
+                </div>
+            </div>
+        </section>
     </main>
     
     <footer class="site-footer">
@@ -500,22 +576,88 @@
     </div>
 
     <script>
-        // ⚠️ PASSO 1: SUBSTITUIR PELAS SUAS CHAVES DO SUPABASE
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
 
-        // ⚠️ PASSO 2: Inicializar o cliente Supabase
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        const heroSection = document.getElementById('heroSection');
+        const mainDevicesImage = document.getElementById('mainDevicesImage');
+        const loginSection = document.getElementById('loginSection');
+        const adminSection = document.getElementById('adminSection');
+        const loginLogoutBtn = document.getElementById('loginLogoutBtn');
+        const loggedInUserName = document.getElementById('loggedInUserName');
+        const adminNameDisplay = document.getElementById('adminNameDisplay');
+
         const orderResponseMessage = document.getElementById('orderResponseMessage');
         const backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
-        const heroSection = document.getElementById('heroSection');
-        const BACKGROUND_BUCKET_NAME = 'background-images'; // ⚠️ Nome do seu bucket no Supabase Storage
+        const devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
+        const loginMessage = document.getElementById('loginMessage');
 
-        /**
-         * Função para enviar uma nova ordem de desbloqueio para o banco de dados Supabase.
-         * Assume que você tem uma tabela chamada 'orders' com as colunas 'device_name' e 'imei'.
-         */
+        const BACKGROUND_BUCKET_NAME = 'background-images'; 
+        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; // Novo bucket para a imagem de dispositivos
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; // Substitua por uma URL de imagem padrão real se tiver
+
+        // --- Funções de Autenticação ---
+        async function signInWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Iniciando sesión...';
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                console.error('Erro ao fazer login:', error);
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = `Erro: ${error.message}`;
+            } else {
+                loginMessage.style.color = '#25d366';
+                loginMessage.textContent = '✅ Sesión iniciada con éxito!';
+                checkUser(); // Verifica o usuário após o login
+            }
+        }
+
+        async function signOut() {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Erro ao fazer logout:', error);
+            } else {
+                checkUser(); // Atualiza a UI após o logout
+            }
+        }
+
+        async function checkUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                loginSection.classList.add('hidden');
+                adminSection.classList.remove('hidden');
+                loginLogoutBtn.textContent = 'Logout';
+                loginLogoutBtn.onclick = signOut;
+                loggedInUserName.textContent = user.email; // Mostra o email do usuário
+                adminNameDisplay.textContent = `Admin: ${user.email.split('@')[0]}`; // Nome de admin na barra superior
+                console.log('Usuário logado:', user);
+            } else {
+                loginSection.classList.remove('hidden');
+                adminSection.classList.add('hidden');
+                loginLogoutBtn.textContent = 'Login';
+                loginLogoutBtn.onclick = () => {
+                    // Se estiver na main page, rola para a seção de login
+                    if (window.location.hash !== '#admin') {
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                };
+                loggedInUserName.textContent = '';
+                adminNameDisplay.textContent = '';
+                console.log('Nenhum usuário logado.');
+            }
+        }
+
+        // --- Funções de Gestão de Ordens ---
         async function submitNewOrder() {
             const deviceName = document.getElementById('deviceName').value;
             const imeiNumber = document.getElementById('imeiNumber').value;
@@ -529,18 +671,17 @@
             orderResponseMessage.style.color = 'yellow';
             orderResponseMessage.textContent = 'Enviando ordem...';
 
-            // ⚠️ PASSO 3: Inserir dados na sua tabela Supabase
             const { data, error } = await supabase
-                .from('orders') // Mude 'orders' para o nome da sua tabela
+                .from('orders') 
                 .insert([
                     { 
                         device_name: deviceName, 
                         imei: imeiNumber, 
                         status: 'Pending',
-                        created_at: new Date().toISOString() // Adicionar timestamp
+                        created_at: new Date().toISOString()
                     },
                 ])
-                .select(); // Adicionar .select() para obter os dados inseridos
+                .select(); 
 
             if (error) {
                 console.error('Erro ao inserir dados:', error);
@@ -548,18 +689,17 @@
                 orderResponseMessage.textContent = `Erro ao enviar a ordem: ${error.message}`;
             } else {
                 console.log('Ordem enviada com sucesso:', data);
-                orderResponseMessage.style.color = '#25d366'; // WhatsApp Green
-                orderResponseMessage.textContent = '✅ Ordem enviada com sucesso! Em breve entraremos em contato.';
+                orderResponseMessage.style.color = '#25d366'; 
+                orderResponseMessage.textContent = '✅ Ordem enviada com sucesso!';
                 
-                // Limpar o formulário
                 document.getElementById('deviceName').value = '';
                 document.getElementById('imeiNumber').value = '';
             }
         }
 
-        /**
-         * Função para fazer upload de uma imagem para o Supabase Storage e definir como fundo.
-         */
+        // --- Funções de Upload de Imagens ---
+
+        // Upload da Imagem de Fundo (hero-section background-image)
         async function uploadBackgroundImage() {
             const fileInput = document.getElementById('backgroundImageFile');
             const file = fileInput.files[0];
@@ -571,19 +711,19 @@
             }
 
             backgroundResponseMessage.style.color = 'yellow';
-            backgroundResponseMessage.textContent = 'Subindo imagem...';
+            backgroundResponseMessage.textContent = 'Subindo imagem de fundo...';
 
-            const filePath = `${Date.now()}_${file.name}`; // Nome do arquivo único
+            const filePath = `hero_background_${Date.now()}_${file.name}`; 
 
             const { data, error } = await supabase.storage
                 .from(BACKGROUND_BUCKET_NAME)
                 .upload(filePath, file, {
                     cacheControl: '3600',
-                    upsert: false // Defina como true se quiser substituir arquivos com o mesmo nome
+                    upsert: false 
                 });
 
             if (error) {
-                console.error('Erro ao fazer upload da imagem:', error);
+                console.error('Erro ao fazer upload da imagem de fundo:', error);
                 backgroundResponseMessage.style.color = 'red';
                 backgroundResponseMessage.textContent = `Erro no upload: ${error.message}`;
             } else {
@@ -594,44 +734,102 @@
                 if (publicURLData && publicURLData.publicUrl) {
                     const publicUrl = publicURLData.publicUrl;
                     heroSection.style.backgroundImage = `url('${publicUrl}')`;
-                    heroSection.style.backgroundColor = 'transparent'; // Remover a cor de fundo sólida
-                    localStorage.setItem('heroBackgroundImage', publicUrl); // Salvar a URL no LocalStorage
+                    heroSection.style.backgroundColor = 'transparent'; 
+                    localStorage.setItem('heroBackgroundImage', publicUrl); 
                     backgroundResponseMessage.style.color = '#25d366';
                     backgroundResponseMessage.textContent = '✅ Imagem de fundo subida e aplicada com sucesso!';
                 } else {
                     backgroundResponseMessage.style.color = 'red';
-                    backgroundResponseMessage.textContent = 'Erro ao obter URL pública da imagem.';
+                    backgroundResponseMessage.textContent = 'Erro ao obter URL pública da imagem de fundo.';
                 }
             }
         }
 
-        /**
-         * Função para limpar a imagem de fundo e restaurar o gradiente padrão.
-         */
+        // Limpar a Imagem de Fundo
         function clearBackgroundImage() {
-            heroSection.style.backgroundImage = 'radial-gradient(circle at center, #1c2025 0%, #161a20 80%)';
-            heroSection.style.backgroundColor = '#161a20';
-            localStorage.removeItem('heroBackgroundImage'); // Remover do LocalStorage
+            heroSection.style.backgroundImage = 'none'; // Remove a imagem de fundo
+            heroSection.style.backgroundColor = '#161a20'; // Restaura a cor de fundo sólida
+            localStorage.removeItem('heroBackgroundImage'); 
             backgroundResponseMessage.style.color = 'lightgray';
-            backgroundResponseMessage.textContent = 'Fundo limpo e restaurado para o padrão.';
+            backgroundResponseMessage.textContent = 'Fundo limpo e restaurado para cor padrão.';
         }
 
-        // Carregar imagem de fundo salva no LocalStorage ao carregar a página
-        window.onload = () => {
+        // Upload da Imagem dos Dispositivos (a imagem grande no lado direito)
+        async function uploadDevicesImage() {
+            const fileInput = document.getElementById('devicesImageFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                devicesImageResponseMessage.style.color = 'red';
+                devicesImageResponseMessage.textContent = 'Por favor, selecione um arquivo de imagem para fazer upload.';
+                return;
+            }
+
+            devicesImageResponseMessage.style.color = 'yellow';
+            devicesImageResponseMessage.textContent = 'Subindo imagem de dispositivos...';
+
+            const filePath = `devices_main_${Date.now()}_${file.name}`; 
+
+            const { data, error } = await supabase.storage
+                .from(DEVICES_IMAGE_BUCKET_NAME) // Usa o novo bucket
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true // Pode ser true para substituir a imagem anterior
+                });
+
+            if (error) {
+                console.error('Erro ao fazer upload da imagem de dispositivos:', error);
+                devicesImageResponseMessage.style.color = 'red';
+                devicesImageResponseMessage.textContent = `Erro no upload: ${error.message}`;
+            } else {
+                const { data: publicURLData } = supabase.storage
+                    .from(DEVICES_IMAGE_BUCKET_NAME)
+                    .getPublicUrl(filePath);
+
+                if (publicURLData && publicURLData.publicUrl) {
+                    const publicUrl = publicURLData.publicUrl;
+                    mainDevicesImage.src = publicUrl;
+                    localStorage.setItem('mainDevicesImage', publicUrl); 
+                    devicesImageResponseMessage.style.color = '#25d366';
+                    devicesImageResponseMessage.textContent = '✅ Imagem de dispositivos subida e aplicada com sucesso!';
+                } else {
+                    devicesImageResponseMessage.style.color = 'red';
+                    devicesImageResponseMessage.textContent = 'Erro ao obter URL pública da imagem de dispositivos.';
+                }
+            }
+        }
+
+        // Limpar a Imagem de Dispositivos (restaurar padrão)
+        function clearDevicesImage() {
+            mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; // Restaura a imagem padrão
+            localStorage.removeItem('mainDevicesImage'); 
+            devicesImageResponseMessage.style.color = 'lightgray';
+            devicesImageResponseMessage.textContent = 'Imagem de dispositivos restaurada para o padrão.';
+        }
+
+
+        // --- Carregar Imagens Salvas e Verificar Autenticação ao Iniciar ---
+        window.onload = async () => {
+             // Carregar imagem de fundo salva no LocalStorage
              const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
              if (savedBackgroundImage) {
                  heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
                  heroSection.style.backgroundColor = 'transparent';
-                 backgroundResponseMessage.style.color = 'lightgray';
-                 backgroundResponseMessage.textContent = 'Imagem de fundo anterior carregada.';
-             } else {
-                 console.log('Nenhuma imagem de fundo salva encontrada.');
              }
 
-             // Verificação de chaves Supabase (já incluído antes)
-             if(SUPABASE_URL !== '[URL_DO_SEU_PROJETO]') {
-                 console.log('Conexão Supabase inicializada.');
+             // Carregar imagem de dispositivos salva no LocalStorage
+             const savedDevicesImage = localStorage.getItem('mainDevicesImage');
+             if (savedDevicesImage) {
+                 mainDevicesImage.src = savedDevicesImage;
              } else {
+                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; // Garante que a imagem padrão seja carregada
+             }
+
+             // Verificar se o usuário já está logado
+             await checkUser();
+
+             // Mensagem inicial de Supabase
+             if(SUPABASE_URL !== 'https://suedecrtpmfgblzfcdhv.supabase.co') { // Verificação para o dev
                  console.warn('⚠️ Por favor, substitua [URL_DO_SEU_PROJETO] e [CHAVE_ANON_PUBLICA] no código JavaScript se ainda não o fez.');
              }
         };
