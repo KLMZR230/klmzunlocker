@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ Unlocker - Réplica</title>
+    <title>KLMZ Unlocker - Conexión Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Variáveis de Cor */
         :root {
-            --dark-bg: #161a20; /* Cor de fundo principal escura */
-            --header-bg: #11141a; /* Cor de fundo da barra superior */
+            --dark-bg: #161a20; 
+            --header-bg: #11141a; 
             --text-light: #ffffff;
             --text-muted: #aaaaaa;
-            --accent-pink: #d9429c; /* Cor de destaque (do chaveiro) */
-            --service-box-bg: #1c2025; /* Fundo da caixa de serviços */
-            --button-bg: #4a4a58; /* Cor de fundo dos botões/links do cabeçalho */
+            --accent-pink: #d9429c; 
+            --service-box-bg: #1c2025; 
+            --button-bg: #4a4a58; 
             --cookie-bar-bg: #333;
-            --whatsapp-green: #25d366; /* Verde do WhatsApp */
-            --elsalvador-number: '+503 68957466'; /* Número de El Salvador */
-            --new-email: 'klmzr230@gmail.com'; /* NOVO EMAIL */
+            --whatsapp-green: #25d366; 
+            --elsalvador-number: '+503 68957466'; 
+            --new-email: 'klmzr230@gmail.com'; 
         }
 
         /* Estilos Globais */
@@ -96,7 +97,13 @@
             padding: 60px 50px 80px 50px;
             min-height: 500px;
             position: relative;
-            background-image: radial-gradient(circle at center, #1c2025 0%, #161a20 80%);
+            /* Fundo padrão, será substituído por JS se houver upload */
+            background-color: #161a20; 
+            background-image: radial-gradient(circle at center, #1c2025 0%, #161a20 80%); /* Gradiente como fallback/inicial */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden; /* Para garantir que as imagens internas não saiam */
         }
 
         .services-content {
@@ -183,8 +190,9 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: right bottom;
-            /* Placeholder Visual da Imagem */
+            /* Placeholder Visual da Imagem - ou imagem real */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%2322252a'/%3E%3Ctext x='400' y='200' font-family='Arial' font-size='30' fill='%23d9429c' text-anchor='middle' alignment-baseline='middle'%3EIMAGEM DE DISPOSITIVOS APPLE (Placeholder)%3C/text%3E%3C/svg%3E");
+            z-index: 1; /* Para estar acima do fundo, mas abaixo do chaveiro */
         }
 
         .keychain-image {
@@ -338,6 +346,41 @@
             background-color: #4dc2f2; /* Azul claro */
         }
 
+        /* Estilos adicionais para o formulário de exemplo e upload */
+        .form-container { 
+            margin-top: 20px; 
+            padding: 20px; 
+            background-color: #22252a; 
+            border-radius: 8px; 
+            max-width: 400px;
+        }
+        .form-container input, .form-container button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+        }
+        .form-container button {
+            background-color: var(--accent-pink);
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .form-container h3 {
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+        .form-container input[type="file"] {
+            padding: 8px; /* Ajuste para inputs de arquivo */
+        }
+        .form-container p.message {
+            margin-top: 10px; 
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -369,12 +412,10 @@
         </div>
     </nav>
 
-    <main class="hero-section">
+    <main class="hero-section" id="heroSection">
         <div class="services-content">
             <div class="services-box">
-                <div class="services-title">
-                    IPHONE SERVICES
-                </div>
+                <div class="services-title">IPHONE SERVICES</div>
                 <div class="service-item">IPHONE CARRIER UNLOCK</div>
                 <div class="service-item">IPHONE ICLOUD UNLOCK</div>
                 <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
@@ -386,8 +427,24 @@
                     <span class="icon">📞</span> +503 68957466 (Whatsapp)
                 </span>
                 <span style="display: flex; align-items: center;">
-                    <span class="icon">✉️</span> **klmzr230@gmail.com**
+                    <span class="icon">✉️</span> klmzr230@gmail.com
                 </span>
+            </div>
+            
+            <div class="form-container">
+                <h3>✍️ Enviar Nueva Orden</h3>
+                <input type="text" id="deviceName" placeholder="Nombre del Dispositivo (iPhone X, etc.)">
+                <input type="text" id="imeiNumber" placeholder="Número IMEI/Serie">
+                <button onclick="submitNewOrder()">Enviar Orden</button>
+                <p id="orderResponseMessage" class="message" style="color: yellow;"></p>
+            </div>
+
+            <div class="form-container" style="margin-top: 30px;">
+                <h3>📸 Subir Imagen de Fondo</h3>
+                <input type="file" id="backgroundImageFile" accept="image/*">
+                <button onclick="uploadBackgroundImage()">Subir Fondo</button>
+                <p id="backgroundResponseMessage" class="message" style="color: yellow;"></p>
+                <button onclick="clearBackgroundImage()" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
             </div>
         </div>
 
@@ -402,35 +459,32 @@
             <div class="footer-col">
                 <h3>KLMZ UNLOCKER</h3>
                 <div class="social-icons">
-                    <a href="#">f</a> <a href="#">📸</a> <a href="#">▶</a> </div>
+                    <a href="#">f</a> 
+                    <a href="#">📸</a> 
+                    <a href="#">▶</a> 
+                </div>
             </div>
-            
             <div class="footer-col">
                 <h3>Enlaces útiles</h3>
                 <ul>
                     <li><a href="#">Contacto</a></li>
                 </ul>
             </div>
-            
             <div class="footer-col">
                 <h3>Suscribir</h3>
                 <p class="subscribe-text">
                     ¡No te pierdas nuestras futuras actualizaciones! Suscríbete ahora!
                 </p>
-                <a href="#" class="subscribe-button">
-                    Hoja informativa
-                </a>
+                <a href="#" class="subscribe-button">Hoja informativa</a>
             </div>
-            
             <div class="footer-col">
                 <h3>Conéctate con nosotros</h3>
                 <div class="contact-footer-info">
                     +503 68957466 (Whatsapp)<br>
-                    **klmzr230@gmail.com**
+                    klmzr230@gmail.com
                 </div>
             </div>
         </div>
-
         <div class="footer-bottom">
             &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
         </div>
@@ -441,13 +495,146 @@
     </div>
 
     <div class="chat-buttons">
-        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">
-            &#x1F4AC; 
-        </a>
-        <div class="chat-button phone">
-            📞
-        </div>
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">&#x1F4AC;</a>
+        <div class="chat-button phone">📞</div>
     </div>
 
+    <script>
+        // ⚠️ PASSO 1: SUBSTITUIR PELAS SUAS CHAVES DO SUPABASE
+        const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
+
+        // ⚠️ PASSO 2: Inicializar o cliente Supabase
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const orderResponseMessage = document.getElementById('orderResponseMessage');
+        const backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
+        const heroSection = document.getElementById('heroSection');
+        const BACKGROUND_BUCKET_NAME = 'background-images'; // ⚠️ Nome do seu bucket no Supabase Storage
+
+        /**
+         * Função para enviar uma nova ordem de desbloqueio para o banco de dados Supabase.
+         * Assume que você tem uma tabela chamada 'orders' com as colunas 'device_name' e 'imei'.
+         */
+        async function submitNewOrder() {
+            const deviceName = document.getElementById('deviceName').value;
+            const imeiNumber = document.getElementById('imeiNumber').value;
+
+            if (!deviceName || !imeiNumber) {
+                orderResponseMessage.style.color = 'red';
+                orderResponseMessage.textContent = 'Por favor, preencha o nome do dispositivo e o IMEI.';
+                return;
+            }
+
+            orderResponseMessage.style.color = 'yellow';
+            orderResponseMessage.textContent = 'Enviando ordem...';
+
+            // ⚠️ PASSO 3: Inserir dados na sua tabela Supabase
+            const { data, error } = await supabase
+                .from('orders') // Mude 'orders' para o nome da sua tabela
+                .insert([
+                    { 
+                        device_name: deviceName, 
+                        imei: imeiNumber, 
+                        status: 'Pending',
+                        created_at: new Date().toISOString() // Adicionar timestamp
+                    },
+                ])
+                .select(); // Adicionar .select() para obter os dados inseridos
+
+            if (error) {
+                console.error('Erro ao inserir dados:', error);
+                orderResponseMessage.style.color = 'red';
+                orderResponseMessage.textContent = `Erro ao enviar a ordem: ${error.message}`;
+            } else {
+                console.log('Ordem enviada com sucesso:', data);
+                orderResponseMessage.style.color = '#25d366'; // WhatsApp Green
+                orderResponseMessage.textContent = '✅ Ordem enviada com sucesso! Em breve entraremos em contato.';
+                
+                // Limpar o formulário
+                document.getElementById('deviceName').value = '';
+                document.getElementById('imeiNumber').value = '';
+            }
+        }
+
+        /**
+         * Função para fazer upload de uma imagem para o Supabase Storage e definir como fundo.
+         */
+        async function uploadBackgroundImage() {
+            const fileInput = document.getElementById('backgroundImageFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                backgroundResponseMessage.style.color = 'red';
+                backgroundResponseMessage.textContent = 'Por favor, selecione um arquivo de imagem para fazer upload.';
+                return;
+            }
+
+            backgroundResponseMessage.style.color = 'yellow';
+            backgroundResponseMessage.textContent = 'Subindo imagem...';
+
+            const filePath = `${Date.now()}_${file.name}`; // Nome do arquivo único
+
+            const { data, error } = await supabase.storage
+                .from(BACKGROUND_BUCKET_NAME)
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false // Defina como true se quiser substituir arquivos com o mesmo nome
+                });
+
+            if (error) {
+                console.error('Erro ao fazer upload da imagem:', error);
+                backgroundResponseMessage.style.color = 'red';
+                backgroundResponseMessage.textContent = `Erro no upload: ${error.message}`;
+            } else {
+                const { data: publicURLData } = supabase.storage
+                    .from(BACKGROUND_BUCKET_NAME)
+                    .getPublicUrl(filePath);
+
+                if (publicURLData && publicURLData.publicUrl) {
+                    const publicUrl = publicURLData.publicUrl;
+                    heroSection.style.backgroundImage = `url('${publicUrl}')`;
+                    heroSection.style.backgroundColor = 'transparent'; // Remover a cor de fundo sólida
+                    localStorage.setItem('heroBackgroundImage', publicUrl); // Salvar a URL no LocalStorage
+                    backgroundResponseMessage.style.color = '#25d366';
+                    backgroundResponseMessage.textContent = '✅ Imagem de fundo subida e aplicada com sucesso!';
+                } else {
+                    backgroundResponseMessage.style.color = 'red';
+                    backgroundResponseMessage.textContent = 'Erro ao obter URL pública da imagem.';
+                }
+            }
+        }
+
+        /**
+         * Função para limpar a imagem de fundo e restaurar o gradiente padrão.
+         */
+        function clearBackgroundImage() {
+            heroSection.style.backgroundImage = 'radial-gradient(circle at center, #1c2025 0%, #161a20 80%)';
+            heroSection.style.backgroundColor = '#161a20';
+            localStorage.removeItem('heroBackgroundImage'); // Remover do LocalStorage
+            backgroundResponseMessage.style.color = 'lightgray';
+            backgroundResponseMessage.textContent = 'Fundo limpo e restaurado para o padrão.';
+        }
+
+        // Carregar imagem de fundo salva no LocalStorage ao carregar a página
+        window.onload = () => {
+             const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
+             if (savedBackgroundImage) {
+                 heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
+                 heroSection.style.backgroundColor = 'transparent';
+                 backgroundResponseMessage.style.color = 'lightgray';
+                 backgroundResponseMessage.textContent = 'Imagem de fundo anterior carregada.';
+             } else {
+                 console.log('Nenhuma imagem de fundo salva encontrada.');
+             }
+
+             // Verificação de chaves Supabase (já incluído antes)
+             if(SUPABASE_URL !== '[URL_DO_SEU_PROJETO]') {
+                 console.log('Conexão Supabase inicializada.');
+             } else {
+                 console.warn('⚠️ Por favor, substitua [URL_DO_SEU_PROJETO] e [CHAVE_ANON_PUBLICA] no código JavaScript se ainda não o fez.');
+             }
+        };
+    </script>
 </body>
 </html>
