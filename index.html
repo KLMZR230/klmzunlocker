@@ -347,7 +347,7 @@
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
         let supabase;
-        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; // Nueva sección
+        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
@@ -359,19 +359,11 @@
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
         // --- DATOS DE SERVICIOS IMEI (Recortados para el ejemplo) ---
-        // ESTOS DATOS SON LOS QUE PROVISTE EN LA SOLICITUD ANTERIOR
         const imeiServicesData = [
-            // IMEI Checkers Worldwide ✅
             { name: "ALL MOBILE Blacklist And Model checker - iPhone | Samsung | Xiaomi | Oppo Etc", price: "$0.012", time: "Instant", category: "IMEI Checkers Worldwide" },
-            { name: "Apple ALL DEVICE MDM CHECK ON/OFF Checker BY SN", price: "$0.27", time: "Miniutes", category: "IMEI Checkers Worldwide" },
-            { name: "Apple iPhone Carrier + FMI On/Off Checker (IMEI/SN) ✅", price: "$0.041", time: "Miniutes", category: "IMEI Checkers Worldwide" },
-            // Sold By Apple GSX Services ✅
-            { name: "APPLE GSX CASES & REPAIRS HISTORY → IMEI/SN", price: "$1.05", time: "1-5 Miniutes", category: "Sold By Apple GSX Services" },
-            { name: "Apple iPhone / iPad Sold By & Warranty Coverage Check (IMEI/SN)", price: "$1.508", time: "1-5 Miniutes", category: "Sold By Apple GSX Services" },
-            // Xiaomi Lock Status
-            { name: "MI Account (Country Activation Region + Clear Or Lost) By [Keylock Or CodeLock Or Lock Code] Instant", price: "$0.624", time: "Miniutes", category: "XIAOMI LOCK STATUS" },
-            { name: "MI Account CLEAN/LOST Checker By [Keylock NEW CODE] Instant (No Refund)", price: "$0.416", time: "Miniutes", category: "XIAOMI LOCK STATUS" },
-            // Motorola Network Unlocking Services ✅
+            { name: "Apple ALL DEVICE MDM CHECK ON/OFF Checker BY SN", price: "$0.27", time: "Minutos", category: "IMEI Checkers Worldwide" },
+            { name: "Apple iPhone Carrier + FMI On/Off Checker (IMEI/SN) ✅", price: "$0.041", time: "Minutos", category: "IMEI Checkers Worldwide" },
+            { name: "APPLE GSX CASES & REPAIRS HISTORY → IMEI/SN", price: "$1.05", time: "1-5 Minutos", category: "Sold By Apple GSX Services" },
             { name: "Motorola WorldWide Exclusive NCK Code Fully Automated INSTANT 24/7", price: "$0.28", time: "Instant", category: "Motorola Network Unlocking Services" },
         ];
 
@@ -381,7 +373,7 @@
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
 
-            container.innerHTML = ''; // Limpiar contenido previo
+            container.innerHTML = ''; 
             
             imeiServicesData.forEach(service => {
                 const card = document.createElement('div');
@@ -403,7 +395,7 @@
             // Ocultar otras secciones y mostrar esta
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
-            imeiServiceSection.scrollIntoView({ behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Subir al inicio de la sección
         }
         
         function hideAllSections() {
@@ -413,38 +405,34 @@
             imeiServiceSection.classList.add('hidden');
         }
 
-        // --- Funciones de Navegación ---
+
+        // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
-            const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
-            
-            // Si hace clic en un link dentro del menú
-            if (event.target.classList.contains('order-type-link')) {
-                event.preventDefault();
-                const serviceType = event.target.dataset.serviceType;
-                pongaOrdenMenu.classList.add('hidden'); // Cierra el menú
-
-                if (serviceType === 'imei') {
-                    renderImeiServices();
-                } else {
-                    // Para otros tipos de servicio, simplemente redirigimos de momento
-                    alert(`Función para ${event.target.textContent} aún no implementada.`);
-                }
-                return;
+            // Utilizamos event.currentTarget para obtener el DIV contenedor
+            const clickedElement = event.currentTarget;
+            if (!clickedElement || !clickedElement.id) {
+                // Prevenir error si el evento se dispara en un elemento sin ID (debería ser raro ahora)
+                return; 
             }
-
-
-            // Lógica principal de navegación
-            const { data: { session } = {} } = await supabase.auth.getSession();
-            const isLoggedIn = !!session; 
-
-            if (event.currentTarget.id !== 'navPongaOrden') {
+            
+            const isPongaOrden = clickedElement.id === 'navPongaOrden';
+            
+            // Cerrar el menú si el usuario hace clic fuera de Ponga la Orden
+            if (!isPongaOrden) {
                 pongaOrdenMenu.classList.add('hidden');
             }
 
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const isLoggedIn = !!session; 
+            
+            // 1. Si el usuario hace clic en Ponga la Orden:
             if (isPongaOrden) {
                 if (isLoggedIn) {
+                    // Logueado: Muestra/Oculta el menú de servicios
                     pongaOrdenMenu.classList.toggle('hidden');
                 } else {
+                    // NO Logueado: Redirige a Login y avisa.
+                    pongaOrdenMenu.classList.add('hidden');
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                     loginMessage.style.color = 'orange';
                     loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
@@ -452,17 +440,21 @@
                 return;
             } 
             
-            // Resto de la navegación (Área Cliente / Historial)
-            pongaOrdenMenu.classList.add('hidden');
+            // 2. Si hace clic en otra opción (Area Cliente / Historial):
+            
+            // Si NO está logueado: Redirige a Login
             if (!isLoggedIn) {
                 loginSection.scrollIntoView({ behavior: 'smooth' });
                 loginMessage.textContent = '';
                 return;
             } 
             
+            // Si está logueado (Cliente o Admin)
             if (!adminSection.classList.contains('hidden')) {
+                // Si es ADMIN: va al panel
                 adminSection.scrollIntoView({ behavior: 'smooth' });
             } else {
+                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
                 loginSection.scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -526,8 +518,7 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
-            // Oculta todas las secciones para decidir cuál mostrar
-            hideAllSections();
+            hideAllSections(); // Siempre ocultar todo al verificar sesión
 
             if (user) {
                 const isAdmin = user.email === ADMIN_EMAIL;
@@ -538,16 +529,12 @@
                 if (isAdmin) {
                     adminSection.classList.remove('hidden');
                     adminNameDisplay.classList.remove('hidden');
-                    // Al ser admin, no mostramos login, sino el panel
                 } else {
-                    // Cliente normal logueado
-                    heroSection.classList.remove('hidden');
-                    // Aquí podrías mostrar un panel de cliente si existiera, por ahora volvemos al inicio.
+                    heroSection.classList.remove('hidden'); // Cliente normal vuelve al inicio
                 }
 
             } else {
-                // No logueado
-                heroSection.classList.remove('hidden');
+                heroSection.classList.remove('hidden'); // No logueado vuelve al inicio
                 loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
                     loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -671,12 +658,12 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM
+            // Mapeo de Elementos DOM 
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
-            imeiServiceSection = document.getElementById('imeiServiceSection'); // Nueva sección
+            imeiServiceSection = document.getElementById('imeiServiceSection'); 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
             adminNameDisplay = document.getElementById('adminNameDisplay');
@@ -705,13 +692,15 @@
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    pongaOrdenMenu.classList.add('hidden'); // Cierra el menú siempre
                     if (this.dataset.serviceType === 'imei') {
                         renderImeiServices();
                     } else {
-                        alert(`Redirigiendo a la sección de: ${this.textContent}.`);
-                        // Aquí iría la lógica para mostrar las otras secciones
+                        // Para otros servicios
                         hideAllSections();
-                        heroSection.classList.remove('hidden'); // Vuelve al inicio por defecto
+                        heroSection.classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        alert(`Función para ${this.textContent} aún no implementada.`);
                     }
                 });
             });
