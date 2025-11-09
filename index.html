@@ -6,7 +6,6 @@
     <title>KLMZ UNLOCKER - Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [ ... ESTILOS CSS INALTERADOS ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -32,10 +31,11 @@
         .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
         .logo .klmz { color: #4dc2f2; }
         .nav-links { display: flex; align-items: center; }
+        /* Añado la clase 'nav-item' al nuevo panel admin */
         .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
         .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
         #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
-        .hero-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 60px 50px 0px 50px; min-height: 500px; position: relative; background-color: #161a20; overflow: hidden; }
+        .hero-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 60px 50px 0px 50px; min-height: 500px; position: relative; background-color: #161a20; overflow: hidden; background-size: cover; background-position: center bottom; }
         .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
         .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
         .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
@@ -86,7 +86,7 @@
             border-radius: 50%; 
         }
 
-        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 500px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
+        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 700px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
         .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
@@ -95,7 +95,7 @@
         .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
         .admin-options .form-container button { background-color: #4c4e97; }
         .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
-        .hidden { display: none; }
+        .hidden { display: none !important; } /* Uso !important para asegurar que el JS lo oculte */
 
         /* Estilo para el Dropdown de Poner Orden */
         .dropdown-menu {
@@ -212,6 +212,8 @@
             </div>
             
             <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
+
+            <div class="nav-item hidden" id="navAdminPanel">Panel de Administración</div>
             
             <a href="#">KLMZ-Firmware.com File Server</a>
             <a href="#">Auto Add Money Video</a>
@@ -247,7 +249,7 @@
                 </div>
             </div>
 
-            <img id="mainDevicesImage" src="https://i.imgur.com/your-devices-image-placeholder.png" alt="Dispositivos Apple">
+            <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
         </section>
 
         <section class="login-section" id="loginSection">
@@ -352,12 +354,14 @@
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
         
-        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu;
+        // Añado el nuevo botón de admin
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
-        // CORREGIDO: Asegura que la URL placeholder tenga un dominio válido (aunque sea solo de ejemplo)
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/placeholder_base.png'; 
+        
+        // CORRECCIÓN: Usamos un URL de imagen de PLACEHOLDER fiable para evitar errores de red.
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png'; 
 
         // --- DATOS DE SERVICIOS IMEI (Recortados para el ejemplo) ---
         const imeiServicesData = [
@@ -393,7 +397,7 @@
                 container.appendChild(card);
             });
             
-            // Ocultar otras secciones y mostrar esta
+            // Ocultar todas las secciones y mostrar esta
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' }); // Subir al inicio de la sección
@@ -409,55 +413,69 @@
 
         // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
-            // Utilizamos event.currentTarget para obtener el DIV contenedor
             const clickedElement = event.currentTarget;
-            
-            // Verificación de seguridad: si no hay elemento o ID, salir.
             if (!clickedElement || !clickedElement.id) {
                 return; 
             }
             
-            const isPongaOrden = clickedElement.id === 'navPongaOrden';
+            const elementId = clickedElement.id;
             
-            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él
-            if (!isPongaOrden) {
+            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él o en sí mismo (para toggle)
+            if (elementId !== 'navPongaOrden') {
                 pongaOrdenMenu.classList.add('hidden');
             }
 
             const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; 
             
-            // 2. Si el usuario hace clic en Ponga la Orden:
-            if (isPongaOrden) {
-                if (isLoggedIn) {
-                    // Logueado: Muestra/Oculta el menú de servicios
-                    pongaOrdenMenu.classList.toggle('hidden');
-                } else {
-                    // NO Logueado: Redirige a Login y avisa.
-                    pongaOrdenMenu.classList.add('hidden');
-                    loginSection.scrollIntoView({ behavior: 'smooth' });
-                    loginMessage.style.color = 'orange';
-                    loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
-                }
-                return;
-            } 
+            hideAllSections();
             
-            // 3. Si hace clic en otra opción (Area Cliente / Historial):
-            
-            // Si NO está logueado: Redirige a Login
-            if (!isLoggedIn) {
-                loginSection.scrollIntoView({ behavior: 'smooth' });
-                loginMessage.textContent = '';
-                return;
-            } 
-            
-            // Si está logueado (Cliente o Admin)
-            if (!adminSection.classList.contains('hidden')) {
-                // Si es ADMIN: va al panel
-                adminSection.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
-                loginSection.scrollIntoView({ behavior: 'smooth' });
+            // Lógica basada en el elemento clicado
+            switch (elementId) {
+                case 'navPongaOrden':
+                    if (isLoggedIn) {
+                        pongaOrdenMenu.classList.toggle('hidden');
+                    } else {
+                        loginSection.classList.remove('hidden');
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
+                        loginMessage.style.color = 'orange';
+                        loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
+                    }
+                    // Muestra la sección principal si no se mostró el menú
+                    if (pongaOrdenMenu.classList.contains('hidden')) {
+                         heroSection.classList.remove('hidden');
+                    }
+                    break;
+                case 'navAdminPanel':
+                    // Solo el admin debería ver esto
+                    if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
+                        adminSection.classList.remove('hidden');
+                        adminSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        heroSection.classList.remove('hidden'); // Vuelve al inicio si no es admin
+                    }
+                    break;
+                case 'navAreaCliente':
+                case 'navHistorialPedidos':
+                    if (isLoggedIn) {
+                         // Asumimos que estas secciones de cliente/historial se mostrarían en la sección login o una nueva,
+                         // por ahora, lo llevamos al hero o login si no está logueado.
+                         if (session.user.email === ADMIN_EMAIL) {
+                             adminSection.classList.remove('hidden');
+                             adminSection.scrollIntoView({ behavior: 'smooth' });
+                         } else {
+                             heroSection.classList.remove('hidden');
+                             heroSection.scrollIntoView({ behavior: 'smooth' });
+                         }
+                    } else {
+                        loginSection.classList.remove('hidden');
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
+                        loginMessage.textContent = '';
+                    }
+                    break;
+                default:
+                    heroSection.classList.remove('hidden');
+                    break;
             }
         }
         
@@ -470,16 +488,22 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
             if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; return; }
-            const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
             if (error) {
                 console.error('Error al hacer login:', error);
                 loginMessage.style.color = 'red';
                 let msg = error.message;
                 if (error.message.includes('Invalid login credentials')) { msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; } else if (error.message.includes('Email not confirmed')) { msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; }
                 loginMessage.textContent = `Error de inicio: ${msg}`;
-            } else if (user) {
+            } else if (data.user) {
+                // Si el login es exitoso, checkUser se llama automáticamente por onAuthStateChange.
                 loginMessage.style.color = '#25d366';
-                loginMessage.textContent = '✅ Sesión iniciada con éxito! Verificando permisos...';
+                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                
+                // Muestra la sección principal después de un inicio de sesión exitoso.
+                hideAllSections();
+                heroSection.classList.remove('hidden'); 
             } else {
                 loginMessage.style.color = 'red';
                 loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
@@ -520,7 +544,11 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
+            // Oculta todas las secciones (excepto la que se va a mostrar) y los elementos de admin
             hideAllSections(); 
+            navAdminPanel.classList.add('hidden');
+            adminNameDisplay.classList.add('hidden');
+
 
             if (user) {
                 const isAdmin = user.email === ADMIN_EMAIL;
@@ -529,16 +557,20 @@
                 loginLogoutBtn.onclick = signOut;
                 
                 if (isAdmin) {
-                    adminSection.classList.remove('hidden');
+                    navAdminPanel.classList.remove('hidden');
                     adminNameDisplay.classList.remove('hidden');
-                } else {
-                    heroSection.classList.remove('hidden'); 
                 }
+                
+                // Muestra la sección principal por defecto después de loguearse
+                heroSection.classList.remove('hidden');
 
             } else {
+                // Usuario no logueado
                 heroSection.classList.remove('hidden'); 
                 loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
+                    hideAllSections();
+                    loginSection.classList.remove('hidden');
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                 };
             }
@@ -573,8 +605,12 @@
             }
         }
         
+        // CORRECCIÓN: La lógica de subida es el punto clave. Si las imágenes no cargan,
+        // es probable que las claves de Supabase o la configuración de privacidad del bucket
+        // sean incorrectas (el bucket debe ser público para usar getPublicUrl sin autenticación en el cliente).
+        // El código de subida es el estándar de Supabase y debería funcionar si las claves y permisos están OK.
+
         async function uploadBackgroundImage() {
-            // Lógica de administración de imágenes
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) return; 
@@ -584,23 +620,28 @@
             backgroundResponseMessage.style.color = 'yellow';
             backgroundResponseMessage.textContent = 'Subiendo imagen de fondo...';
             const filePath = `hero_background_${Date.now()}_${file.name}`; 
-            const { error } = await supabase.storage.from(BACKGROUND_BUCKET_NAME).upload(filePath, file);
-            if (error) {
+            
+            // Subir archivo
+            const { error: uploadError } = await supabase.storage.from(BACKGROUND_BUCKET_NAME).upload(filePath, file);
+            if (uploadError) {
+                console.error("Error de Subida de Fondo:", uploadError.message);
                 backgroundResponseMessage.style.color = 'red';
-                backgroundResponseMessage.textContent = `Error: ${error.message}`;
+                backgroundResponseMessage.textContent = `Error de Supabase: ${uploadError.message}. Revise sus claves y permisos de bucket.`;
+                return;
+            } 
+
+            // Obtener URL pública (asume que el bucket es público)
+            const { data: publicURLData } = supabase.storage.from(BACKGROUND_BUCKET_NAME).getPublicUrl(filePath);
+            if (publicURLData && publicURLData.publicUrl) {
+                const publicUrl = publicURLData.publicUrl;
+                heroSection.style.backgroundImage = `url('${publicUrl}')`;
+                heroSection.style.backgroundColor = 'transparent'; 
+                localStorage.setItem('heroBackgroundImage', publicUrl); 
+                backgroundResponseMessage.style.color = '#25d366';
+                backgroundResponseMessage.textContent = '✅ Fondo subido y aplicado!';
             } else {
-                const { data: publicURLData } = supabase.storage.from(BACKGROUND_BUCKET_NAME).getPublicUrl(filePath);
-                if (publicURLData && publicURLData.publicUrl) {
-                    const publicUrl = publicURLData.publicUrl;
-                    heroSection.style.backgroundImage = `url('${publicUrl}')`;
-                    heroSection.style.backgroundColor = 'transparent'; 
-                    localStorage.setItem('heroBackgroundImage', publicUrl); 
-                    backgroundResponseMessage.style.color = '#25d366';
-                    backgroundResponseMessage.textContent = '✅ Fondo subido y aplicado!';
-                } else {
-                    backgroundResponseMessage.style.color = 'red';
-                    backgroundResponseMessage.textContent = 'Error al obtener URL pública.';
-                }
+                backgroundResponseMessage.style.color = 'red';
+                backgroundResponseMessage.textContent = 'Error al obtener URL pública. El bucket debe ser público.';
             }
         }
 
@@ -622,22 +663,25 @@
             devicesImageResponseMessage.style.color = 'yellow';
             devicesImageResponseMessage.textContent = 'Subiendo imagen de dispositivos...';
             const filePath = `devices_main_${Date.now()}_${file.name}`; 
-            const { error } = await supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).upload(filePath, file);
-            if (error) {
+            
+            const { error: uploadError } = await supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).upload(filePath, file);
+            if (uploadError) {
+                console.error("Error de Subida de Dispositivos:", uploadError.message);
                 devicesImageResponseMessage.style.color = 'red';
-                devicesImageResponseMessage.textContent = `Error: ${error.message}`;
+                devicesImageResponseMessage.textContent = `Error de Supabase: ${uploadError.message}. Revise sus claves y permisos de bucket.`;
+                return;
+            }
+            
+            const { data: publicURLData } = supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).getPublicUrl(filePath);
+            if (publicURLData && publicURLData.publicUrl) {
+                const publicUrl = publicURLData.publicUrl;
+                mainDevicesImage.src = publicUrl;
+                localStorage.setItem('mainDevicesImage', publicUrl); 
+                devicesImageResponseMessage.style.color = '#25d366';
+                devicesImageResponseMessage.textContent = '✅ Imagen de dispositivos subida y aplicada!';
             } else {
-                const { data: publicURLData } = supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).getPublicUrl(filePath);
-                if (publicURLData && publicURLData.publicUrl) {
-                    const publicUrl = publicURLData.publicUrl;
-                    mainDevicesImage.src = publicUrl;
-                    localStorage.setItem('mainDevicesImage', publicUrl); 
-                    devicesImageResponseMessage.style.color = '#25d366';
-                    devicesImageResponseMessage.textContent = '✅ Imagen de dispositivos subida y aplicada!';
-                } else {
-                    devicesImageResponseMessage.style.color = 'red';
-                    devicesImageResponseMessage.textContent = 'Error al obtener URL pública.';
-                }
+                devicesImageResponseMessage.style.color = 'red';
+                devicesImageResponseMessage.textContent = 'Error al obtener URL pública. El bucket debe ser público.';
             }
         }
 
@@ -674,6 +718,7 @@
             navPongaOrden = document.getElementById('navPongaOrden');
             navHistorialPedidos = document.getElementById('navHistorialPedidos');
             pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); 
+            navAdminPanel = document.getElementById('navAdminPanel'); // Mapear el nuevo botón
 
             // Mensajes
             orderResponseMessage = document.getElementById('orderResponseMessage');
@@ -689,6 +734,7 @@
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
+            navAdminPanel.addEventListener('click', handleNavigationClick); // Listener para el nuevo panel
 
             // Listener para los enlaces dentro del menú de Poner Orden
             document.querySelectorAll('.order-type-link').forEach(link => {
@@ -708,7 +754,7 @@
             });
 
 
-            // Botões do Admin (Mantidos)
+            // Botones del Admin (Mantidos)
             const submitOrderButton = document.getElementById('submitOrderButton');
             if(submitOrderButton) submitOrderButton.addEventListener('click', submitNewOrder);
             
@@ -737,6 +783,7 @@
             if (savedDevicesImage) {
                 mainDevicesImage.src = savedDevicesImage;
             } else {
+                // CORRECCIÓN: Si no hay imagen guardada, usamos el placeholder fiable (WhatsApp SVG)
                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
             }
 
