@@ -298,23 +298,25 @@
 
         // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
-            const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
-            const { data: { session } = {} } = await supabase.auth.getSession();
-            const isLoggedIn = !!session; // Verdadero si hay una sesión activa
-
-            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él
-            if (event.currentTarget.id !== 'navPongaOrden') {
+            // Utilizamos event.currentTarget para asegurar que obtenemos el DIV con el listener
+            const clickedElement = event.currentTarget;
+            const isPongaOrden = clickedElement.id === 'navPongaOrden';
+            
+            // Cerrar el menú si el usuario hace clic fuera de Ponga la Orden
+            if (!isPongaOrden) {
                 pongaOrdenMenu.classList.add('hidden');
             }
 
-            // 2. Si el usuario hace clic en Ponga la Orden:
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const isLoggedIn = !!session; 
+            
+            // 1. Si el usuario hace clic en Ponga la Orden:
             if (isPongaOrden) {
                 if (isLoggedIn) {
-                    // Si está logueado (cliente o admin): Muestra/Oculta el menú
+                    // Logueado: Muestra/Oculta el menú de servicios
                     pongaOrdenMenu.classList.toggle('hidden');
                 } else {
-                    // Si NO está logueado: Redirige a Login y avisa.
-                    pongaOrdenMenu.classList.add('hidden');
+                    // NO Logueado: Redirige a Login y avisa.
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                     loginMessage.style.color = 'orange';
                     loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
@@ -322,22 +324,22 @@
                 return;
             } 
             
-            // 3. Si hace clic en otra opción (Area Cliente / Historial):
+            // 2. Si hace clic en otra opción (Area Cliente / Historial):
+            
+            // Si NO está logueado: Redirige a Login
             if (!isLoggedIn) {
-                // Si NO está logueado: Redirige a Login
                 loginSection.scrollIntoView({ behavior: 'smooth' });
                 loginMessage.textContent = '';
                 return;
             } 
             
-            // 4. Si está logueado (Cliente o Admin)
+            // Si está logueado (Cliente o Admin)
             if (!adminSection.classList.contains('hidden')) {
                 // Si es ADMIN: va al panel
                 adminSection.scrollIntoView({ behavior: 'smooth' });
             } else {
-                // Si es Cliente (Area Cliente / Historial de pedidos)
+                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
                 loginSection.scrollIntoView({ behavior: 'smooth' });
-                // Aquí podrías implementar la vista del historial de cliente si existiera.
             }
         }
         
@@ -591,7 +593,7 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM (Incluyendo el menú)
+            // Mapeo de Elementos DOM 
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
@@ -616,6 +618,7 @@
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             
             // Atribuir listeners de navegación (redirigir/mostrar menú)
+            // Se utiliza el DIV nav-item como contenedor principal para el listener
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
