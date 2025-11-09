@@ -6,6 +6,7 @@
     <title>KLMZ UNLOCKER - Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* [ ... ESTILOS CSS INALTERADOS ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -31,7 +32,6 @@
         .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
         .logo .klmz { color: #4dc2f2; }
         .nav-links { display: flex; align-items: center; }
-        /* Añado la clase 'nav-item' al nuevo panel admin */
         .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
         .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
         #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
@@ -42,7 +42,6 @@
         .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
         .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 10px; }
         .contact-info-hero { margin-top: 40px; line-height: 1.8; font-size: 16px; }
-        .contact-info-hero span { display: block; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
         .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
@@ -62,31 +61,13 @@
         .cookie-bar a { color: orange; text-decoration: underline; margin-left: 10px; }
         .chat-buttons { position: fixed; bottom: 60px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
         .chat-button { 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 24px; 
-            color: white; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
-            cursor: pointer; 
-            overflow: hidden; 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
         }
-        .chat-button.whatsapp { 
-            background-color: var(--whatsapp-green); 
-            text-decoration: none; 
-            border: none; 
-        }
-        .chat-button.whatsapp img {
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            border-radius: 50%; 
-        }
+        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
+        .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 700px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
+        .admin-section { max-width: 900px; }
+        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
         .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
@@ -95,88 +76,32 @@
         .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
         .admin-options .form-container button { background-color: #4c4e97; }
         .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
-        .hidden { display: none !important; } /* Uso !important para asegurar que el JS lo oculte */
+        .hidden { display: none !important; }
 
         /* Estilo para el Dropdown de Poner Orden */
         .dropdown-menu {
-            position: absolute;
-            top: 100%; 
-            left: 50%;
-            transform: translateX(-50%);
-            min-width: 350px; 
-            background-color: var(--header-bg);
-            border: 1px solid #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            z-index: 20;
-            padding: 10px 0;
-            list-style: none;
-            text-align: left;
-            text-transform: none; 
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 350px; background-color: var(--header-bg); border: 1px solid #333; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); z-index: 20; padding: 10px 0; list-style: none; text-align: left; text-transform: none; 
         }
-        .dropdown-menu li a {
-            display: block;
-            padding: 8px 15px;
-            color: var(--text-light);
-            font-weight: normal;
-        }
-        .dropdown-menu li a:hover {
-            background-color: #22252a;
-            color: var(--accent-pink);
-        }
+        .dropdown-menu li a { display: block; padding: 8px 15px; color: var(--text-light); font-weight: normal; }
+        .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
 
         /* --- ESTILOS DE LA SECCIÓN IMEI SERVICE --- */
-        #imeiServiceSection {
-            padding: 40px 50px;
-            background-color: var(--dark-bg);
-        }
-        #imeiServiceSection h2 {
-            margin-bottom: 30px;
-            color: var(--accent-pink);
-            font-size: 28px;
-            border-bottom: 2px solid var(--card-border);
-            padding-bottom: 10px;
-        }
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        .service-card {
-            background-color: #1a1e25;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-        .service-card h3 {
-            font-size: 16px;
-            color: var(--text-light);
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-        .card-details {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--card-border);
-            padding-top: 10px;
-        }
-        .card-footer .price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #4dc2f2; /* Azul claro */
-        }
-        .card-footer .time {
-            color: var(--accent-pink);
-        }
+        #imeiServiceSection { padding: 40px 50px; background-color: var(--dark-bg); }
+        #imeiServiceSection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
+        .service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .service-card { background-color: #1a1e25; border: 1px solid var(--card-border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
+        .card-details { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; }
+        .card-footer .price { font-size: 16px; font-weight: bold; color: #4dc2f2; }
+        .card-footer .time { color: var(--accent-pink); }
+        
+        /* Estilos del Editor de Servicios */
+        .service-editor-list { list-style: none; padding: 0; }
+        .service-editor-list li { background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .service-editor-list li span { font-weight: bold; }
+        .service-editor-list li button { background-color: orange; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 10px; }
+
     </style>
 </head>
 <body>
@@ -252,7 +177,7 @@
             <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
         </section>
 
-        <section class="login-section" id="loginSection">
+        <section class="login-section hidden" id="loginSection">
             <h3>Iniciar Sesión / Registrarse</h3>
             <input type="email" id="loginEmail" placeholder="Email">
             <input type="password" id="loginPassword" placeholder="Contraseña">
@@ -293,6 +218,17 @@
                      <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
                 </div>
             </div>
+            
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>⚙️ Editar Tarjetas de Servicios IMEI (Solo Admin)</h4>
+                <div class="form-container">
+                    <ul id="serviceEditorList" class="service-editor-list">
+                        </ul>
+                    <button id="saveServiceChanges" style="background-color: var(--whatsapp-green);">Guardar Cambios (Local)</button>
+                    <p id="editorMessage" class="form-message"></p>
+                </div>
+            </div>
+
         </section>
     </main>
     
@@ -354,32 +290,32 @@
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
         
-        // Añado el nuevo botón de admin
         let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
-        
-        // CORRECCIÓN: Usamos un URL de imagen de PLACEHOLDER fiable para evitar errores de red.
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png'; 
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_13_Pro.png/300px-IPhone_13_Pro.png'; // Placeholder de imagen de dispositivo
 
-        // --- DATOS DE SERVICIOS IMEI (Recortados para el ejemplo) ---
-        const imeiServicesData = [
-            { name: "ALL MOBILE Blacklist And Model checker - iPhone | Samsung | Xiaomi | Oppo Etc", price: "$0.012", time: "Instant", category: "IMEI Checkers Worldwide" },
-            { name: "Apple ALL DEVICE MDM CHECK ON/OFF Checker BY SN", price: "$0.27", time: "Minutos", category: "IMEI Checkers Worldwide" },
-            { name: "Apple iPhone Carrier + FMI On/Off Checker (IMEI/SN) ✅", price: "$0.041", time: "Minutos", category: "IMEI Checkers Worldwide" },
-            { name: "APPLE GSX CASES & REPAIRS HISTORY → IMEI/SN", price: "$1.05", time: "1-5 Minutos", category: "Sold By Apple GSX Services" },
-            { name: "Motorola WorldWide Exclusive NCK Code Fully Automated INSTANT 24/7", price: "$0.28", time: "Instant", category: "Motorola Network Unlocking Services" },
+        // --- DATOS DE SERVICIOS IMEI (AUMENTADOS y con ID único) ---
+        let imeiServicesData = [
+            { id: 1, name: "ALL MOBILE Blacklist And Model checker", price: "$0.012", time: "Instant", category: "IMEI Checkers Worldwide" },
+            { id: 2, name: "Apple ALL DEVICE MDM CHECK ON/OFF Checker BY SN", price: "$0.27", time: "Minutos", category: "IMEI Checkers Worldwide" },
+            { id: 3, name: "Apple iPhone Carrier + FMI On/Off Checker (IMEI/SN) ✅", price: "$0.041", time: "Minutos", category: "IMEI Checkers Worldwide" },
+            { id: 4, name: "APPLE GSX CASES & REPAIRS HISTORY → IMEI/SN", price: "$1.05", time: "1-5 Minutos", category: "Sold By Apple GSX Services" },
+            { id: 5, name: "Motorola WorldWide Exclusive NCK Code Fully Automated INSTANT 24/7", price: "$0.28", time: "Instant", category: "Motorola Network Unlocking Services" },
+            { id: 6, name: "NEW SERVICE: Samsung FRP Remove by IMEI/SN", price: "$11.00", time: "10 Minutos", category: "SAMSUNG FRP" },
+            { id: 7, name: "NEW SERVICE: Xfinity iPhone Unlock (Premium)", price: "$134.16", time: "1-10 días", category: "Xfinity" },
         ];
 
 
-        // --- FUNCIÓN PRINCIPAL DE RENDERIZADO DE SERVICIOS ---
+        // --- FUNCIÓN PRINCIPAL DE RENDERIZADO DE SERVICIOS (Cliente) ---
         function renderImeiServices() {
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
 
             container.innerHTML = ''; 
             
+            // Usamos la variable global actualizada
             imeiServicesData.forEach(service => {
                 const card = document.createElement('div');
                 card.className = 'service-card';
@@ -397,10 +333,10 @@
                 container.appendChild(card);
             });
             
-            // Ocultar todas las secciones y mostrar esta
+            // Ocultar otras secciones y mostrar esta
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Subir al inicio de la sección
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         function hideAllSections() {
@@ -409,18 +345,82 @@
             adminSection.classList.add('hidden');
             imeiServiceSection.classList.add('hidden');
         }
+        
+        // --- FUNCIÓN DE EDICIÓN DE SERVICIOS (ADMIN) ---
 
+        function renderServiceEditor() {
+            const editorList = document.getElementById('serviceEditorList');
+            const editorMessage = document.getElementById('editorMessage');
+            if (!editorList) return;
+
+            editorList.innerHTML = '';
+
+            imeiServicesData.forEach((service, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>${service.name.substring(0, 40)}...</span>
+                    <input type="text" id="name-${service.id}" value="${service.name}" class="hidden" data-field="name" data-id="${service.id}" />
+                    <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
+                    <input type="text" id="time-${service.id}" value="${service.time}" data-field="time" data-id="${service.id}" style="width: 100px;" />
+                    <button onclick="editService(${service.id})">Editar</button>
+                `;
+                editorList.appendChild(listItem);
+            });
+            
+            // Oculta todas las secciones y muestra el admin
+            hideAllSections();
+            adminSection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            editorMessage.textContent = 'Lista de servicios IMEI cargada. Los cambios son locales.';
+        }
+        
+        // Función para editar un servicio (solo en el contexto del DOM)
+        function editService(id) {
+            const serviceIndex = imeiServicesData.findIndex(s => s.id === id);
+            if (serviceIndex === -1) return;
+
+            const nameInput = document.getElementById(`name-${id}`);
+            const priceInput = document.getElementById(`price-${id}`);
+            const timeInput = document.getElementById(`time-${id}`);
+            const listItem = nameInput.closest('li');
+
+            // Simulación de edición (en un entorno real, usaría un modal)
+            const newName = prompt("Editar Nombre:", imeiServicesData[serviceIndex].name);
+            if (newName !== null) {
+                 imeiServicesData[serviceIndex].name = newName;
+                 listItem.querySelector('span').textContent = newName.substring(0, 40) + '...';
+            }
+        }
+        
+        // Simulación de guardar (En un entorno real, esto iría al Supabase DB)
+        document.getElementById('saveServiceChanges').addEventListener('click', function() {
+            const editorMessage = document.getElementById('editorMessage');
+            
+            // 1. Recorrer los inputs del editor para actualizar la variable global
+            document.querySelectorAll('.service-editor-list li').forEach(item => {
+                const id = parseInt(item.querySelector('input').dataset.id);
+                const price = item.querySelector(`input[data-field="price"]`).value;
+                const time = item.querySelector(`input[data-field="time"]`).value;
+                
+                const index = imeiServicesData.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    imeiServicesData[index].price = price;
+                    imeiServicesData[index].time = time;
+                }
+            });
+            
+            editorMessage.style.color = 'lightgreen';
+            editorMessage.textContent = 'Cambios guardados localmente. (En un entorno real, estos datos se sincronizarían con una tabla de Supabase).';
+        });
 
         // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
             const clickedElement = event.currentTarget;
-            if (!clickedElement || !clickedElement.id) {
-                return; 
-            }
+            if (!clickedElement || !clickedElement.id) { return; }
             
             const elementId = clickedElement.id;
             
-            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él o en sí mismo (para toggle)
+            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él o en sí mismo
             if (elementId !== 'navPongaOrden') {
                 pongaOrdenMenu.classList.add('hidden');
             }
@@ -435,38 +435,26 @@
                 case 'navPongaOrden':
                     if (isLoggedIn) {
                         pongaOrdenMenu.classList.toggle('hidden');
+                        heroSection.classList.remove('hidden'); // Mostrar el hero si no se abre el menú
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
                         loginMessage.style.color = 'orange';
                         loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
                     }
-                    // Muestra la sección principal si no se mostró el menú
-                    if (pongaOrdenMenu.classList.contains('hidden')) {
-                         heroSection.classList.remove('hidden');
-                    }
                     break;
                 case 'navAdminPanel':
-                    // Solo el admin debería ver esto
+                    // Solo el admin puede acceder
                     if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
-                        adminSection.classList.remove('hidden');
-                        adminSection.scrollIntoView({ behavior: 'smooth' });
+                        renderServiceEditor(); // Llama a la función de edición
                     } else {
-                        heroSection.classList.remove('hidden'); // Vuelve al inicio si no es admin
+                        heroSection.classList.remove('hidden'); 
                     }
                     break;
                 case 'navAreaCliente':
                 case 'navHistorialPedidos':
                     if (isLoggedIn) {
-                         // Asumimos que estas secciones de cliente/historial se mostrarían en la sección login o una nueva,
-                         // por ahora, lo llevamos al hero o login si no está logueado.
-                         if (session.user.email === ADMIN_EMAIL) {
-                             adminSection.classList.remove('hidden');
-                             adminSection.scrollIntoView({ behavior: 'smooth' });
-                         } else {
-                             heroSection.classList.remove('hidden');
-                             heroSection.scrollIntoView({ behavior: 'smooth' });
-                         }
+                         heroSection.classList.remove('hidden'); // Vuelve al inicio para clientes
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -479,10 +467,9 @@
             }
         }
         
-        // --- Otras funciones (Mantidas) ---
+        // --- Otras funciones (Mantenidas) ---
 
         async function signInWithEmail() {
-            // Lógica de inicio de sesión
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
@@ -497,11 +484,9 @@
                 if (error.message.includes('Invalid login credentials')) { msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; } else if (error.message.includes('Email not confirmed')) { msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; }
                 loginMessage.textContent = `Error de inicio: ${msg}`;
             } else if (data.user) {
-                // Si el login es exitoso, checkUser se llama automáticamente por onAuthStateChange.
                 loginMessage.style.color = '#25d366';
                 loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
                 
-                // Muestra la sección principal después de un inicio de sesión exitoso.
                 hideAllSections();
                 heroSection.classList.remove('hidden'); 
             } else {
@@ -511,7 +496,6 @@
         }
         
         async function signUpWithEmail() {
-            // Lógica de registro
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
@@ -544,7 +528,6 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
-            // Oculta todas las secciones (excepto la que se va a mostrar) y los elementos de admin
             hideAllSections(); 
             navAdminPanel.classList.add('hidden');
             adminNameDisplay.classList.add('hidden');
@@ -561,11 +544,9 @@
                     adminNameDisplay.classList.remove('hidden');
                 }
                 
-                // Muestra la sección principal por defecto después de loguearse
                 heroSection.classList.remove('hidden');
 
             } else {
-                // Usuario no logueado
                 heroSection.classList.remove('hidden'); 
                 loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
@@ -577,7 +558,6 @@
         }
         
         async function submitNewOrder() {
-            // Lógica de administración de órdenes
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) {
@@ -605,11 +585,6 @@
             }
         }
         
-        // CORRECCIÓN: La lógica de subida es el punto clave. Si las imágenes no cargan,
-        // es probable que las claves de Supabase o la configuración de privacidad del bucket
-        // sean incorrectas (el bucket debe ser público para usar getPublicUrl sin autenticación en el cliente).
-        // El código de subida es el estándar de Supabase y debería funcionar si las claves y permisos están OK.
-
         async function uploadBackgroundImage() {
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
@@ -621,7 +596,6 @@
             backgroundResponseMessage.textContent = 'Subiendo imagen de fondo...';
             const filePath = `hero_background_${Date.now()}_${file.name}`; 
             
-            // Subir archivo
             const { error: uploadError } = await supabase.storage.from(BACKGROUND_BUCKET_NAME).upload(filePath, file);
             if (uploadError) {
                 console.error("Error de Subida de Fondo:", uploadError.message);
@@ -630,7 +604,6 @@
                 return;
             } 
 
-            // Obtener URL pública (asume que el bucket es público)
             const { data: publicURLData } = supabase.storage.from(BACKGROUND_BUCKET_NAME).getPublicUrl(filePath);
             if (publicURLData && publicURLData.publicUrl) {
                 const publicUrl = publicURLData.publicUrl;
@@ -663,7 +636,6 @@
             devicesImageResponseMessage.style.color = 'yellow';
             devicesImageResponseMessage.textContent = 'Subiendo imagen de dispositivos...';
             const filePath = `devices_main_${Date.now()}_${file.name}`; 
-            
             const { error: uploadError } = await supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).upload(filePath, file);
             if (uploadError) {
                 console.error("Error de Subida de Dispositivos:", uploadError.message);
@@ -704,7 +676,7 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM
+            // Mapeo de Elementos DOM 
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
@@ -718,7 +690,7 @@
             navPongaOrden = document.getElementById('navPongaOrden');
             navHistorialPedidos = document.getElementById('navHistorialPedidos');
             pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); 
-            navAdminPanel = document.getElementById('navAdminPanel'); // Mapear el nuevo botón
+            navAdminPanel = document.getElementById('navAdminPanel'); 
 
             // Mensajes
             orderResponseMessage = document.getElementById('orderResponseMessage');
@@ -734,7 +706,7 @@
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
-            navAdminPanel.addEventListener('click', handleNavigationClick); // Listener para el nuevo panel
+            navAdminPanel.addEventListener('click', handleNavigationClick); 
 
             // Listener para los enlaces dentro del menú de Poner Orden
             document.querySelectorAll('.order-type-link').forEach(link => {
@@ -783,7 +755,6 @@
             if (savedDevicesImage) {
                 mainDevicesImage.src = savedDevicesImage;
             } else {
-                // CORRECCIÓN: Si no hay imagen guardada, usamos el placeholder fiable (WhatsApp SVG)
                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
             }
 
