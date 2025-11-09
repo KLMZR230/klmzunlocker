@@ -6,7 +6,7 @@
     <title>KLMZ Unlocker - Acceso de Cliente</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [ ... ESTILOS CSS INALTERADOS ... ] */
+        /* [ ... CSS EXISTENTE ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -31,9 +31,8 @@
         .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
         .logo .klmz { color: #4dc2f2; }
         .nav-links { display: flex; align-items: center; }
-        .nav-links > a, .dropdown { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; }
-        .dropdown { position: relative; cursor: pointer; }
-        .dropdown::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
+        .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; /* Necesario para el dropdown */ } 
+        .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
         #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
         .hero-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 60px 50px 0px 50px; min-height: 500px; position: relative; background-color: #161a20; overflow: hidden; }
         .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
@@ -61,36 +60,16 @@
         .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
         .cookie-bar { background-color: var(--cookie-bar-bg); padding: 15px 30px; font-size: 13px; text-align: center; border-top: 2px solid #555; position: fixed; bottom: 0; width: 100%; z-index: 100; }
         .cookie-bar a { color: orange; text-decoration: underline; margin-left: 10px; }
-        
-        /* Botones de Chat Flotantes */
-        .chat-buttons {
-            position: fixed;
-            bottom: 60px; 
-            right: 20px;
-            z-index: 101;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .chat-buttons { position: fixed; bottom: 60px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
+        .chat-button { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); cursor: pointer; }
+        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; }
+        /* Estilo para la imagen del icono de WhatsApp */
+        .chat-button.whatsapp img {
+            width: 35px; /* Ajusta este valor para el tamaño deseado del icono */
+            height: 35px; /* Mismo valor para mantener proporción */
+            object-fit: contain; /* Asegura que la imagen se vea completa */
         }
-        
-        .chat-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px; /* Tamaño normalizado para un solo ícono */
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-        
-        .chat-button.whatsapp {
-            background-color: var(--whatsapp-green); 
-            text-decoration: none; 
-        }
-        
+
         .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 500px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
@@ -101,6 +80,33 @@
         .admin-options .form-container button { background-color: #4c4e97; }
         .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
         .hidden { display: none; }
+
+        /* Estilo para el Dropdown de Poner Orden */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%; /* Just below the nav item */
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 250px;
+            background-color: var(--header-bg);
+            border: 1px solid #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+            padding: 10px 0;
+            list-style: none;
+            text-align: left;
+            text-transform: none; /* Mantener texto normal */
+        }
+        .dropdown-menu li a {
+            display: block;
+            padding: 8px 15px;
+            color: var(--text-light);
+            font-weight: normal;
+        }
+        .dropdown-menu li a:hover {
+            background-color: #22252a;
+            color: var(--accent-pink);
+        }
     </style>
 </head>
 <body>
@@ -122,9 +128,21 @@
         </div>
         
         <div class="nav-links">
-            <div class="dropdown">Area del Cliente</div>
-            <div class="dropdown">Ponga la orden</div>
-            <div class="dropdown">Historial de pedidos</div>
+            <div class="nav-item" id="navAreaCliente">Area del Cliente</div>
+            
+            <div class="nav-item" id="navPongaOrden">
+                Ponga la orden
+                <div class="dropdown-menu hidden" id="pongaOrdenMenu">
+                    <ul>
+                        <li><a href="#">IMEI Service</a></li>
+                        <li><a href="#">Box/Dongle/Tool/Credit - Activation</a></li>
+                        <li><a href="#">Digital Tool Rent & Remote Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
+            
             <a href="#">KLMZ-Firmware.com File Server</a>
             <a href="#">Auto Add Money Video</a>
             <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
@@ -243,9 +261,9 @@
 
     <div class="chat-buttons">
         <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">
-            📞
+            <img src="https://pub-0c024c9a5a7a439aa0319b5140a52857.r2.dev/6c784972cbf5806215d46fbda8b0c46a.jpg" alt="WhatsApp Icon">
         </a>
-        </div>
+    </div>
 
     <script>
         // 🔑 TUS CLAVES SUPABASE 
@@ -257,85 +275,45 @@
         let heroSection, mainDevicesImage, loginSection, adminSection, loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
+        
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu; // Elementos de Navegación
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // Adiciona un listener para garantir que o DOM esteja completamente carregado
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- Funciones de Navegación (MODIFICADA) ---
+        async function handleNavigationClick(event) {
+            const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
+            const { data: { session } } = await supabase.auth.getSession();
+            const isLoggedIn = !!session; // Verdadero si hay una sesión activa
+
+            // Si el usuario es ADMIN, siempre mostrar el panel de admin (por simplicidad)
+            if (!adminSection.classList.contains('hidden')) {
+                adminSection.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
             
-            // CORRECCIÓN DO TYPERROR AQUI: Inicializar Supabase
-            if (window.supabase) {
-                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // Si el usuario está logueado (como cliente normal) Y hace clic en Ponga la orden, muestra/oculta el menú
+            if (isPongaOrden && isLoggedIn) {
+                pongaOrdenMenu.classList.toggle('hidden');
+                return;
+            } 
+            
+            // Si el usuario está deslogueado o hace clic en otra opción de cliente, redirigir a Login
+            pongaOrdenMenu.classList.add('hidden'); // Asegurar que el menú se cierre
+            loginSection.scrollIntoView({ behavior: 'smooth' });
+            
+            if (isPongaOrden) {
+                loginMessage.style.color = 'orange';
+                loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
             } else {
-                 console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
-                 return; 
+                loginMessage.textContent = '';
             }
-
-            // Elementos DOM
-            heroSection = document.getElementById('heroSection');
-            mainDevicesImage = document.getElementById('mainDevicesImage');
-            loginSection = document.getElementById('loginSection');
-            adminSection = document.getElementById('adminSection');
-            loginLogoutBtn = document.getElementById('loginLogoutBtn');
-            loggedInUserName = document.getElementById('loggedInUserName');
-            adminNameDisplay = document.getElementById('adminNameDisplay');
-
-            // Mensajes
-            orderResponseMessage = document.getElementById('orderResponseMessage');
-            backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
-            devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
-            loginMessage = document.getElementById('loginMessage');
-            
-            // --- Atribuir Listeners de Evento ---
-            document.getElementById('signInButton').addEventListener('click', signInWithEmail);
-            document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
-            
-            // Botões do Admin
-            const submitOrderButton = document.getElementById('submitOrderButton');
-            if(submitOrderButton) submitOrderButton.addEventListener('click', submitNewOrder);
-            
-            const uploadBackgroundButton = document.getElementById('uploadBackgroundButton');
-            if(uploadBackgroundButton) uploadBackgroundButton.addEventListener('click', uploadBackgroundImage);
-            
-            const clearBackgroundButton = document.getElementById('clearBackgroundButton');
-            if(clearBackgroundButton) clearBackgroundButton.addEventListener('click', clearBackgroundImage);
-
-            const uploadDevicesButton = document.getElementById('uploadDevicesButton');
-            if(uploadDevicesButton) uploadDevicesButton.addEventListener('click', uploadDevicesImage);
-
-            const clearDevicesButton = document.getElementById('clearDevicesButton');
-            if(clearDevicesButton) clearDevicesButton.addEventListener('click', clearDevicesImage);
-            
-            // --- Inicialización de Datos y Autenticación ---
-            
-            // 1. Carregar imágenes salvas
-            const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
-            if (savedBackgroundImage) {
-                heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
-                heroSection.style.backgroundColor = 'transparent';
-            }
-
-            const savedDevicesImage = localStorage.getItem('mainDevicesImage');
-            if (savedDevicesImage) {
-                mainDevicesImage.src = savedDevicesImage;
-            } else {
-                mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
-            }
-
-            // 2. Verificar estado de autenticación
-            supabase.auth.onAuthStateChange((event, session) => {
-                checkUser();
-            });
-            
-            // Chamada inicial
-            checkUser(); 
-        });
-
-
-        // --- Funções Auxiliares (CORPO DAS FUNÇÕES) ---
+        }
         
+        // --- Las otras funciones (signInWithEmail, checkUser, etc.) permanecen las mismas ---
+
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -379,7 +357,7 @@
             
             if (!supabase) {
                  loginMessage.style.color = 'red';
-                 loginMessage.textContent = 'Error de inicialización de la API.';
+                 loginMessage.textContent = 'Erro de inicialização da API.';
                  return;
             }
 
@@ -571,6 +549,89 @@
             devicesImageResponseMessage.style.color = 'lightgray';
             devicesImageResponseMessage.textContent = 'Imagen de dispositivos restaurada.';
         }
+
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Inicialización de Supabase
+            if (window.supabase) {
+                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                 console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
+                 return; 
+            }
+
+            // Mapeo de Elementos DOM (Incluyendo el menú)
+            heroSection = document.getElementById('heroSection');
+            mainDevicesImage = document.getElementById('mainDevicesImage');
+            loginSection = document.getElementById('loginSection');
+            adminSection = document.getElementById('adminSection');
+            loginLogoutBtn = document.getElementById('loginLogoutBtn');
+            loggedInUserName = document.getElementById('loggedInUserName');
+            adminNameDisplay = document.getElementById('adminNameDisplay');
+            
+            navAreaCliente = document.getElementById('navAreaCliente');
+            navPongaOrden = document.getElementById('navPongaOrden');
+            navHistorialPedidos = document.getElementById('navHistorialPedidos');
+            pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); // Nuevo elemento de menú
+
+            // Mensajes
+            orderResponseMessage = document.getElementById('orderResponseMessage');
+            backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
+            devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
+            loginMessage = document.getElementById('loginMessage');
+            
+            // --- Atribuir Listeners de Evento (Principal) ---
+            document.getElementById('signInButton').addEventListener('click', signInWithEmail);
+            document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
+            
+            // Atribuir listeners de navegación (redirigir/mostrar menú)
+            navAreaCliente.addEventListener('click', handleNavigationClick);
+            navPongaOrden.addEventListener('click', handleNavigationClick);
+            navHistorialPedidos.addEventListener('click', handleNavigationClick);
+
+
+            // Botões do Admin (Mantidos)
+            const submitOrderButton = document.getElementById('submitOrderButton');
+            if(submitOrderButton) submitOrderButton.addEventListener('click', submitNewOrder);
+            
+            const uploadBackgroundButton = document.getElementById('uploadBackgroundButton');
+            if(uploadBackgroundButton) uploadBackgroundButton.addEventListener('click', uploadBackgroundImage);
+            
+            const clearBackgroundButton = document.getElementById('clearBackgroundButton');
+            if(clearBackgroundButton) clearBackgroundButton.addEventListener('click', clearBackgroundImage);
+
+            const uploadDevicesButton = document.getElementById('uploadDevicesButton');
+            if(uploadDevicesButton) uploadDevicesButton.addEventListener('click', uploadDevicesImage);
+
+            const clearDevicesButton = document.getElementById('clearDevicesButton');
+            if(clearDevicesButton) clearDevicesButton.addEventListener('click', clearDevicesImage);
+            
+            // --- Inicialización de Datos y Autenticación ---
+            
+            // 1. Carregar imágenes salvas
+            const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
+            if (savedBackgroundImage) {
+                heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
+                heroSection.style.backgroundColor = 'transparent';
+            }
+
+            const savedDevicesImage = localStorage.getItem('mainDevicesImage');
+            if (savedDevicesImage) {
+                mainDevicesImage.src = savedDevicesImage;
+            } else {
+                mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
+            }
+
+            // 2. Verificar estado de autenticación
+            supabase.auth.onAuthStateChange((event, session) => {
+                checkUser();
+            });
+            
+            // Chamada inicial
+            checkUser(); 
+        });
     </script>
 </body>
 </html>
