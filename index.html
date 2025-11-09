@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLMZ Unlocker - Réplica</title>
+    <style>
+        /* Variáveis de Cor */
+        :root {
+            --dark-bg: #161a20; /* Cor de fundo principal escura */
+            --header-bg: #11141a; /* Cor de fundo da barra superior */
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-pink: #d9429c; /* Cor de destaque (do chaveiro) */
+            --service-box-bg: #1c2025; /* Fundo da caixa de serviços */
+            --button-bg: #4a4a58; /* Cor de fundo dos botões/links do cabeçalho */
+            --cookie-bar-bg: #333;
+            --whatsapp-green: #25d366; /* Verde do WhatsApp */
+            --elsalvador-number: '+503 68957466'; /* Número de El Salvador */
+            --new-email: 'klmzr230@gmail.com'; /* NOVO EMAIL */
+        }
+
+        /* Estilos Globais */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: var(--accent-pink);
+        }
+
+        /* 1. Barra Superior (Preta com Links/Info) */
+        .top-info-bar {
+            background-color: var(--header-bg);
+            display: flex;
+            justify-content: flex-end; /* Conteúdo alinhado à direita */
+            align-items: center;
+            padding: 8px 30px;
+            font-size: 12px;
+            border-bottom: 1px solid #292d34;
+        }
+
+        .top-info-bar .info-group a {
+            margin-left: 20px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            background-color: var(--button-bg);
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .top-info-bar .contact-info {
+            color: var(--text-muted);
+            margin-right: 20px;
+        }
+        
+        /* 2. Navegação Principal */
+        .main-nav {
+            background-color: var(--header-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+        
+        .logo .klmz {
+            color: #4dc2f2; /* Cor azul claro para 'KLMZ' */
+        }
+        
+        /* 3. Seção Principal/Hero */
+        .hero-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 60px 50px 80px 50px;
+            min-height: 500px;
+            position: relative;
+            background-image: radial-gradient(circle at center, #1c2025 0%, #161a20 80%);
+        }
+
+        .services-content {
+            flex-basis: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .services-box {
+            background-color: var(--service-box-bg);
+            border-radius: 10px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            width: 90%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            /* Simulação do contorno oval */
+            border: 3px solid var(--accent-pink); 
+            border-radius: 50px / 10px; /* Borda mais arredondada na horizontal */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .services-title {
+            background-color: #000;
+            color: var(--text-light);
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px 20px;
+            margin-top: -45px; /* Posição sobreposta */
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: -10px;
+            border: 2px solid var(--accent-pink);
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .service-item::before {
+            content: ''; /* Ícone Apple */
+            font-size: 18px;
+            color: var(--accent-pink);
+            margin-right: 10px;
+        }
+        
+        .contact-info-hero {
+            margin-top: 40px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .contact-info-hero span {
+            display: block;
+        }
+
+        .contact-info-hero .icon {
+            color: var(--accent-pink);
+            margin-right: 5px;
+        }
+
+        /* Imagem de Fundo/Central - Placeholder */
+        .image-placeholder {
+            flex-basis: 60%;
+            position: relative;
+        }
+
+        .devices-image {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            max-width: 800px; /* Simulação do tamanho da imagem */
+            height: 400px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: right bottom;
+            /* Placeholder Visual da Imagem */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%2322252a'/%3E%3Ctext x='400' y='200' font-family='Arial' font-size='30' fill='%23d9429c' text-anchor='middle' alignment-baseline='middle'%3EIMAGEM DE DISPOSITIVOS APPLE (Placeholder)%3C/text%3E%3C/svg%3E");
+        }
+
+        .keychain-image {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--accent-pink); /* Simulação do chaveiro rosa */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            z-index: 2;
+        }
+        
+        .keychain-image::before {
+            content: '';
+            color: white;
+        }
+        
+        /* 4. Rodapé */
+        .site-footer {
+            background-color: #1a1e25;
+            padding: 50px 30px 20px 30px; /* Ajuste para o rodapé inferior */
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #292d34;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            padding-bottom: 30px;
+        }
+        
+        .footer-col {
+            flex-basis: 20%;
+        }
+
+        .footer-col h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 20px;
+        }
+        
+        .social-icons a {
+            color: var(--text-muted);
+        }
+        
+        .social-icons a:hover {
+            color: var(--accent-pink);
+        }
+        
+        .subscribe-text {
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .subscribe-button {
+            background-color: #4c4e97; /* Cor do botão roxo */
+            color: var(--text-light);
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            display: block;
+            text-align: center;
+        }
+        
+        .contact-footer-info {
+            line-height: 1.8;
+        }
+
+        /* Rodapé Inferior de Direitos Autorais */
+        .footer-bottom {
+            border-top: 1px solid #292d34;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* 5. Barra de Cookies */
+        .cookie-bar {
+            background-color: var(--cookie-bar-bg);
+            padding: 15px 30px;
+            font-size: 13px;
+            text-align: center;
+            border-top: 2px solid #555;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .cookie-bar a {
+            color: orange;
+            text-decoration: underline;
+            margin-left: 10px;
+        }
+
+        /* Botões de Chat Flutuantes (Direita) */
+        .chat-buttons {
+            position: fixed;
+            bottom: 60px; /* Acima da barra de cookies */
+            right: 20px;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        
+        /* Estilo para o botão de WhatsApp (usando o ícone de telefone para o segundo botão) */
+        .chat-button.whatsapp {
+            background-color: var(--whatsapp-green); /* Verde do WhatsApp */
+            text-decoration: none; /* Assegura que links não tenham sublinhado */
+        }
+        
+        .chat-button.phone {
+            background-color: #4dc2f2; /* Azul claro */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-info-bar">
+        <span class="contact-info">
+            +503 68957466 (Whatsapp)
+        </span>
+        <div class="info-group">
+            <a href="#">FULL Model FRP Unlock Official Distributor</a>
+            <a href="#">Digital Tool Rent</a>
+            <a href="#">Login ID & Password</a>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <div class="logo">
+            <span class="klmz">KLMZ</span> UNLOCKER
+        </div>
+        
+        <div class="nav-links">
+            <div class="dropdown">Area del Cliente</div>
+            <div class="dropdown">Ponga la orden</div>
+            <div class="dropdown">Historial de pedidos</div>
+            <a href="#">KLMZ-Firmware.com File Server</a>
+            <a href="#">Auto Add Money Video</a>
+            <a href="#">FREDDY GRANADOS</a>
+            <a href="#" style="background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545;">Join / Login</a>
+        </div>
+    </nav>
+
+    <main class="hero-section">
+        <div class="services-content">
+            <div class="services-box">
+                <div class="services-title">
+                    IPHONE SERVICES
+                </div>
+                <div class="service-item">IPHONE CARRIER UNLOCK</div>
+                <div class="service-item">IPHONE ICLOUD UNLOCK</div>
+                <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
+                <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
+            </div>
+            
+            <div class="contact-info-hero">
+                <span style="display: flex; align-items: center;">
+                    <span class="icon">📞</span> +503 68957466 (Whatsapp)
+                </span>
+                <span style="display: flex; align-items: center;">
+                    <span class="icon">✉️</span> **klmzr230@gmail.com**
+                </span>
+            </div>
+        </div>
+
+        <div class="image-placeholder">
+            <div class="keychain-image"></div>
+            <div class="devices-image"></div>
+        </div>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>KLMZ UNLOCKER</h3>
+                <div class="social-icons">
+                    <a href="#">f</a> <a href="#">📸</a> <a href="#">▶</a> </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Enlaces útiles</h3>
+                <ul>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Suscribir</h3>
+                <p class="subscribe-text">
+                    ¡No te pierdas nuestras futuras actualizaciones! Suscríbete ahora!
+                </p>
+                <a href="#" class="subscribe-button">
+                    Hoja informativa
+                </a>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Conéctate con nosotros</h3>
+                <div class="contact-footer-info">
+                    +503 68957466 (Whatsapp)<br>
+                    **klmzr230@gmail.com**
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
+        </div>
+    </footer>
+    
+    <div class="cookie-bar">
+        The cookie settings on this website are adjusted to allow all cookies so that you have the very best experience. If you continue without changing your cookie settings <a href="#">Change Settings</a>
+    </div>
+
+    <div class="chat-buttons">
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">
+            &#x1F4AC; 
+        </a>
+        <div class="chat-button phone">
+            📞
+        </div>
+    </div>
+
+</body>
+</html>
