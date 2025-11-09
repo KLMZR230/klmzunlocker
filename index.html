@@ -17,6 +17,7 @@
             --button-bg: #4a4a58; 
             --cookie-bar-bg: #333;
             --whatsapp-green: #25d366; 
+            --card-border: #292d34;
         }
 
         /* Estilos Globales */
@@ -122,6 +123,60 @@
             background-color: #22252a;
             color: var(--accent-pink);
         }
+
+        /* --- ESTILOS DE LA SECCIÓN IMEI SERVICE --- */
+        #imeiServiceSection {
+            padding: 40px 50px;
+            background-color: var(--dark-bg);
+        }
+        #imeiServiceSection h2 {
+            margin-bottom: 30px;
+            color: var(--accent-pink);
+            font-size: 28px;
+            border-bottom: 2px solid var(--card-border);
+            padding-bottom: 10px;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .service-card {
+            background-color: #1a1e25;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .service-card h3 {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .card-details {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--card-border);
+            padding-top: 10px;
+        }
+        .card-footer .price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4dc2f2; /* Azul claro */
+        }
+        .card-footer .time {
+            color: var(--accent-pink);
+        }
     </style>
 </head>
 <body>
@@ -149,9 +204,9 @@
                 Ponga la orden
                 <div class="dropdown-menu hidden" id="pongaOrdenMenu">
                     <ul>
-                        <li><a href="#" class="order-type-link">IMEI Service</a></li>
-                        <li><a href="#" class="order-type-link">Box/Dongle/Tool/Credit - Activation</a></li>
-                        <li><a href="#" class="order-type-link">Digital Tool Rent & Remote Service</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="imei">IMEI Service</a></li> 
+                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Box/Dongle/Tool/Credit - Activation</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Digital Tool Rent & Remote Service</a></li>
                     </ul>
                 </div>
             </div>
@@ -166,6 +221,12 @@
     </nav>
 
     <main>
+        <section class="hidden" id="imeiServiceSection">
+            <h2>IMEI Service</h2>
+            <div id="serviceGridContainer" class="service-grid">
+                </div>
+        </section>
+
         <section class="hero-section" id="heroSection">
             <div class="services-content">
                 <div class="services-box">
@@ -187,7 +248,7 @@
             </div>
 
             <img id="mainDevicesImage" src="https://i.imgur.com/your-devices-image-placeholder.png" alt="Dispositivos Apple">
-            </section>
+        </section>
 
         <section class="login-section" id="loginSection">
             <h3>Iniciar Sesión / Registrarse</h3>
@@ -286,37 +347,104 @@
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
         let supabase;
-        let heroSection, mainDevicesImage, loginSection, adminSection, loginLogoutBtn;
+        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; // Nueva sección
+        let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
         
-        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu; // Elementos de Navegación
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // --- Funciones de Navegación (CORREGIDA) ---
-        async function handleNavigationClick(event) {
-            // Utilizamos event.currentTarget para asegurar que obtenemos el DIV con el listener
-            const clickedElement = event.currentTarget;
-            const isPongaOrden = clickedElement.id === 'navPongaOrden';
+        // --- DATOS DE SERVICIOS IMEI (Recortados para el ejemplo) ---
+        // ESTOS DATOS SON LOS QUE PROVISTE EN LA SOLICITUD ANTERIOR
+        const imeiServicesData = [
+            // IMEI Checkers Worldwide ✅
+            { name: "ALL MOBILE Blacklist And Model checker - iPhone | Samsung | Xiaomi | Oppo Etc", price: "$0.012", time: "Instant", category: "IMEI Checkers Worldwide" },
+            { name: "Apple ALL DEVICE MDM CHECK ON/OFF Checker BY SN", price: "$0.27", time: "Miniutes", category: "IMEI Checkers Worldwide" },
+            { name: "Apple iPhone Carrier + FMI On/Off Checker (IMEI/SN) ✅", price: "$0.041", time: "Miniutes", category: "IMEI Checkers Worldwide" },
+            // Sold By Apple GSX Services ✅
+            { name: "APPLE GSX CASES & REPAIRS HISTORY → IMEI/SN", price: "$1.05", time: "1-5 Miniutes", category: "Sold By Apple GSX Services" },
+            { name: "Apple iPhone / iPad Sold By & Warranty Coverage Check (IMEI/SN)", price: "$1.508", time: "1-5 Miniutes", category: "Sold By Apple GSX Services" },
+            // Xiaomi Lock Status
+            { name: "MI Account (Country Activation Region + Clear Or Lost) By [Keylock Or CodeLock Or Lock Code] Instant", price: "$0.624", time: "Miniutes", category: "XIAOMI LOCK STATUS" },
+            { name: "MI Account CLEAN/LOST Checker By [Keylock NEW CODE] Instant (No Refund)", price: "$0.416", time: "Miniutes", category: "XIAOMI LOCK STATUS" },
+            // Motorola Network Unlocking Services ✅
+            { name: "Motorola WorldWide Exclusive NCK Code Fully Automated INSTANT 24/7", price: "$0.28", time: "Instant", category: "Motorola Network Unlocking Services" },
+        ];
+
+
+        // --- FUNCIÓN PRINCIPAL DE RENDERIZADO DE SERVICIOS ---
+        function renderImeiServices() {
+            const container = document.getElementById('serviceGridContainer');
+            if (!container) return;
+
+            container.innerHTML = ''; // Limpiar contenido previo
             
-            // Cerrar el menú si el usuario hace clic fuera de Ponga la Orden
-            if (!isPongaOrden) {
+            imeiServicesData.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                
+                card.innerHTML = `
+                    <h3>${service.name}</h3>
+                    <div class="card-details">
+                        Categoría: <strong>${service.category}</strong>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price">${service.price}</span>
+                        <span class="time">${service.time}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Ocultar otras secciones y mostrar esta
+            hideAllSections();
+            imeiServiceSection.classList.remove('hidden');
+            imeiServiceSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function hideAllSections() {
+            heroSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            adminSection.classList.add('hidden');
+            imeiServiceSection.classList.add('hidden');
+        }
+
+        // --- Funciones de Navegación ---
+        async function handleNavigationClick(event) {
+            const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
+            
+            // Si hace clic en un link dentro del menú
+            if (event.target.classList.contains('order-type-link')) {
+                event.preventDefault();
+                const serviceType = event.target.dataset.serviceType;
+                pongaOrdenMenu.classList.add('hidden'); // Cierra el menú
+
+                if (serviceType === 'imei') {
+                    renderImeiServices();
+                } else {
+                    // Para otros tipos de servicio, simplemente redirigimos de momento
+                    alert(`Función para ${event.target.textContent} aún no implementada.`);
+                }
+                return;
+            }
+
+
+            // Lógica principal de navegación
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const isLoggedIn = !!session; 
+
+            if (event.currentTarget.id !== 'navPongaOrden') {
                 pongaOrdenMenu.classList.add('hidden');
             }
 
-            const { data: { session } = {} } = await supabase.auth.getSession();
-            const isLoggedIn = !!session; 
-            
-            // 1. Si el usuario hace clic en Ponga la Orden:
             if (isPongaOrden) {
                 if (isLoggedIn) {
-                    // Logueado: Muestra/Oculta el menú de servicios
                     pongaOrdenMenu.classList.toggle('hidden');
                 } else {
-                    // NO Logueado: Redirige a Login y avisa.
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                     loginMessage.style.color = 'orange';
                     loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
@@ -324,21 +452,17 @@
                 return;
             } 
             
-            // 2. Si hace clic en otra opción (Area Cliente / Historial):
-            
-            // Si NO está logueado: Redirige a Login
+            // Resto de la navegación (Área Cliente / Historial)
+            pongaOrdenMenu.classList.add('hidden');
             if (!isLoggedIn) {
                 loginSection.scrollIntoView({ behavior: 'smooth' });
                 loginMessage.textContent = '';
                 return;
             } 
             
-            // Si está logueado (Cliente o Admin)
             if (!adminSection.classList.contains('hidden')) {
-                // Si es ADMIN: va al panel
                 adminSection.scrollIntoView({ behavior: 'smooth' });
             } else {
-                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
                 loginSection.scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -346,29 +470,18 @@
         // --- Otras funciones (Mantidas) ---
 
         async function signInWithEmail() {
+            // Lógica de inicio de sesión
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
-
-            if (!supabase) {
-                 loginMessage.style.color = 'red';
-                 loginMessage.textContent = 'Error de inicialización de la API.';
-                 return;
-            }
-
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; return; }
             const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
-
             if (error) {
                 console.error('Error al hacer login:', error);
                 loginMessage.style.color = 'red';
                 let msg = error.message;
-                if (error.message.includes('Invalid login credentials')) {
-                    msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.';
-                } else if (error.message.includes('Email not confirmed')) {
-                    msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.';
-                }
+                if (error.message.includes('Invalid login credentials')) { msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; } else if (error.message.includes('Email not confirmed')) { msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; }
                 loginMessage.textContent = `Error de inicio: ${msg}`;
             } else if (user) {
                 loginMessage.style.color = '#25d366';
@@ -380,20 +493,13 @@
         }
         
         async function signUpWithEmail() {
+            // Lógica de registro
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
-            
-            if (!supabase) {
-                 loginMessage.style.color = 'red';
-                 loginMessage.textContent = 'Erro de inicialização da API.';
-                 return;
-            }
-
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
             const { error } = await supabase.auth.signUp({ email, password });
-
             if (error) {
                 console.error('Error al registrar:', error);
                 loginMessage.style.color = 'red';
@@ -420,34 +526,28 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
+            // Oculta todas las secciones para decidir cuál mostrar
+            hideAllSections();
+
             if (user) {
                 const isAdmin = user.email === ADMIN_EMAIL;
                 
                 loginLogoutBtn.textContent = 'Logout';
                 loginLogoutBtn.onclick = signOut;
                 
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                
                 if (isAdmin) {
-                    loginSection.classList.add('hidden');
                     adminSection.classList.remove('hidden');
                     adminNameDisplay.classList.remove('hidden');
-                    loggedInUserName.textContent = user.email;
-                    adminNameDisplay.textContent = `Admin: ${user.email.split('@')[0]}`;
-                    loginMessage.textContent = 'Panel de Admin activo.';
+                    // Al ser admin, no mostramos login, sino el panel
                 } else {
-                    loginSection.classList.remove('hidden'); 
-                    adminSection.classList.add('hidden');
-                    adminNameDisplay.classList.add('hidden');
-                    loginMessage.style.color = 'red';
-                    loginMessage.textContent = `Acceso denegado. Este correo (${user.email}) no es un administrador.`;
+                    // Cliente normal logueado
+                    heroSection.classList.remove('hidden');
+                    // Aquí podrías mostrar un panel de cliente si existiera, por ahora volvemos al inicio.
                 }
 
             } else {
-                loginSection.classList.remove('hidden');
-                adminSection.classList.add('hidden');
-                adminNameDisplay.classList.add('hidden');
+                // No logueado
+                heroSection.classList.remove('hidden');
                 loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
                     loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -456,27 +556,19 @@
         }
         
         async function submitNewOrder() {
+            // Lógica de administración de órdenes
             if (!supabase) return;
-            
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) {
                 orderResponseMessage.style.color = 'red';
                 orderResponseMessage.textContent = 'Función restringida a administradores.';
                 return;
             }
-
             const deviceName = document.getElementById('deviceName').value;
             const imeiNumber = document.getElementById('imeiNumber').value;
-
-            if (!deviceName || !imeiNumber) {
-                orderResponseMessage.style.color = 'red';
-                orderResponseMessage.textContent = 'Por favor, complete ambos campos.';
-                return;
-            }
-
+            if (!deviceName || !imeiNumber) { orderResponseMessage.style.color = 'red'; orderResponseMessage.textContent = 'Por favor, complete ambos campos.'; return; }
             orderResponseMessage.style.color = 'yellow';
             orderResponseMessage.textContent = 'Enviando orden...';
-
             const { error } = await supabase
                 .from('orders') 
                 .insert([{ device_name: deviceName, imei: imeiNumber, status: 'Pending', created_at: new Date().toISOString() }]);
@@ -493,23 +585,17 @@
         }
         
         async function uploadBackgroundImage() {
+            // Lógica de administración de imágenes
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) return; 
-
             const fileInput = document.getElementById('backgroundImageFile');
             const file = fileInput.files[0];
-            if (!file) {
-                backgroundResponseMessage.style.color = 'red';
-                backgroundResponseMessage.textContent = 'Seleccione una imagen.';
-                return;
-            }
+            if (!file) { backgroundResponseMessage.style.color = 'red'; backgroundResponseMessage.textContent = 'Seleccione una imagen.'; return; }
             backgroundResponseMessage.style.color = 'yellow';
             backgroundResponseMessage.textContent = 'Subiendo imagen de fondo...';
             const filePath = `hero_background_${Date.now()}_${file.name}`; 
-
             const { error } = await supabase.storage.from(BACKGROUND_BUCKET_NAME).upload(filePath, file);
-
             if (error) {
                 backgroundResponseMessage.style.color = 'red';
                 backgroundResponseMessage.textContent = `Error: ${error.message}`;
@@ -541,21 +627,13 @@
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) return;
-
             const fileInput = document.getElementById('devicesImageFile');
             const file = fileInput.files[0];
-            if (!file) {
-                devicesImageResponseMessage.style.color = 'red';
-                devicesImageResponseMessage.textContent = 'Seleccione una imagen de dispositivos.';
-                return;
-            }
-
+            if (!file) { devicesImageResponseMessage.style.color = 'red'; devicesImageResponseMessage.textContent = 'Seleccione una imagen de dispositivos.'; return; }
             devicesImageResponseMessage.style.color = 'yellow';
             devicesImageResponseMessage.textContent = 'Subiendo imagen de dispositivos...';
             const filePath = `devices_main_${Date.now()}_${file.name}`; 
-
             const { error } = await supabase.storage.from(DEVICES_IMAGE_BUCKET_NAME).upload(filePath, file);
-
             if (error) {
                 devicesImageResponseMessage.style.color = 'red';
                 devicesImageResponseMessage.textContent = `Error: ${error.message}`;
@@ -593,11 +671,12 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM 
+            // Mapeo de Elementos DOM
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
+            imeiServiceSection = document.getElementById('imeiServiceSection'); // Nueva sección
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
             adminNameDisplay = document.getElementById('adminNameDisplay');
@@ -618,10 +697,24 @@
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             
             // Atribuir listeners de navegación (redirigir/mostrar menú)
-            // Se utiliza el DIV nav-item como contenedor principal para el listener
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
+
+            // Listener para los enlaces dentro del menú de Poner Orden
+            document.querySelectorAll('.order-type-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (this.dataset.serviceType === 'imei') {
+                        renderImeiServices();
+                    } else {
+                        alert(`Redirigiendo a la sección de: ${this.textContent}.`);
+                        // Aquí iría la lógica para mostrar las otras secciones
+                        hideAllSections();
+                        heroSection.classList.remove('hidden'); // Vuelve al inicio por defecto
+                    }
+                });
+            });
 
 
             // Botões do Admin (Mantidos)
