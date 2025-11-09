@@ -6,7 +6,7 @@
     <title>KLMZ Unlocker - Acceso de Cliente</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [ ... CSS EXISTENTE ... ] */
+        /* [ ... ESTILOS CSS INALTERADOS ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -19,7 +19,7 @@
             --whatsapp-green: #25d366; 
         }
 
-        /* Estilos Globales (Se mantienen igual que la versión anterior para mantener el diseño) */
+        /* Estilos Globales */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
         a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
@@ -72,19 +72,18 @@
             color: white; 
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
             cursor: pointer; 
-            overflow: hidden; /* Importante para recortar la imagen si es más grande */
+            overflow: hidden; 
         }
         .chat-button.whatsapp { 
             background-color: var(--whatsapp-green); 
             text-decoration: none; 
-            border: none; /* Eliminar cualquier borde por defecto del enlace */
+            border: none; 
         }
-        /* Estilo para la imagen del icono de WhatsApp */
         .chat-button.whatsapp img {
-            width: 100%; /* La imagen ocupará el 100% del ancho del botón */
-            height: 100%; /* La imagen ocupará el 100% del alto del botón */
-            object-fit: contain; /* Asegura que la imagen se vea completa sin estirarse */
-            border-radius: 50%; /* Hacer la imagen redonda, por si tiene bordes cuadrados */
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            border-radius: 50%; 
         }
 
         .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 500px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
@@ -104,7 +103,7 @@
             top: 100%; 
             left: 50%;
             transform: translateX(-50%);
-            min-width: 250px;
+            min-width: 350px; /* Ancho ajustado para las nuevas frases */
             background-color: var(--header-bg);
             border: 1px solid #333;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -299,19 +298,19 @@
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // --- Funciones de Navegación (MODIFICADA) ---
+        // --- Funciones de Navegación ---
         async function handleNavigationClick(event) {
             const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; // Verdadero si hay una sesión activa
 
             // Si el usuario es ADMIN, siempre mostrar el panel de admin (por simplicidad)
-            if (!adminSection.classList.contains('hidden')) {
+            if (!adminSection.classList.contains('hidden') && isLoggedIn) {
                 adminSection.scrollIntoView({ behavior: 'smooth' });
                 return;
             }
             
-            // Si el usuario está logueado (como cliente normal) Y hace clic en Ponga la orden, muestra/oculta el menú
+            // Si el usuario está logueado (como cliente normal o admin) Y hace clic en Ponga la orden, muestra/oculta el menú
             if (isPongaOrden && isLoggedIn) {
                 pongaOrdenMenu.classList.toggle('hidden');
                 return;
