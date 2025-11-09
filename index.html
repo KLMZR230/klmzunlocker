@@ -61,10 +61,36 @@
         .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
         .cookie-bar { background-color: var(--cookie-bar-bg); padding: 15px 30px; font-size: 13px; text-align: center; border-top: 2px solid #555; position: fixed; bottom: 0; width: 100%; z-index: 100; }
         .cookie-bar a { color: orange; text-decoration: underline; margin-left: 10px; }
-        .chat-buttons { position: fixed; bottom: 60px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
-        .chat-button { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); cursor: pointer; }
-        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; }
-        .chat-button.phone { background-color: #4dc2f2; }
+        
+        /* Botones de Chat Flotantes */
+        .chat-buttons {
+            position: fixed;
+            bottom: 60px; 
+            right: 20px;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; /* Tamaño normalizado para un solo ícono */
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        
+        .chat-button.whatsapp {
+            background-color: var(--whatsapp-green); 
+            text-decoration: none; 
+        }
+        
         .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 500px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
@@ -216,9 +242,10 @@
     </div>
 
     <div class="chat-buttons">
-        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">&#x1F4AC;</a>
-        <div class="chat-button phone">📞</div>
-    </div>
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">
+            📞
+        </a>
+        </div>
 
     <script>
         // 🔑 TUS CLAVES SUPABASE 
@@ -226,7 +253,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
-        let supabase; // Declarada globalmente, mas inicializada no DOMContentLoaded
+        let supabase;
         let heroSection, mainDevicesImage, loginSection, adminSection, loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
@@ -235,18 +262,16 @@
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // Adiciona um listener para garantir que o DOM esteja completamente carregado
+        // Adiciona un listener para garantir que o DOM esteja completamente carregado
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- CORREÇÃO DO TYPERROR AQUI ---
-            // Inicializar Supabase usando window.supabase, que é onde a CDN injeta o objeto.
+            // CORRECCIÓN DO TYPERROR AQUI: Inicializar Supabase
             if (window.supabase) {
                  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                 console.error("Erro: A biblioteca Supabase não foi carregada. Verifique o link CDN.");
+                 console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
                  return; 
             }
-            // ------------------------------------
 
             // Elementos DOM
             heroSection = document.getElementById('heroSection');
@@ -257,13 +282,13 @@
             loggedInUserName = document.getElementById('loggedInUserName');
             adminNameDisplay = document.getElementById('adminNameDisplay');
 
-            // Mensagens
+            // Mensajes
             orderResponseMessage = document.getElementById('orderResponseMessage');
             backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
             devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
             loginMessage = document.getElementById('loginMessage');
             
-            // --- Atribuir Listeners de Evento (Substituindo onclick no HTML) ---
+            // --- Atribuir Listeners de Evento ---
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             
@@ -283,9 +308,9 @@
             const clearDevicesButton = document.getElementById('clearDevicesButton');
             if(clearDevicesButton) clearDevicesButton.addEventListener('click', clearDevicesImage);
             
-            // --- Inicialização de Dados e Autenticação ---
+            // --- Inicialización de Datos y Autenticación ---
             
-            // 1. Carregar imagens salvas
+            // 1. Carregar imágenes salvas
             const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
             if (savedBackgroundImage) {
                 heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
@@ -299,7 +324,7 @@
                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL; 
             }
 
-            // 2. Verificar estado de autenticação
+            // 2. Verificar estado de autenticación
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser();
             });
@@ -310,7 +335,7 @@
 
 
         // --- Funções Auxiliares (CORPO DAS FUNÇÕES) ---
-
+        
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -318,10 +343,9 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
 
-            // Certifique-se de que supabase está inicializado
             if (!supabase) {
                  loginMessage.style.color = 'red';
-                 loginMessage.textContent = 'Erro de inicialização da API.';
+                 loginMessage.textContent = 'Error de inicialización de la API.';
                  return;
             }
 
@@ -355,7 +379,7 @@
             
             if (!supabase) {
                  loginMessage.style.color = 'red';
-                 loginMessage.textContent = 'Erro de inicialização da API.';
+                 loginMessage.textContent = 'Error de inicialización de la API.';
                  return;
             }
 
