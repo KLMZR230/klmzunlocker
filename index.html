@@ -19,412 +19,62 @@
             --whatsapp-green: #25d366; 
         }
 
-        /* Estilos Globales */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        a:hover {
-            color: var(--accent-pink);
-        }
-
-        /* 1. Barra Superior (Preta con Links/Info) */
-        .top-info-bar {
-            background-color: var(--header-bg);
-            display: flex;
-            justify-content: flex-end; 
-            align-items: center;
-            padding: 8px 30px;
-            font-size: 12px;
-            border-bottom: 1px solid #292d34;
-        }
-
-        .top-info-bar .info-group a {
-            margin-left: 20px;
-            padding: 5px 10px;
-            border-radius: 3px;
-            background-color: var(--button-bg);
-            color: white;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .top-info-bar .contact-info {
-            color: var(--text-muted);
-            margin-right: 20px;
-        }
-        
-        /* 2. Navegación Principal */
-        .main-nav {
-            background-color: var(--header-bg);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-light);
-        }
-        
-        .logo .klmz {
-            color: #4dc2f2; 
-        }
-        
-        .nav-links {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-links > a, .dropdown {
-            margin-left: 25px;
-            font-weight: 500;
-            padding: 10px 0;
-            text-transform: uppercase;
-        }
-        
-        .dropdown {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .dropdown::after {
-            content: ' ▼';
-            font-size: 8px;
-            margin-left: 5px;
-        }
-
-        /* Botón de Login/Logout/Registrar */
-        #loginLogoutBtn {
-            background-color: #3b3b3b; 
-            padding: 5px 15px; 
-            border-radius: 5px; 
-            margin-left: 30px; 
-            border: 1px solid #454545;
-            cursor: pointer;
-        }
-
-        /* Seção Principal/Hero - Layout original */
-        .hero-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end; 
-            padding: 60px 50px 0px 50px; 
-            min-height: 500px;
-            position: relative;
-            background-color: #161a20; 
-            overflow: hidden; 
-        }
-
-        .services-content {
-            flex-basis: 40%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end; 
-            padding-bottom: 80px; 
-            z-index: 10;
-        }
-
-        .services-box {
-            background-color: var(--service-box-bg);
-            border-radius: 10px;
-            padding: 25px 30px;
-            margin-bottom: 30px;
-            width: 90%;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 3px solid var(--accent-pink); 
-            border-radius: 50px / 10px; 
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .services-title {
-            background-color: #000;
-            color: var(--text-light);
-            font-size: 20px;
-            font-weight: bold;
-            padding: 10px 20px;
-            margin-top: -45px; 
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-left: -10px;
-            border: 2px solid var(--accent-pink);
-        }
-
-        .service-item {
-            display: flex;
-            align-items: center;
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .service-item::before {
-            content: ''; 
-            font-size: 18px;
-            color: var(--accent-pink);
-            margin-right: 10px;
-        }
-        
-        .contact-info-hero {
-            margin-top: 40px;
-            line-height: 1.8;
-            font-size: 16px;
-        }
-        
-        .contact-info-hero span {
-            display: block;
-        }
-
-        .contact-info-hero .icon {
-            color: var(--accent-pink);
-            margin-right: 5px;
-        }
-
-        /* Imagem de Dispositivos */
-        #mainDevicesImage {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 60%; 
-            max-width: 900px; 
-            height: auto;
-            object-fit: contain; 
-            z-index: 1; 
-        }
-        
-        .keychain-image {
-            position: absolute;
-            top: 20%; 
-            left: 55%; 
-            width: 120px; 
-            height: 120px;
-            border-radius: 50%;
-            background-color: var(--accent-pink); 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 35px;
-            color: white;
-            z-index: 2;
-        }
-        
-        /* 4. Rodapé */
-        .site-footer {
-            background-color: #1a1e25;
-            padding: 50px 30px 20px 30px; 
-            display: flex;
-            flex-direction: column;
-            border-top: 1px solid #292d34;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-around;
-            padding-bottom: 30px;
-        }
-        
-        .footer-col {
-            flex-basis: 20%;
-        }
-
-        .footer-col h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 10px;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 15px;
-            font-size: 20px;
-        }
-        
-        .social-icons a {
-            color: var(--text-muted);
-        }
-        
-        .social-icons a:hover {
-            color: var(--accent-pink);
-        }
-        
-        .subscribe-text {
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        
-        .subscribe-button {
-            background-color: #4c4e97; 
-            color: var(--text-light);
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 5px;
-            display: block;
-            text-align: center;
-        }
-        
-        .contact-footer-info {
-            line-height: 1.8;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid #292d34;
-            padding-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        /* 5. Barra de Cookies */
-        .cookie-bar {
-            background-color: var(--cookie-bar-bg);
-            padding: 15px 30px;
-            font-size: 13px;
-            text-align: center;
-            border-top: 2px solid #555;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 100;
-        }
-        
-        .cookie-bar a {
-            color: orange;
-            text-decoration: underline;
-            margin-left: 10px;
-        }
-
-        /* Botones de Chat Flotantes */
-        .chat-buttons {
-            position: fixed;
-            bottom: 60px; 
-            right: 20px;
-            z-index: 101;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .chat-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-        
-        .chat-button.whatsapp {
-            background-color: var(--whatsapp-green); 
-            text-decoration: none; 
-        }
-        
-        .chat-button.phone {
-            background-color: #4dc2f2; 
-        }
-
-        /* Estilos para Formularios (Login/Admin) */
-        .admin-section, .login-section {
-            background-color: #22252a; 
-            border-radius: 8px; 
-            padding: 30px; 
-            margin: 50px auto; 
-            max-width: 500px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        .admin-section h3, .login-section h3 {
-            margin-bottom: 25px;
-            color: var(--text-light);
-            font-size: 24px;
-        }
-        .admin-section input, .login-section input {
-            display: block;
-            width: calc(100% - 20px); 
-            padding: 12px;
-            margin: 15px auto;
-            border-radius: 5px;
-            border: 1px solid #444;
-            background-color: #333;
-            color: white;
-            font-size: 16px;
-        }
-        .admin-section button, .login-section button {
-            background-color: var(--accent-pink);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.2s;
-            margin-top: 15px;
-        }
-        .admin-options {
-            text-align: left;
-            margin-top: 30px;
-            border-top: 1px solid #333;
-            padding-top: 20px;
-        }
-        .admin-options h4 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: var(--text-light);
-        }
-        .admin-options .form-container { 
-            margin-top: 20px;
-            background-color: #1c2025; 
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .admin-options .form-container button {
-             background-color: #4c4e97; 
-        }
-        .form-message {
-            margin-top: 15px; 
-            font-size: 14px;
-            color: yellow;
-        }
-        /* Esconder secciones por defecto */
-        .hidden {
-            display: none;
-        }
+        /* Estilos Globales (Se mantienen igual que la versión anterior para mantener el diseño) */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
+        a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-pink); }
+        .top-info-bar { background-color: var(--header-bg); display: flex; justify-content: flex-end; align-items: center; padding: 8px 30px; font-size: 12px; border-bottom: 1px solid #292d34; }
+        .top-info-bar .info-group a { margin-left: 20px; padding: 5px 10px; border-radius: 3px; background-color: var(--button-bg); color: white; font-weight: bold; text-transform: uppercase; }
+        .top-info-bar .contact-info { color: var(--text-muted); margin-right: 20px; }
+        .main-nav { background-color: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
+        .logo .klmz { color: #4dc2f2; }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links > a, .dropdown { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; }
+        .dropdown { position: relative; cursor: pointer; }
+        .dropdown::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
+        #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
+        .hero-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 60px 50px 0px 50px; min-height: 500px; position: relative; background-color: #161a20; overflow: hidden; }
+        .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
+        .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
+        .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
+        .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
+        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 10px; }
+        .contact-info-hero { margin-top: 40px; line-height: 1.8; font-size: 16px; }
+        .contact-info-hero span { display: block; }
+        .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
+        #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
+        .keychain-image { position: absolute; top: 20%; left: 55%; width: 120px; height: 120px; border-radius: 50%; background-color: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-size: 35px; color: white; z-index: 2; }
+        .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
+        .footer-content { display: flex; justify-content: space-around; padding-bottom: 30px; }
+        .footer-col { flex-basis: 20%; }
+        .footer-col h3 { font-size: 18px; margin-bottom: 20px; text-transform: uppercase; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .social-icons { display: flex; gap: 15px; font-size: 20px; }
+        .social-icons a { color: var(--text-muted); }
+        .social-icons a:hover { color: var(--accent-pink); }
+        .subscribe-text { color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .subscribe-button { background-color: #4c4e97; color: var(--text-light); padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; display: block; text-align: center; }
+        .contact-footer-info { line-height: 1.8; }
+        .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
+        .cookie-bar { background-color: var(--cookie-bar-bg); padding: 15px 30px; font-size: 13px; text-align: center; border-top: 2px solid #555; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .cookie-bar a { color: orange; text-decoration: underline; margin-left: 10px; }
+        .chat-buttons { position: fixed; bottom: 60px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
+        .chat-button { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); cursor: pointer; }
+        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; }
+        .chat-button.phone { background-color: #4dc2f2; }
+        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; max-width: 500px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
+        .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
+        .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
+        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
+        .admin-options { text-align: left; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
+        .admin-options h4 { font-size: 20px; margin-bottom: 15px; color: var(--text-light); }
+        .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
+        .admin-options .form-container button { background-color: #4c4e97; }
+        .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -571,10 +221,10 @@
     </div>
 
     <script>
-        // 🔑 TUS CLAVES SUPABASE
+        // 🔑 TUS CLAVES SUPABASE (Se mantienen correctas)
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
-        const ADMIN_EMAIL = 'klmzr230@gmail.com'; // 🔑 CORREO DEL ADMINISTRADOR
+        const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -595,12 +245,12 @@
         // Nombres de Buckets (Asegúrese de que existan en Supabase Storage)
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; // URL de la imagen inicial
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
         // --- Funciones de Autenticación ---
 
         /**
-         * Maneja el inicio de sesión del usuario.
+         * Maneja el inicio de sesión del usuario. (CORREGIDA)
          */
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
@@ -609,17 +259,29 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
 
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            // Uso correcto de signInWithPassword y manejo de errores
+            const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 console.error('Error al hacer login:', error);
                 loginMessage.style.color = 'red';
-                loginMessage.textContent = `Error: ${error.message}`;
-            } else {
+                // Mensaje más específico para errores comunes
+                let msg = error.message;
+                if (error.message.includes('Invalid login credentials')) {
+                    msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.';
+                }
+                loginMessage.textContent = `Error de inicio: ${msg}`;
+            } else if (user) {
                 loginMessage.style.color = '#25d366';
-                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
-                // Esperamos un momento para que Supabase actualice el estado
-                setTimeout(checkUser, 1000); 
+                loginMessage.textContent = '✅ Sesión iniciada con éxito! Verificando permisos...';
+                // Verificar permisos inmediatamente
+                checkUser();
+            } else {
+                 // Este caso puede ocurrir si la respuesta es exitosa pero el usuario es nulo (ej: confirmación pendiente)
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
             }
         }
         
@@ -633,7 +295,6 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
             
-            // Nota: Por defecto, Supabase requiere confirmación de correo
             const { error } = await supabase.auth.signUp({ email, password });
 
             if (error) {
@@ -642,7 +303,7 @@
                 loginMessage.textContent = `Error: ${error.message}`;
             } else {
                 loginMessage.style.color = '#4dc2f2'; 
-                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta.';
+                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
             }
         }
 
@@ -654,6 +315,8 @@
             if (error) {
                 console.error('Error al hacer logout:', error);
             } else {
+                // Al hacer logout, limpiamos el mensaje de login
+                loginMessage.textContent = '';
                 checkUser(); 
             }
         }
@@ -662,7 +325,9 @@
          * Verifica el estado del usuario y actualiza la UI.
          */
         async function checkUser() {
-            const { data: { user } } = await supabase.auth.getUser();
+            // Se usa getSession para obtener la sesión actual si existe
+            const { data: { session } } = await supabase.auth.getSession();
+            const user = session?.user;
             
             if (user) {
                 const isAdmin = user.email === ADMIN_EMAIL;
@@ -671,6 +336,10 @@
                 loginLogoutBtn.textContent = 'Logout';
                 loginLogoutBtn.onclick = signOut;
                 
+                // Limpiamos los campos de login al iniciar sesión correctamente
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                
                 if (isAdmin) {
                     // MODO ADMINISTRADOR: Mostrar panel de administración
                     loginSection.classList.add('hidden');
@@ -678,9 +347,10 @@
                     adminNameDisplay.classList.remove('hidden');
                     loggedInUserName.textContent = user.email;
                     adminNameDisplay.textContent = `Admin: ${user.email.split('@')[0]}`;
+                    loginMessage.textContent = 'Panel de Admin activo.';
                 } else {
                     // MODO CLIENTE: Ocultar todo lo de administración
-                    loginSection.classList.remove('hidden'); // Permitir ver el formulario, pero mostrar mensaje
+                    loginSection.classList.remove('hidden'); 
                     adminSection.classList.add('hidden');
                     adminNameDisplay.classList.add('hidden');
                     loginMessage.style.color = 'red';
@@ -696,18 +366,20 @@
                 loginLogoutBtn.onclick = () => {
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                 };
-                loginMessage.textContent = ''; // Limpiar mensaje de login al iniciar
             }
         }
+        
+        // El resto de las funciones (submitNewOrder, uploadBackgroundImage, etc.) se mantienen sin cambios.
 
-        // --- Funciones de Gestión de Órdenes (Solo Admin) ---
         async function submitNewOrder() {
-            if (document.getElementById('loginEmail').value !== ADMIN_EMAIL) {
+            // Esta función ahora depende de la verificación de RLS en Supabase, ya que el usuario ya está autenticado.
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user || user.email !== ADMIN_EMAIL) {
                 orderResponseMessage.style.color = 'red';
                 orderResponseMessage.textContent = 'Función restringida a administradores.';
                 return;
             }
-            
+
             const deviceName = document.getElementById('deviceName').value;
             const imeiNumber = document.getElementById('imeiNumber').value;
 
@@ -735,11 +407,11 @@
                 document.getElementById('imeiNumber').value = '';
             }
         }
-
-        // --- Funciones de Upload de Imágenes (Solo Admin) ---
-
+        
         async function uploadBackgroundImage() {
-            // Se asume que checkUser ya ha verificado que el usuario es admin
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user || user.email !== ADMIN_EMAIL) return; // Solo admin
+            
             const fileInput = document.getElementById('backgroundImageFile');
             const file = fileInput.files[0];
             if (!file) {
@@ -781,6 +453,9 @@
         }
 
         async function uploadDevicesImage() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user || user.email !== ADMIN_EMAIL) return; // Solo admin
+
             const fileInput = document.getElementById('devicesImageFile');
             const file = fileInput.files[0];
             if (!file) {
@@ -838,7 +513,10 @@
              }
 
              // Verificar si el usuario ya está logueado
-             await checkUser();
+             // Usamos onAuthStateChange para escuchar cualquier cambio de sesión
+             supabase.auth.onAuthStateChange((event, session) => {
+                checkUser();
+             });
         };
     </script>
 </body>
