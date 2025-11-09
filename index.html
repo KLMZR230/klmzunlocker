@@ -6,7 +6,7 @@
     <title>KLMZ UNLOCKER - Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [ ... CSS EXISTENTE ... ] */
+        /* [ ... ESTILOS CSS INALTERADOS ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -44,10 +44,6 @@
         .contact-info-hero span { display: block; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
-        
-        /* Chaveiro Rosa (REMOVIDO DEL CÓDIGO) 
-        .keychain-image { ... } */
-        
         .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
         .footer-content { display: flex; justify-content: space-around; padding-bottom: 30px; }
         .footer-col { flex-basis: 20%; }
@@ -300,13 +296,13 @@
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // --- Funciones de Navegación (MODIFICADA) ---
+        // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
             const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
             const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; // Verdadero si hay una sesión activa
 
-            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera
+            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él
             if (event.currentTarget.id !== 'navPongaOrden') {
                 pongaOrdenMenu.classList.add('hidden');
             }
@@ -334,13 +330,14 @@
                 return;
             } 
             
-            // 4. Si está logueado pero NO es la opción "Ponga la orden" (cliente o admin)
+            // 4. Si está logueado (Cliente o Admin)
             if (!adminSection.classList.contains('hidden')) {
                 // Si es ADMIN: va al panel
                 adminSection.scrollIntoView({ behavior: 'smooth' });
             } else {
-                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
+                // Si es Cliente (Area Cliente / Historial de pedidos)
                 loginSection.scrollIntoView({ behavior: 'smooth' });
+                // Aquí podrías implementar la vista del historial de cliente si existiera.
             }
         }
         
