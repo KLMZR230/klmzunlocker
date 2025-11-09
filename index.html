@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ Unlocker - Acceso de Cliente</title>
+    <title>KLMZ UNLOCKER - Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [ ... ESTILOS CSS INALTERADOS ... ] */
+        /* [ ... CSS EXISTENTE ... ] */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -44,7 +44,10 @@
         .contact-info-hero span { display: block; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
-        .keychain-image { position: absolute; top: 20%; left: 55%; width: 120px; height: 120px; border-radius: 50%; background-color: var(--accent-pink); display: flex; align-items: center; justify-content: center; font-size: 35px; color: white; z-index: 2; }
+        
+        /* Chaveiro Rosa (REMOVIDO DEL CÓDIGO) 
+        .keychain-image { ... } */
+        
         .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
         .footer-content { display: flex; justify-content: space-around; padding-bottom: 30px; }
         .footer-col { flex-basis: 20%; }
@@ -103,7 +106,7 @@
             top: 100%; 
             left: 50%;
             transform: translateX(-50%);
-            min-width: 350px; /* Ancho ajustado para las nuevas frases */
+            min-width: 350px; 
             background-color: var(--header-bg);
             border: 1px solid #333;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -150,9 +153,9 @@
                 Ponga la orden
                 <div class="dropdown-menu hidden" id="pongaOrdenMenu">
                     <ul>
-                        <li><a href="#">IMEI Service</a></li>
-                        <li><a href="#">Box/Dongle/Tool/Credit - Activation</a></li>
-                        <li><a href="#">Digital Tool Rent & Remote Service</a></li>
+                        <li><a href="#" class="order-type-link">IMEI Service</a></li>
+                        <li><a href="#" class="order-type-link">Box/Dongle/Tool/Credit - Activation</a></li>
+                        <li><a href="#" class="order-type-link">Digital Tool Rent & Remote Service</a></li>
                     </ul>
                 </div>
             </div>
@@ -188,8 +191,7 @@
             </div>
 
             <img id="mainDevicesImage" src="https://i.imgur.com/your-devices-image-placeholder.png" alt="Dispositivos Apple">
-            <div class="keychain-image"></div>
-        </section>
+            </section>
 
         <section class="login-section" id="loginSection">
             <h3>Iniciar Sesión / Registrarse</h3>
@@ -298,37 +300,51 @@
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
         const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
 
-        // --- Funciones de Navegación ---
+        // --- Funciones de Navegación (MODIFICADA) ---
         async function handleNavigationClick(event) {
             const isPongaOrden = event.currentTarget.id === 'navPongaOrden';
             const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; // Verdadero si hay una sesión activa
 
-            // Si el usuario es ADMIN, siempre mostrar el panel de admin (por simplicidad)
-            if (!adminSection.classList.contains('hidden') && isLoggedIn) {
-                adminSection.scrollIntoView({ behavior: 'smooth' });
-                return;
+            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera
+            if (event.currentTarget.id !== 'navPongaOrden') {
+                pongaOrdenMenu.classList.add('hidden');
             }
-            
-            // Si el usuario está logueado (como cliente normal o admin) Y hace clic en Ponga la orden, muestra/oculta el menú
-            if (isPongaOrden && isLoggedIn) {
-                pongaOrdenMenu.classList.toggle('hidden');
+
+            // 2. Si el usuario hace clic en Ponga la Orden:
+            if (isPongaOrden) {
+                if (isLoggedIn) {
+                    // Si está logueado (cliente o admin): Muestra/Oculta el menú
+                    pongaOrdenMenu.classList.toggle('hidden');
+                } else {
+                    // Si NO está logueado: Redirige a Login y avisa.
+                    pongaOrdenMenu.classList.add('hidden');
+                    loginSection.scrollIntoView({ behavior: 'smooth' });
+                    loginMessage.style.color = 'orange';
+                    loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
+                }
                 return;
             } 
             
-            // Si el usuario está deslogueado o hace clic en otra opción de cliente, redirigir a Login
-            pongaOrdenMenu.classList.add('hidden'); // Asegurar que el menú se cierre
-            loginSection.scrollIntoView({ behavior: 'smooth' });
-            
-            if (isPongaOrden) {
-                loginMessage.style.color = 'orange';
-                loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
-            } else {
+            // 3. Si hace clic en otra opción (Area Cliente / Historial):
+            if (!isLoggedIn) {
+                // Si NO está logueado: Redirige a Login
+                loginSection.scrollIntoView({ behavior: 'smooth' });
                 loginMessage.textContent = '';
+                return;
+            } 
+            
+            // 4. Si está logueado pero NO es la opción "Ponga la orden" (cliente o admin)
+            if (!adminSection.classList.contains('hidden')) {
+                // Si es ADMIN: va al panel
+                adminSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // Si es Cliente: va a la sección de Login (donde estaría el panel de cliente si existiera)
+                loginSection.scrollIntoView({ behavior: 'smooth' });
             }
         }
         
-        // --- Las otras funciones (signInWithEmail, checkUser, etc.) permanecen las mismas ---
+        // --- Otras funciones (Mantidas) ---
 
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
