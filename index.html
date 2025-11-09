@@ -356,7 +356,8 @@
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/your-devices-image-placeholder.png'; 
+        // CORREGIDO: Asegura que la URL placeholder tenga un dominio válido (aunque sea solo de ejemplo)
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://i.imgur.com/placeholder_base.png'; 
 
         // --- DATOS DE SERVICIOS IMEI (Recortados para el ejemplo) ---
         const imeiServicesData = [
@@ -410,14 +411,15 @@
         async function handleNavigationClick(event) {
             // Utilizamos event.currentTarget para obtener el DIV contenedor
             const clickedElement = event.currentTarget;
+            
+            // Verificación de seguridad: si no hay elemento o ID, salir.
             if (!clickedElement || !clickedElement.id) {
-                // Prevenir error si el evento se dispara en un elemento sin ID (debería ser raro ahora)
                 return; 
             }
             
             const isPongaOrden = clickedElement.id === 'navPongaOrden';
             
-            // Cerrar el menú si el usuario hace clic fuera de Ponga la Orden
+            // 1. Siempre cerrar el menú de órdenes si se hace clic fuera de él
             if (!isPongaOrden) {
                 pongaOrdenMenu.classList.add('hidden');
             }
@@ -425,7 +427,7 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; 
             
-            // 1. Si el usuario hace clic en Ponga la Orden:
+            // 2. Si el usuario hace clic en Ponga la Orden:
             if (isPongaOrden) {
                 if (isLoggedIn) {
                     // Logueado: Muestra/Oculta el menú de servicios
@@ -440,7 +442,7 @@
                 return;
             } 
             
-            // 2. Si hace clic en otra opción (Area Cliente / Historial):
+            // 3. Si hace clic en otra opción (Area Cliente / Historial):
             
             // Si NO está logueado: Redirige a Login
             if (!isLoggedIn) {
@@ -518,7 +520,7 @@
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
-            hideAllSections(); // Siempre ocultar todo al verificar sesión
+            hideAllSections(); 
 
             if (user) {
                 const isAdmin = user.email === ADMIN_EMAIL;
@@ -530,11 +532,11 @@
                     adminSection.classList.remove('hidden');
                     adminNameDisplay.classList.remove('hidden');
                 } else {
-                    heroSection.classList.remove('hidden'); // Cliente normal vuelve al inicio
+                    heroSection.classList.remove('hidden'); 
                 }
 
             } else {
-                heroSection.classList.remove('hidden'); // No logueado vuelve al inicio
+                heroSection.classList.remove('hidden'); 
                 loginLogoutBtn.textContent = 'Login / Register';
                 loginLogoutBtn.onclick = () => {
                     loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -658,7 +660,7 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM 
+            // Mapeo de Elementos DOM
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
@@ -724,7 +726,7 @@
             
             // --- Inicialización de Datos y Autenticación ---
             
-            // 1. Carregar imágenes salvas
+            // 1. Cargar imágenes salvas
             const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
             if (savedBackgroundImage) {
                 heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`;
