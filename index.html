@@ -221,22 +221,12 @@
     </div>
 
     <script>
-        // 🔑 TUS CLAVES SUPABASE (Mantenidas)
+        // 🔑 TUS CLAVES SUPABASE 
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
-        // As funções de manipuladores de eventos e inicialização devem estar dentro do escopo
-        
-        // --- Definições de Funções (Mantidas globais, mas chamadas pelo listener) ---
-
-        // Funções de Auth (signInWithEmail, signUpWithEmail, signOut, checkUser)
-        // Funções de Admin (submitNewOrder, uploadBackgroundImage, etc.)
-
-        // Vamos refatorar o escopo para evitar o ReferenceError
-
-        // Definindo as variáveis globais que serão inicializadas no DOMContentLoaded
-        let supabase;
+        let supabase; // Declarada globalmente, mas inicializada no DOMContentLoaded
         let heroSection, mainDevicesImage, loginSection, adminSection, loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage;
@@ -247,9 +237,17 @@
 
         // Adiciona um listener para garantir que o DOM esteja completamente carregado
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicializar Supabase e selecionar elementos DOM
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             
+            // --- CORREÇÃO DO TYPERROR AQUI ---
+            // Inicializar Supabase usando window.supabase, que é onde a CDN injeta o objeto.
+            if (window.supabase) {
+                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                 console.error("Erro: A biblioteca Supabase não foi carregada. Verifique o link CDN.");
+                 return; 
+            }
+            // ------------------------------------
+
             // Elementos DOM
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
@@ -269,7 +267,7 @@
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             
-            // Botões do Admin (garante que as funções só são chamadas após a inicialização)
+            // Botões do Admin
             const submitOrderButton = document.getElementById('submitOrderButton');
             if(submitOrderButton) submitOrderButton.addEventListener('click', submitNewOrder);
             
@@ -320,6 +318,13 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Iniciando sesión...';
 
+            // Certifique-se de que supabase está inicializado
+            if (!supabase) {
+                 loginMessage.style.color = 'red';
+                 loginMessage.textContent = 'Erro de inicialização da API.';
+                 return;
+            }
+
             const { data: { user }, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
@@ -335,7 +340,6 @@
             } else if (user) {
                 loginMessage.style.color = '#25d366';
                 loginMessage.textContent = '✅ Sesión iniciada con éxito! Verificando permisos...';
-                // checkUser será chamado pelo onAuthStateChange listener
             } else {
                 loginMessage.style.color = 'red';
                 loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
@@ -349,6 +353,12 @@
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
             
+            if (!supabase) {
+                 loginMessage.style.color = 'red';
+                 loginMessage.textContent = 'Erro de inicialização da API.';
+                 return;
+            }
+
             const { error } = await supabase.auth.signUp({ email, password });
 
             if (error) {
@@ -362,16 +372,18 @@
         }
 
         async function signOut() {
+            if (!supabase) return;
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Error al hacer logout:', error);
             } else {
                 loginMessage.textContent = '';
-                // checkUser será chamado pelo onAuthStateChange listener
             }
         }
 
         async function checkUser() {
+            if (!supabase) return;
+            
             const { data: { session } } = await supabase.auth.getSession();
             const user = session?.user;
             
@@ -411,6 +423,8 @@
         }
         
         async function submitNewOrder() {
+            if (!supabase) return;
+            
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) {
                 orderResponseMessage.style.color = 'red';
@@ -446,8 +460,9 @@
         }
         
         async function uploadBackgroundImage() {
+            if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user || user.email !== ADMIN_EMAIL) return;
+            if (!user || user.email !== ADMIN_EMAIL) return; 
 
             const fileInput = document.getElementById('backgroundImageFile');
             const file = fileInput.files[0];
@@ -490,6 +505,7 @@
         }
 
         async function uploadDevicesImage() {
+            if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.email !== ADMIN_EMAIL) return;
 
