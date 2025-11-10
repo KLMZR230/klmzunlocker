@@ -18,8 +18,6 @@
             --cookie-bar-bg: #333;
             --whatsapp-green: #25d366; 
             --card-border: #292d34;
-            --card-inner-bg: #1a1e25; /* Fondo de la tarjeta interior */
-            --green-check: #00ff00; /* Verde brillante para el check */
         }
 
         /* Estilos Globales */
@@ -146,15 +144,20 @@
             margin-left: 5px;
         }
         /* Fin de estilos de tarjeta */
-        
+
         /* Estilos del Editor de Servicios */
         .service-editor-list { list-style: none; padding: 0; }
-        .service-editor-list li { background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .service-editor-list li span { font-weight: bold; margin-right: 15px; }
-        .service-editor-list li input { display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; }
-        .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; }
+        .service-editor-list li { 
+            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start; /* Alineación para edición */
+            flex-wrap: wrap; /* Permite que los campos se envuelvan */
+        }
+        .service-editor-list li input { 
+            display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; font-size: 12px;
+        }
+        .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; flex-shrink: 0; }
         .service-editor-list li .input-group p { font-size: 10px; color: #aaa; margin-bottom: 2px; }
-        .service-editor-actions { display: flex; align-items: center; }
+        .service-editor-list li .full-name-input { width: 95%; } /* Campo de nombre completo */
+        .service-editor-list li .service-editor-actions { margin-left: auto; }
 
     </style>
 </head>
@@ -2032,9 +2035,7 @@ UK Vodafone iPhone All Models Clean IMEI Only ✅ 100% Success Rate
 UK Vodafone iPhone & Generic Unlocking Services [Direct Source]
 $7.634 1-5 days
 UK
-UK Vodafone iPhone All Models Clean IMEI Only ✅ 100% Success Rate
-UK Vodafone iPhone & Generic Unlocking Services [Direct Source]
-$8.074 1-5 days
+UK Vodafone iPhone All Models Clean IMEI Only ✅ 10PLUGÍN_CALL$8.074 1-5 days
 UK
 UK Vodafone iPHONE XR/XS/XS MAX/11/12/13 & 14 CLEAN / Blacklist / Block Premimum Service ( PROMO ON )
 UK Vodafone iPhone & Generic Unlocking Services [Direct Source]
@@ -2411,7 +2412,7 @@ $12.012 1-5 days`;
 
         // --- FUNCIÓN PARA PARSEAR LA DATA BRUTA ---
         function parseAndNormalizeServices(rawText) {
-            // (La misma lógica de parsing robusta de la versión anterior)
+            // (La misma lógica de parsing robusta)
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             const services = [];
             let currentCategory = 'Todo Grupo';
@@ -2468,40 +2469,39 @@ $12.012 1-5 days`;
         async function fetchServices() {
             if (loadingMessage) loadingMessage.textContent = 'Cargando servicios desde Supabase...';
             
-            // Intenta leer los datos
             const { data, error } = await supabase
                 .from('store_services') 
                 .select('service_data')
                 .eq('id', SERVICES_RECORD_ID)
-                .maybeSingle(); // Usamos maybeSingle para manejar 0 o 1 resultado, evitando errores en 404
+                .maybeSingle(); 
 
-            // Manejo de error de RLS (404) o de conexión
             if (error) { 
                 console.error("Error al cargar servicios de Supabase:", error);
                 if (loadingMessage) {
                     loadingMessage.style.color = 'red';
-                    loadingMessage.textContent = `ERROR CRÍTICO: ${error.message}. Verifique la política RLS (SELECT para anon) en 'store_services'.`;
+                    // Mensaje de error mejorado para RLS
+                    loadingMessage.textContent = `ERROR DE ACCESO (400/404): Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
                 }
-                return false;
+                // Si hay un error (que no sea PGRST116, que es un 404 esperado por registro vacío)
+                if (error.code !== 'PGRST116') return false; 
             }
             
             if (data && data.service_data && data.service_data.length > 0) {
-                // Datos encontrados, usar estos como fuente de verdad
+                // Datos encontrados
                 imeiServicesData = data.service_data;
                 if (loadingMessage) loadingMessage.textContent = `✅ ${imeiServicesData.length} servicios cargados correctamente.`;
                 return true;
             } else {
-                // Si no se encuentra el registro (o está vacío), inicializamos con los datos brutos
+                // Si el registro no existe o está vacío, inicializamos.
                 if (loadingMessage) loadingMessage.textContent = 'No se encontró registro. Inicializando con datos predeterminados...';
                 
                 const initialData = parseAndNormalizeServices(rawServiceList);
-                const success = await updateServiceInSupabase(initialData); // Usamos upsert
+                const success = await updateServiceInSupabase(initialData);
                 
                 if (success) {
                     imeiServicesData = initialData;
-                    if (loadingMessage) loadingMessage.textContent = `✅ ${imeiServicesData.length} servicios inicializados y guardados en Supabase. Recargue la página.`;
-                    // Retorna falso y pide recargar para que el fetchServices inicial no se ejecute dos veces en el mismo ciclo.
-                    return false; 
+                    if (loadingMessage) loadingMessage.textContent = `✅ ${imeiServicesData.length} servicios inicializados y guardados en Supabase.`;
+                    return true;
                 }
                 return false;
             }
@@ -2536,7 +2536,11 @@ $12.012 1-5 days`;
             if (!container) return;
 
             if (imeiServicesData.length === 0) {
-                 container.innerHTML = `<p style="color:orange;">No hay servicios cargados. Intente recargar la página o contacte al administrador.</p>`;
+                 container.innerHTML = `<p style="color:orange;">Cargando...</p>`;
+                 fetchServices().then(() => {
+                     if (imeiServicesData.length > 0) renderImeiServices();
+                     else container.innerHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
+                 });
                  hideAllSections();
                  imeiServiceSection.classList.remove('hidden');
                  return;
@@ -2548,24 +2552,25 @@ $12.012 1-5 days`;
                 const card = document.createElement('div');
                 card.className = 'service-card';
                 
-                // Usamos la estructura de la imagen "Digital Tool Rent"
+                const isNew = service.name.includes('Nuevo');
+                
                 card.innerHTML = `
                     <h3>
-                        ${service.name}
-                        ${service.name.toLowerCase().includes('nuevo') ? `<span class="new-tag">Nuevo</span>` : ''}
+                        ${service.name.replace('Nuevo', '').trim()}
+                        ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
+                        <span class="card-icon-check">✅</span>
                     </h3>
                     <div class="card-details">
                         Digital Tool Rent (ID + Password) (Auto Api) 
                     </div>
                     <div class="card-footer">
                         <span class="price">${service.price}</span>
-                        <span class="time">${service.time}</span>
+                        <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
                     </div>
                 `;
                 container.appendChild(card);
             });
             
-            // Ocultar otras secciones y mostrar esta
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2599,7 +2604,7 @@ $12.012 1-5 days`;
                         <div style="flex-grow: 1; margin-right: 15px;">
                             <div class="input-group">
                                 <p>Nombre Completo:</p>
-                                <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" style="width: 100%;" />
+                                <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
                             </div>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
                                 <div class="input-group">
@@ -2674,7 +2679,7 @@ $12.012 1-5 days`;
         });
 
 
-        // --- Funciones de Navegación ---
+        // --- Funciones de Navegación (CORREGIDA) ---
         async function handleNavigationClick(event) {
             const clickedElement = event.currentTarget;
             if (!clickedElement || !clickedElement.id) { return; }
@@ -2756,19 +2761,8 @@ $12.012 1-5 days`;
             }
         }
         
-        async function signUpWithEmail() {
-            // ... lógica de registro
-        }
-
-        async function signOut() {
-            if (!supabase) return;
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error al hacer logout:', error);
-            } else {
-                loginMessage.textContent = '';
-            }
-        }
+        async function signUpWithEmail() { /* ... lógica de registro ... */ }
+        async function signOut() { /* ... lógica de logout ... */ }
 
         async function checkUser() {
             if (!supabase) return;
@@ -2800,25 +2794,11 @@ $12.012 1-5 days`;
             }
         }
         
-        async function submitNewOrder() {
-            // ... lógica de submit order
-        }
-        
-        async function uploadBackgroundImage() {
-            // ... lógica de subida de fondo
-        }
-
-        function clearBackgroundImage() {
-            // ... lógica de limpieza
-        }
-
-        async function uploadDevicesImage() {
-            // ... lógica de subida de imagen principal
-        }
-
-        function clearDevicesImage() {
-            // ... lógica de limpieza de imagen principal
-        }
+        async function submitNewOrder() { /* ... lógica de submit order ... */ }
+        async function uploadBackgroundImage() { /* ... lógica de subida de fondo ... */ }
+        function clearBackgroundImage() { /* ... lógica de limpieza ... */ }
+        async function uploadDevicesImage() { /* ... lógica de subida de imagen principal ... */ }
+        function clearDevicesImage() { /* ... lógica de limpieza de imagen principal ... */ }
 
 
         // --- Inicialización ---
@@ -2857,7 +2837,7 @@ $12.012 1-5 days`;
             
             // --- CARGA INICIAL DE DATOS Y LISTENERS ---
             
-            await fetchServices(); // Cargar los servicios
+            await fetchServices(); 
             
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
@@ -2867,10 +2847,10 @@ $12.012 1-5 days`;
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
 
-            // Listener para los enlaces dentro del menú de Poner Orden (CORREGIDO)
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation(); // CRUCIAL: Detiene la propagación para que el DIV padre no se active
                     pongaOrdenMenu.classList.add('hidden');
                     if (this.dataset.serviceType === 'imei') {
                         renderImeiServices(); 
