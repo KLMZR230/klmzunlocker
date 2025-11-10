@@ -59,7 +59,7 @@
         .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
         .chat-buttons { position: fixed; bottom: 20px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
         .chat-button { 
-            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
         }
         .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
         .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
@@ -477,21 +477,30 @@
                 BACKGROUND_FILE_PATH, 
                 null 
             );
-            if (bgUrl) {
+
+            // 2. Aplicar el fondo a la sección hero
+            if (bgUrl && heroSection) {
+                // Forzar la imagen de fondo con alta prioridad
                 heroSection.style.backgroundImage = `url('${bgUrl}')`;
-                heroSection.style.backgroundColor = 'transparent';
-            } else {
+                heroSection.style.backgroundColor = 'transparent'; // Asegura que el fondo CSS no bloquee la imagen
+                heroSection.style.backgroundSize = 'cover';
+                heroSection.style.backgroundPosition = 'center bottom';
+
+            } else if (heroSection) {
+                // Si no hay URL, restaurar el fondo al color sólido
                 heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = '#161a20';
+                heroSection.style.backgroundColor = '#161a20'; // Color definido en CSS :root
             }
 
-            // 2. Cargar Imagen de Dispositivos (Se aplica al <img> src)
+            // 3. Cargar Imagen de Dispositivos (Se aplica al <img> src)
             const devicesUrl = await getPublicUrl(
                 DEVICES_IMAGE_BUCKET_NAME, 
                 DEVICES_FILE_PATH, 
                 DEFAULT_DEVICES_IMAGE_URL
             );
-            mainDevicesImage.src = devicesUrl;
+            if (mainDevicesImage) {
+                mainDevicesImage.src = devicesUrl;
+            }
         }
 
         // --- LÓGICA DEL ADMIN PARA SUBIR IMAGENES (GLOBAL) ---
@@ -521,7 +530,7 @@
             if (uploadError) {
                 messageElement.style.color = 'red';
                 
-                // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
+                // MANEJO MEJORADO DE RLS PARA EVITAR EL CIERRE DEL PANEL
                 if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
                     messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
                 } else {
@@ -549,7 +558,7 @@
 
             if (deleteError && deleteError.statusCode !== '404') {
                 messageElement.style.color = 'red';
-                // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
+                // MANEJO MEJORADO DE RLS PARA EVITAR EL CIERRE DEL PANEL
                 if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
                      messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
                 } else {
@@ -573,6 +582,7 @@
         }
         
         async function handleUploadBackground() {
+            // Se sube la imagen. El manejo de error previene la salida del panel.
             await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
         }
 
@@ -711,6 +721,7 @@
 
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
+            // ARREGLO: Solo hacemos scroll la primera vez que se carga la sección
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
