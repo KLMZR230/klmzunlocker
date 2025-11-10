@@ -510,37 +510,53 @@
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Subiendo imagen...';
 
-            const { error } = await supabase.storage
+            // 1. Subida del archivo al Storage
+            const { error: uploadError } = await supabase.storage
                 .from(bucketName)
                 .upload(filePath, file, {
                     cacheControl: '3600',
                     upsert: true 
                 });
 
-            if (error) {
+            if (uploadError) {
                 messageElement.style.color = 'red';
-                messageElement.textContent = `Error al subir: ${error.message}`;
-            } else {
-                messageElement.style.color = '#25d366';
-                messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
                 
-                await loadImages();
+                // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
+                if (uploadError.status === 400 && uploadError.message.includes('row-level security')) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE o tablas asociadas permita la subida al administrador.';
+                } else {
+                    messageElement.textContent = `Error al subir: ${uploadError.message}`;
+                }
+                console.error('Error al subir imagen:', uploadError);
+                return;
             }
+
+            // 2. Si la subida fue exitosa, forzar la recarga de las imágenes en la UI
+            messageElement.style.color = '#25d366';
+            messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
+            await loadImages();
         }
         
         async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
+            const fileInput = document.getElementById(fileInputId);
             const messageElement = document.getElementById(responseElementId);
             
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Eliminando imagen...';
 
-            const { error } = await supabase.storage
+            const { error: deleteError } = await supabase.storage
                 .from(bucketName)
                 .remove([filePath]);
 
-            if (error && error.statusCode !== '404') {
+            if (deleteError && deleteError.statusCode !== '404') {
                 messageElement.style.color = 'red';
-                messageElement.textContent = `Error al eliminar: ${error.message}`;
+                // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
+                if (deleteError.status === 400 && deleteError.message.includes('row-level security')) {
+                     messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
+                } else {
+                     messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
+                }
+                console.error('Error al eliminar imagen:', deleteError);
                 return;
             }
             
@@ -758,7 +774,7 @@
                 // Mensaje de error detallado
                 container.innerHTML = `<p style="color:red;">
                     ❌ Error al cargar pedidos del Admin: ${error.message}. 
-                    <br>Verifique que la política RLS de SELECT en la tabla 'orders' esté configurada para el rol 'admin' o deshabilitada temporalmente para el administrador.
+                    <br>Verifique que la política RLS de SELECT en la tabla 'orders' esté configurada correctamente para el administrador.
                 </p>`;
                 console.error("RLS/API Error al cargar pedidos del Admin:", error);
                 return;
@@ -948,6 +964,7 @@
                 
                 renderServiceEditor(); 
             } else {
+                addServiceMessage.style.color = 'red'; // Asegura que el error RLS de guardado se muestre
                 imeiServicesData.pop(); 
             }
         }
@@ -1213,7 +1230,7 @@
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
-            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialización de la API.'; return; }
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
             const { error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 console.error('Error al registrar:', error);
