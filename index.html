@@ -102,24 +102,6 @@
         .card-footer .time { font-size: 14px; color: #ff9800; }
         .card-icon-check { color: var(--green-check); font-size: 1.2em; margin-left: 5px; }
 
-        /* Estilo para las tarjetas fijas */
-        .fixed-card {
-            cursor: pointer;
-            background-color: #4c4e97; /* Color distinto para destacar */
-            border: 3px solid #6c70d9;
-            text-align: center;
-            align-items: center;
-        }
-        .fixed-card h3 {
-            font-size: 20px;
-            color: white;
-            justify-content: center;
-        }
-        .fixed-card .card-details {
-            color: #d1d1d1;
-        }
-
-
         /* Estilos del Editor de Servicios */
         .service-editor-list { list-style: none; padding: 0; }
         .service-editor-list li { 
@@ -209,18 +191,6 @@
         <section class="hidden" id="imeiServiceSection">
             <h2>IMEI Service</h2>
             <div id="serviceGridContainer" class="service-grid">
-                <div class="service-card fixed-card" id="fixed-card-new-order">
-                    <h3>Realizar un nuevo pedido de IMEI</h3>
-                    <div class="card-details">
-                        /Realizar un nuevo pedido de IMEI
-                    </div>
-                </div>
-                <div class="service-card fixed-card" id="fixed-card-dashboard">
-                    <h3>Salpicadero</h3>
-                    <div class="card-details">
-                        /
-                    </div>
-                </div>
                 <p id="loadingMessage">Cargando servicios...</p>
             </div>
         </section>
@@ -2431,12 +2401,14 @@ $12.012 1-5 days`;
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
                 
+                // Intentar detectar si la línea es un nuevo encabezado de categoría
                 if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
                     if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
                        currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
                     }
                 }
-
+                
+                // Buscar la combinación de Precio y Tiempo
                 const priceTimeMatch = line.match(/(\$[0-9,.]+)[\s\u00A0]+([0-9-.\s\u00A0A-Za-z]+)$/);
                 
                 if (priceTimeMatch) {
@@ -2445,6 +2417,8 @@ $12.012 1-5 days`;
                     
                     let name = '';
                     let k = i - 1;
+                    
+                    // Buscar hacia atrás hasta encontrar el nombre del servicio (antes del precio y tiempo)
                     while (k >= 0 && !lines[k].startsWith('$') && lines[k].length > 3) {
                          name = lines[k] + ' ' + name;
                          k--;
@@ -2454,7 +2428,7 @@ $12.012 1-5 days`;
                     if (name.trim() === '') {
                          name = line.replace(priceTimeMatch[0], '').trim();
                     } else {
-                         // Limpieza más agresiva de códigos de categoría de 1 o 2 letras
+                         // Limpieza de los códigos de categoría abreviados (He, F, Mr, etc.) que se filtran en las líneas
                          name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
                          name = name.replace(/\s+/g, ' ').trim(); 
                     }
@@ -2543,47 +2517,46 @@ $12.012 1-5 days`;
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
 
-            // Mantener las tarjetas fijas y limpiar solo los servicios dinámicos
-            let dynamicServicesHTML = '';
-
+            container.innerHTML = ''; // Limpiar el contenedor completamente
+            
             if (imeiServicesData.length === 0) {
-                 dynamicServicesHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
-                 // Intentar cargar la data
+                 container.innerHTML = `<p id="loadingMessage" style="color:orange;">Cargando...</p>`;
                  fetchServices().then(() => {
                      if (imeiServicesData.length > 0) renderImeiServices();
+                     else container.innerHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
                  });
-            } else {
-                // Renderizar los servicios dinámicos
-                imeiServicesData.forEach(service => {
-                    const isNew = service.name.toLowerCase().includes('nuevo');
-                    
-                    dynamicServicesHTML += `
-                        <div class="service-card" data-service-id="${service.id}">
-                            <h3>
-                                ${service.name.replace('Nuevo', '').trim()}
-                                ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
-                                <span class="card-icon-check">✅</span>
-                            </h3>
-                            <div class="card-details">
-                                Categoría: <strong>${service.category}</strong>
-                            </div>
-                            <div class="card-footer">
-                                <span class="price">${service.price}</span>
-                                <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
-                            </div>
-                        </div>
-                    `;
-                });
+                 hideAllSections();
+                 imeiServiceSection.classList.remove('hidden');
+                 return;
             }
+
+            // Renderizar los servicios dinámicos
+            imeiServicesData.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.dataset.serviceId = service.id; 
+                
+                const isNew = service.name.toLowerCase().includes('nuevo');
+                
+                card.innerHTML = `
+                    <h3>
+                        ${service.name.replace('Nuevo', '').trim()}
+                        ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
+                        <span class="card-icon-check">✅</span>
+                    </h3>
+                    <div class="card-details">
+                        Categoría: <strong>${service.category}</strong>
+                    </div>
+                    <div class="card-footer">
+                        <span class="price">${service.price}</span>
+                        <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
             
-            // Reemplazar solo la parte dinámica, manteniendo las tarjetas fijas
-            const fixedCardsHTML = container.querySelector('#fixed-card-new-order').outerHTML + 
-                                   container.querySelector('#fixed-card-dashboard').outerHTML;
-                                   
-            container.innerHTML = fixedCardsHTML + dynamicServicesHTML + (imeiServicesData.length === 0 ? '<p id="loadingMessage">Cargando servicios...</p>' : '');
-            
-            // Adjuntar listener de click a las tarjetas dinámicas recién creadas
-            document.querySelectorAll('.service-card:not(.fixed-card)').forEach(card => {
+            // Adjuntar listener de click a las tarjetas recién creadas
+            document.querySelectorAll('.service-card').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
 
@@ -3043,16 +3016,6 @@ $12.012 1-5 days`;
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
-
-            // Listener para las tarjetas fijas (para que se puedan esconder si hacen clic)
-            document.getElementById('fixed-card-dashboard').addEventListener('click', () => {
-                hideAllSections();
-                heroSection.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-            document.getElementById('fixed-card-new-order').addEventListener('click', () => {
-                renderImeiServices(); // Recarga la sección que incluye todas las tarjetas
-            });
 
             // Listener para los enlaces dentro del menú de Poner Orden
             document.querySelectorAll('.order-type-link').forEach(link => {
