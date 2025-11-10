@@ -391,6 +391,9 @@
         let imeiServicesData = []; 
         const SERVICES_RECORD_ID = 1; 
 
+        // NUEVA VARIABLE GLOBAL PARA ALMACENAR EL USUARIO LOGUEADO
+        let currentUser = null; 
+
         // Función de parseo (mantenida por si acaso)
         function parseAndNormalizeServices(rawText) {
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
@@ -756,18 +759,18 @@
             
             container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
 
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) {
+            // USAR LA VARIABLE GLOBAL PARA COMPROBAR EL ID
+            if (!currentUser) {
                 container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
                 return;
             }
+            const userId = currentUser.id;
 
             // Filtra por el ID del usuario logueado
             const { data: orders, error } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('user_id', user.id) 
+                .eq('user_id', userId) 
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -797,35 +800,30 @@
             }
         }
 
-        // FUNCIÓN CORREGIDA PARA MANEJAR EL ERROR 429 EN LA APERTURA DEL MODAL Y VERIFICACIÓN DE SESIÓN
+        // FUNCIÓN CORREGIDA PARA USAR LA VARIABLE GLOBAL currentUser
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // 1. Uso de getSession para verificar el estado de la sesión actual
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            const user = session?.user;
-            
-            // Manejo de error de red (como 429) o fallos de sesión
-            if (sessionError) {
-                console.error("Error al obtener la sesión para el modal:", sessionError);
-                if (sessionError.status === 429) {
-                    alert('⛔ ERROR 429 (Límite de Solicitudes): El servidor está sobrecargado. Espera un minuto y recarga la página antes de intentar hacer un pedido.');
-                    return;
-                }
-            }
-
-            if (!user) {
+            // 1. VERIFICACIÓN CRÍTICA: Usar la variable global INSTANTÁNEA
+            if (!currentUser) {
                 alert('Debe iniciar sesión para realizar un pedido.');
                 
-                // Muestra la sección de login si no está logeado
-                hideAllSections();
-                loginSection.classList.remove('hidden');
-                loginSection.scrollIntoView({ behavior: 'smooth' });
-                loginMessage.style.color = 'orange';
-                loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
-                return;
+                // Si la variable global es nula, intentamos forzar una recarga de estado
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    hideAllSections();
+                    loginSection.classList.remove('hidden');
+                    loginSection.scrollIntoView({ behavior: 'smooth' });
+                    loginMessage.style.color = 'orange';
+                    loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
+                    return;
+                }
+                // Si la sesión existe pero la variable global es nula (lag), checkUser() la actualizará.
             }
+            
+            const user = currentUser; // Usamos el usuario almacenado en la variable global
+
             if (!service) return;
 
             document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
@@ -842,13 +840,14 @@
             const serviceId = document.getElementById('modalServiceId').value;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            const { data: { user } } = await supabase.auth.getUser();
+            // Usamos la variable global
+            const user = currentUser;
 
             const modalMessage = document.getElementById('modalMessage');
             
             if (!user) {
                 modalMessage.style.color = 'red';
-                modalMessage.textContent = 'Error de sesión. Intente iniciar sesión de nuevo.';
+                modalMessage.textContent = 'Error de sesión. Por favor, vuelva a iniciar sesión.';
                 return;
             }
 
@@ -869,7 +868,7 @@
             const { error } = await supabase
                 .from('orders')
                 .insert([{
-                    user_id: user.id,
+                    user_id: user.id, // Usamos el ID de la variable global
                     service_id: serviceId,
                     service_name: service.name,
                     device_name: sn, 
@@ -1040,12 +1039,12 @@
         }
 
 
-        async function checkUser() {
-            if (!supabase) return;
+        async function checkUser(userSession) {
+            // Recibe la sesión del listener o de la carga inicial
+            const user = userSession?.user;
             
-            // Obtener la sesión
-            const { data: { session } = {} } = await supabase.auth.getSession();
-            const user = session?.user;
+            // **ACTUALIZACIÓN CRÍTICA**: Almacenar en la variable global
+            currentUser = user || null;
             
             hideAllSections();
 
@@ -1094,9 +1093,9 @@
                 pongaOrdenMenu.classList.add('hidden');
             }
 
-            const { data: { session } = {} } = await supabase.auth.getSession();
-            const isLoggedIn = !!session; 
-            const isAdmin = isLoggedIn && session.user.email === ADMIN_EMAIL;
+            // USAMOS LA VARIABLE GLOBAL PARA LA VERIFICACIÓN INSTANTÁNEA
+            const isLoggedIn = !!currentUser; 
+            const isAdmin = isLoggedIn && currentUser.email === ADMIN_EMAIL;
             
             hideAllSections();
             
@@ -1150,7 +1149,7 @@
             }
         }
         
-        // FUNCIÓN CORREGIDA PARA MANEJAR ERRORES DE AUTENTICACIÓN
+        // FUNCIÓN CORREGIDA PARA ACTUALIZAR LA VARIABLE GLOBAL DESPUÉS DEL LOGIN
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -1183,7 +1182,7 @@
                 loginMessage.style.color = '#25d366';
                 loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
                 
-                // La redirección/actualización de UI la maneja el onAuthStateChange listener
+                // La actualización de la UI se manejará mediante el listener onAuthStateChange
             } else {
                 loginMessage.style.color = 'red';
                 loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
@@ -1195,7 +1194,7 @@
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
-            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialización de la API.'; return; }
             const { error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 console.error('Error al registrar:', error);
@@ -1222,15 +1221,14 @@
         document.addEventListener('DOMContentLoaded', async () => {
             
             if (window.supabase) {
-                 // --- CAMBIO CLAVE: Inicializar con NO AUTO REFRESH para evitar el ciclo ---
-                 // Esto detiene el refresh loop y asegura que la sesión se obtenga de la cookie.
+                 // Inicialización estándar
                  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                  console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
                  return; 
             }
 
-            // Mapeo de Elementos DOM
+            // Mapeo de Elementos DOM (Mantenido por brevedad)
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
@@ -1303,22 +1301,13 @@
                 });
             });
 
-            // 1. Obtener la sesión ANTES de configurar el listener
-            const { data: { session }, error: initialError } = await supabase.auth.getSession();
-            
-            if (initialError || !session) {
-                console.warn('Advertencia: No se pudo cargar la sesión inicial o falló la API. Se ejecutará checkUser() para mostrar la pantalla de login.');
-            }
+            // PASO CRÍTICO: Obtener la sesión inicial y usar el listener para las actualizaciones.
+            const { data: { session } } = await supabase.auth.getSession();
+            checkUser(session); 
 
-            // 2. Ejecutar checkUser una vez (después de intentar cargar la sesión)
-            checkUser(); 
-
-            // 3. Configurar el listener para cambios futuros (logout manual, expiración, etc.)
             supabase.auth.onAuthStateChange((event, session) => {
-                // Prevenir el doble manejo de la carga inicial
-                if (event !== 'INITIAL_SESSION') {
-                     checkUser();
-                }
+                 // El listener llama a checkUser para actualizar la UI y la variable global
+                 checkUser(session);
             });
         });
     </script>
