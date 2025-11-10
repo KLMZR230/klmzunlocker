@@ -522,8 +522,8 @@
                 messageElement.style.color = 'red';
                 
                 // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
-                if (uploadError.status === 400 && uploadError.message.includes('row-level security')) {
-                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE o tablas asociadas permita la subida al administrador.';
+                if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
                 } else {
                     messageElement.textContent = `Error al subir: ${uploadError.message}`;
                 }
@@ -538,7 +538,6 @@
         }
         
         async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
-            const fileInput = document.getElementById(fileInputId);
             const messageElement = document.getElementById(responseElementId);
             
             messageElement.style.color = 'yellow';
@@ -551,7 +550,7 @@
             if (deleteError && deleteError.statusCode !== '404') {
                 messageElement.style.color = 'red';
                 // MEJORA CRÍTICA: Mensaje específico si el error es por RLS (Error 400)
-                if (deleteError.status === 400 && deleteError.message.includes('row-level security')) {
+                if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
                      messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
                 } else {
                      messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
@@ -1133,9 +1132,12 @@
                     if (isLoggedIn) {
                         pongaOrdenMenu.classList.toggle('hidden');
                         if(pongaOrdenMenu.classList.contains('hidden')) {
+                            // Si se cierra el menú, no hacemos scroll
+                            shouldScrollToTop = false; 
                             heroSection.classList.remove('hidden'); 
                         } else {
-                            shouldScrollToTop = false; // No hacer scroll si solo abre/cierra el menú
+                            // Si se abre el menú, no hacemos scroll
+                            shouldScrollToTop = false; 
                         }
                     } else {
                         loginSection.classList.remove('hidden');
@@ -1230,7 +1232,7 @@
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
             loginMessage.textContent = 'Registrando usuario...';
-            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialización de la API.'; return; }
             const { error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 console.error('Error al registrar:', error);
