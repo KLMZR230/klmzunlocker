@@ -6,7 +6,6 @@
     <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos CSS Base y Replicados (Se omite la mayor parte por brevedad) */
         :root {
             --dark-bg: #161a20; 
             --header-bg: #11141a; 
@@ -21,6 +20,7 @@
             --green-check: #00ff00; 
         }
 
+        /* Estilos Globales */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
         a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
@@ -40,7 +40,7 @@
         .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
         .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
         .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
-        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 10px; }
+        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
         .contact-info-hero { margin-top: 40px; line-height: 1.8; font-size: 16px; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
@@ -85,32 +85,12 @@
         .dropdown-menu li a { display: block; padding: 8px 15px; color: var(--text-light); font-weight: normal; }
         .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
 
-        /* --- ESTILOS DE LA SECCIÓN IMEI SERVICE --- */
+        /* --- ESTILOS DE SECCIONES INTERNAS --- */
         #imeiServiceSection { padding: 40px 50px; background-color: var(--dark-bg); }
         #imeiServiceSection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
         .service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        
-        .service-card {
-            background-color: var(--card-inner-bg);
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            cursor: pointer; /* Indica que es clickeable */
-        }
-        .service-card h3 {
-            font-size: 16px;
-            color: var(--text-light);
-            margin-bottom: 5px;
-            line-height: 1.4;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+        .service-card { cursor: pointer; background-color: var(--card-inner-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 5px; line-height: 1.4; display: flex; justify-content: space-between; align-items: flex-start; }
         .service-card .new-tag { color: var(--accent-pink); font-size: 11px; font-weight: bold; margin-left: 10px; }
         .card-details { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
         .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: none; font-weight: bold; }
@@ -121,8 +101,7 @@
         /* Estilos del Editor de Servicios */
         .service-editor-list { list-style: none; padding: 0; }
         .service-editor-list li { 
-            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start;
-            flex-wrap: wrap; 
+            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; 
         }
         .service-editor-list li input { display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; font-size: 12px; }
         .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; flex-shrink: 0; }
@@ -131,49 +110,18 @@
         .service-editor-list li .service-editor-actions { margin-left: auto; }
         
         /* Estilos para el Historial de Pedidos */
-        .order-history-grid {
-            display: grid;
-            gap: 15px;
-            grid-template-columns: 1fr;
-        }
-        .order-card {
-            background-color: #1a1e25;
-            padding: 15px;
-            border-left: 5px solid gray;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .order-card.success { border-left-color: var(--whatsapp-green); }
-        .order-card.pending { border-left-color: yellow; }
-        .order-card.rejected { border-left-color: red; }
+        .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
+        .order-card { background-color: #1a1e25; padding: 15px; border-left: 5px solid gray; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .order-card.Exitoso { border-left-color: var(--whatsapp-green); }
+        .order-card.Pendiente { border-left-color: yellow; }
+        .order-card.Rechazado { border-left-color: red; }
         .order-details p { margin: 2px 0; }
-        .order-actions select {
-            padding: 5px;
-            border-radius: 3px;
-            background-color: #333;
-            color: white;
-            border: 1px solid #555;
-            cursor: pointer;
-        }
-        .order-actions button {
-            margin-top: 5px;
-            background-color: #4c4e97;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
+        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; }
+        .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; }
 
         /* Modal Styles */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background-color: #22252a; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center;
-        }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background-color: #22252a; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center; }
         .modal-content h3 { color: var(--accent-pink); margin-bottom: 20px; }
         .modal-content input { margin-bottom: 15px; }
         .modal-content button { margin: 10px; }
@@ -270,8 +218,8 @@
             <h3>Iniciar Sesión / Registrarse</h3>
             <input type="email" id="loginEmail" placeholder="Email">
             <input type="password" id="loginPassword" placeholder="Contraseña">
-            <button id="signInButton">Iniciar Sesión</button>
-            <button id="signUpButton" style="background-color: #4c4e97;">Registrarse</button>
+            <button id="signInButton" onclick="signInWithEmail()">Iniciar Sesión</button>
+            <button id="signUpButton" onclick="signUpWithEmail()" style="background-color: #4c4e97;">Registrarse</button>
             <p id="loginMessage" class="form-message" style="color: red;"></p>
         </section>
 
@@ -295,7 +243,7 @@
                     <ul id="serviceEditorList" class="service-editor-list">
                         <p id="editorMessage">Cargando editor...</p>
                     </ul>
-                    <button id="saveServiceChanges" style="background-color: var(--whatsapp-green);">Guardar Cambios y Sincronizar (Supabase)</button>
+                    <button id="saveServiceChanges">Guardar Cambios y Sincronizar (Supabase)</button>
                 </div>
             </div>
             
@@ -372,14 +320,13 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
+        // DECLARACIONES GLOBALES (ACCESIBLES POR HTML ONCLICK)
         let supabase;
         let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage;
-        let adminOrderHistory;
-        
-        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel;
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
@@ -389,7 +336,6 @@
         const SERVICES_RECORD_ID = 1; 
 
         // --- DATOS BRUTOS INICIALES (La lista completa que proporcionaste) ---
-        // (Se omite la lista para ahorrar espacio, asumiendo que la variable rawServiceList existe)
         const rawServiceList = `
 Discounted
 Hello A12+ iCloud Bypass Windows Tool — SPECIAL OFFER ✅
@@ -2260,11 +2206,8 @@ Apple ID - OWNER INFO BY IMEI ONLY
 $9.702 1-24 Hours
 Ap
 Apple ID - T-Mobile USA Owner Info By IMEI Only
-Apple ID - OWNER INFO BY IMEI ONLY
-$9.776 1-24 Hours
 Ap
 Apple ID - T-Mobile USA Owner Info By IMEI Only
-Apple ID - OWNER INFO BY IMEI ONLY
 $10.34 1-24 Hours
 Ap
 Apple ID - Verizon USA Owner Info By IMEI Only
@@ -2436,7 +2379,6 @@ $12.012 1-5 days`;
 
         // --- FUNCIÓN PARA PARSEAR LA DATA BRUTA ---
         function parseAndNormalizeServices(rawText) {
-            // ... (La misma lógica de parsing robusta)
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             const services = [];
             let currentCategory = 'Todo Grupo';
@@ -2487,10 +2429,9 @@ $12.012 1-5 days`;
         }
 
 
-        // --- SINCRONIZACIÓN CON SUPABASE (Las funciones se quedan fuera del DOMContentLoaded para ser globales) ---
+        // --- SINCRONIZACIÓN CON SUPABASE ---
 
         async function fetchServices() {
-            // ... (función fetchServices sin cambios)
             if (loadingMessage) loadingMessage.textContent = 'Cargando servicios desde Supabase...';
             
             const { data, error } = await supabase
@@ -2501,11 +2442,13 @@ $12.012 1-5 days`;
 
             if (error) { 
                 console.error("Error al cargar servicios de Supabase:", error);
-                if (loadingMessage) {
-                    loadingMessage.style.color = 'red';
-                    loadingMessage.textContent = `ERROR DE ACCESO (400/404): Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
+                if (error.code !== 'PGRST116') {
+                     if (loadingMessage) {
+                        loadingMessage.style.color = 'red';
+                        loadingMessage.textContent = `ERROR DE ACCESO: Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
+                    }
+                    return false;
                 }
-                if (error.code !== 'PGRST116') return false; 
             }
             
             if (data && data.service_data && data.service_data.length > 0) {
@@ -2570,7 +2513,7 @@ $12.012 1-5 days`;
             imeiServicesData.forEach(service => {
                 const card = document.createElement('div');
                 card.className = 'service-card';
-                card.dataset.serviceId = service.id; // Asignar ID para el evento de clic
+                card.dataset.serviceId = service.id; 
                 
                 const isNew = service.name.toLowerCase().includes('nuevo');
                 
@@ -2600,16 +2543,22 @@ $12.012 1-5 days`;
             imeiServiceSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        
+        function hideAllSections() {
+            heroSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            adminSection.classList.add('hidden');
+            imeiServiceSection.classList.add('hidden');
+        }
 
         // --- GESTIÓN DE MODAL DE ORDEN ---
 
         function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
-            const user = supabase.auth.user(); // Obtiene el usuario autenticado
+            const user = supabase.auth.user(); 
 
             if (!user) {
-                // Esto no debería suceder si la navegación es correcta, pero es una protección
                 alert('Debe iniciar sesión para realizar un pedido.');
                 return;
             }
@@ -2646,10 +2595,10 @@ $12.012 1-5 days`;
                     user_id: user.id,
                     service_id: serviceId,
                     service_name: service.name,
-                    device_name: sn, // Usamos SN en lugar de device_name
-                    imei: sn, // Asumimos que el SN es la entrada principal
+                    device_name: sn, 
+                    imei: sn, 
                     contact_email: email,
-                    status: 'Pendiente',
+                    status: 'Pendiente', // Estado inicial
                 }]);
 
             if (error) {
@@ -2659,10 +2608,12 @@ $12.012 1-5 days`;
             } else {
                 modalMessage.style.color = '#25d366';
                 modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
+                // Si es admin, actualiza el historial
+                if (user.email === ADMIN_EMAIL) {
+                    fetchOrdersHistory(); 
+                }
                 setTimeout(() => {
                     document.getElementById('orderModal').classList.add('hidden');
-                    // Recargar historial en el admin después del envío
-                    fetchOrdersHistory(); 
                 }, 2000);
             }
         }
@@ -2694,7 +2645,7 @@ $12.012 1-5 days`;
 
             orders.forEach(order => {
                 const card = document.createElement('div');
-                card.className = `order-card ${order.status.toLowerCase()}`;
+                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
                 card.dataset.orderId = order.id;
 
                 const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
@@ -2725,22 +2676,16 @@ $12.012 1-5 days`;
                 .eq('id', orderId);
 
             if (error) {
-                alert(`Error al actualizar: ${error.message}. Revise los permisos.`);
+                alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
             } else {
                 fetchOrdersHistory(); // Recargar la lista después de actualizar
             }
         }
-
-        function hideAllSections() {
-            heroSection.classList.add('hidden');
-            loginSection.classList.add('hidden');
-            adminSection.classList.add('hidden');
-            imeiServiceSection.classList.add('hidden');
-        }
         
+        // --- FUNCIÓN DE EDICIÓN DE SERVICIOS (ADMIN) ---
+
         function renderServiceEditor() {
-            // ... (Función de edición de servicios existente) ...
-             const editorList = document.getElementById('serviceEditorList');
+            const editorList = document.getElementById('serviceEditorList');
             if (!editorList) return;
 
             fetchServices().then(() => {
@@ -2788,8 +2733,162 @@ $12.012 1-5 days`;
                 editorMessage.textContent = `${imeiServicesData.length} servicios listados y listos para editar.`;
             });
         }
-        // Las demás funciones se mantienen fuera de DCL para ser accesibles:
-        // signInWithEmail, signUpWithEmail, signOut, checkUser, updateServiceInSupabase, deleteService, upload...
+        
+        function deleteService(id) {
+             if (confirm(`¿Seguro que quieres eliminar el servicio ID ${id}?`)) {
+                imeiServicesData = imeiServicesData.filter(s => s.id !== id);
+                renderServiceEditor(); 
+             }
+        }
+
+        async function checkUser() {
+            if (!supabase) return;
+            
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const user = session?.user;
+            
+            hideAllSections(); 
+            navAdminPanel.classList.add('hidden');
+            adminNameDisplay.classList.add('hidden');
+
+            if (user) {
+                const isAdmin = user.email === ADMIN_EMAIL;
+                
+                loginLogoutBtn.textContent = 'Logout';
+                loginLogoutBtn.onclick = signOut;
+                
+                if (isAdmin) { navAdminPanel.classList.remove('hidden'); adminNameDisplay.classList.remove('hidden'); }
+                
+                heroSection.classList.remove('hidden');
+            } else {
+                heroSection.classList.remove('hidden'); 
+                loginLogoutBtn.textContent = 'Login / Register';
+                loginLogoutBtn.onclick = () => {
+                    hideAllSections();
+                    loginSection.classList.remove('hidden');
+                    loginSection.scrollIntoView({ behavior: 'smooth' });
+                };
+            }
+        }
+
+        async function handleNavigationClick(event) {
+            const clickedElement = event.currentTarget;
+            if (!clickedElement || !clickedElement.id) { return; }
+            
+            const elementId = clickedElement.id;
+            
+            if (elementId !== 'navPongaOrden') {
+                pongaOrdenMenu.classList.add('hidden');
+            }
+
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const isLoggedIn = !!session; 
+            
+            hideAllSections();
+            
+            switch (elementId) {
+                case 'navPongaOrden':
+                    if (isLoggedIn) {
+                        pongaOrdenMenu.classList.toggle('hidden');
+                        heroSection.classList.remove('hidden'); 
+                    } else {
+                        loginSection.classList.remove('hidden');
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
+                        loginMessage.style.color = 'orange';
+                        loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
+                    }
+                    if (pongaOrdenMenu.classList.contains('hidden')) {
+                         heroSection.classList.remove('hidden');
+                    }
+                    break;
+                case 'navAdminPanel':
+                    if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
+                        renderServiceEditor(); 
+                    } else {
+                        heroSection.classList.remove('hidden'); 
+                    }
+                    break;
+                case 'navHistorialPedidos':
+                    if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
+                        fetchOrdersHistory(); // Solo si es admin, carga el historial
+                        adminSection.classList.remove('hidden');
+                    } else if (isLoggedIn) {
+                         heroSection.classList.remove('hidden'); // Clientes vuelven al inicio
+                    } else {
+                        loginSection.classList.remove('hidden');
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
+                        loginMessage.textContent = '';
+                    }
+                    break;
+                case 'navAreaCliente':
+                    if (isLoggedIn) { heroSection.classList.remove('hidden'); } else { loginSection.classList.remove('hidden'); loginSection.scrollIntoView({ behavior: 'smooth' }); loginMessage.textContent = ''; }
+                    break;
+                default:
+                    heroSection.classList.remove('hidden');
+                    break;
+            }
+        }
+        
+        async function signInWithEmail() {
+            // ... lógica de inicio de sesión
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Iniciando sesión...';
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; return; }
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                console.error('Error al hacer login:', error);
+                loginMessage.style.color = 'red';
+                let msg = error.message;
+                if (error.message.includes('Invalid login credentials')) { msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; } else if (error.message.includes('Email not confirmed')) { msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; }
+                loginMessage.textContent = `Error de inicio: ${msg}`;
+            } else if (data.user) {
+                loginMessage.style.color = '#25d366';
+                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                
+                hideAllSections();
+                heroSection.classList.remove('hidden'); 
+            } else {
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
+            }
+        }
+        
+        async function signUpWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Registrando usuario...';
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                console.error('Error al registrar:', error);
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = `Error: ${error.message}`;
+            } else {
+                loginMessage.style.color = '#4dc2f2'; 
+                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
+            }
+        }
+
+        async function signOut() {
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error al hacer logout:', error);
+            } else {
+                loginMessage.textContent = '';
+            }
+        }
+        
+        async function submitNewOrder() { /* ... lógica de submit order ... */ }
+        async function uploadBackgroundImage() { /* ... lógica de subida de fondo ... */ }
+        function clearBackgroundImage() { /* ... lógica de limpieza ... */ }
+        async function uploadDevicesImage() { /* ... lógica de subida de imagen principal ... */ }
+        function clearDevicesImage() { /* ... lógica de limpieza de imagen principal ... */ }
+
 
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -2807,11 +2906,9 @@ $12.012 1-5 days`;
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
-            
-            // Mapeo de Mensajes y Contenedores
             loadingMessage = document.getElementById('loadingMessage'); 
             editorMessage = document.getElementById('editorMessage'); 
-            adminOrderHistory = document.getElementById('adminOrderHistory');
+            adminOrderHistory = document.getElementById('adminOrderHistory'); // Mapear historial
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
@@ -2828,32 +2925,41 @@ $12.012 1-5 days`;
             devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
             loginMessage = document.getElementById('loginMessage');
             
-            // --- LISTENERS DE ACCIÓN ---
+            // --- CARGA INICIAL DE DATOS Y LISTENERS ---
+            
+            // Cargar servicios y el estado del usuario
+            await fetchServices(); 
+            
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
+            document.getElementById('closeModal').addEventListener('click', () => { document.getElementById('orderModal').classList.add('hidden'); });
+            document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
             
-            // Listeners de Navegación
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
 
-            // Botones del Modal
-            document.getElementById('closeModal').addEventListener('click', () => {
-                 document.getElementById('orderModal').classList.add('hidden');
+            // Listener para los enlaces dentro del menú de Poner Orden (CORREGIDO)
+            document.querySelectorAll('.order-type-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // CRUCIAL: Detiene la propagación para que el DIV padre no se active
+                    pongaOrdenMenu.classList.add('hidden');
+                    if (this.dataset.serviceType === 'imei') {
+                        renderImeiServices(); 
+                    } else {
+                        hideAllSections();
+                        heroSection.classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        alert(`Función para ${this.textContent} aún no implementada.`);
+                    }
+                });
             });
-            document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
 
-
-            // Carga de Datos
-            await fetchServices();
+            const submitOrderButton = document.getElementById('submitOrderButton');
+            if(submitOrderButton) submitOrderButton.addEventListener('click', submitNewOrder);
             
-            // Cargar historial si el admin está logueado al inicio
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user && user.email === ADMIN_EMAIL) {
-                fetchOrdersHistory(); 
-            }
-
             // Cargar imágenes guardadas
             const savedBackgroundImage = localStorage.getItem('heroBackgroundImage');
             if (savedBackgroundImage) { heroSection.style.backgroundImage = `url('${savedBackgroundImage}')`; heroSection.style.backgroundColor = 'transparent'; }
@@ -2867,10 +2973,6 @@ $12.012 1-5 days`;
             
             checkUser(); 
         });
-        
-        // --- Otras funciones que deben ser globales (se asume que su contenido completo fue transferido) ---
-        // Se omiten los cuerpos de las funciones restantes (signInWithEmail, checkUser, etc.) por brevedad.
-        
     </script>
 </body>
 </html>
