@@ -243,8 +243,8 @@
             <h3>Iniciar Sesión / Registrarse</h3>
             <input type="email" id="loginEmail" placeholder="Email">
             <input type="password" id="loginPassword" placeholder="Contraseña">
-            <button id="signInButton" onclick="signInWithEmail()">Iniciar Sesión</button>
-            <button id="signUpButton" onclick="signUpWithEmail()" style="background-color: #4c4e97;">Registrarse</button>
+            <button id="signInButton">Iniciar Sesión</button>
+            <button id="signUpButton">Registrarse</button>
             <p id="loginMessage" class="form-message" style="color: red;"></p>
         </section>
 
@@ -451,8 +451,6 @@
             if (!url || url.includes('not-found') || (url.endsWith(filePath) && url.length > SUPABASE_URL.length + bucketName.length + filePath.length)) {
                 return fallbackUrl;
             }
-            // Si la URL generada no es usable, o no contiene la estructura esperada, volvemos a la URL de fallback.
-            // Nota: Aquí confiamos en que Supabase devuelve una URL real si el archivo existe.
             return url || fallbackUrl;
         }
 
@@ -559,8 +557,8 @@
             await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
         }
 
-        // --- LÓGICA DE SERVICIOS Y SESIÓN (GLOBAL) ---
-        
+        // --- SINCRONIZACIÓN DE SERVICIOS ---
+
         async function fetchServices() {
             if (loadingMessage) loadingMessage.textContent = 'Cargando servicios desde Supabase...';
             
@@ -621,6 +619,16 @@
             return true;
         }
 
+
+        // --- FUNCIONES DE LA APLICACIÓN (GLOBAL) ---
+
+        function hideAllSections() {
+            heroSection.classList.add('hidden');
+            loginSection.classList.add('hidden');
+            adminSection.classList.add('hidden');
+            imeiServiceSection.classList.add('hidden');
+        }
+
         function renderImeiServices() {
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
@@ -671,6 +679,151 @@
             hideAllSections();
             imeiServiceSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function openOrderModal(event) {
+            const serviceId = event.currentTarget.dataset.serviceId;
+            const service = imeiServicesData.find(s => s.id == serviceId);
+            
+            const { data: { user } } = await supabase.auth.getUser(); 
+
+            if (!user) {
+                alert('Debe iniciar sesión para realizar un pedido.');
+                return;
+            }
+            if (!service) return;
+
+            document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
+            document.getElementById('modalEmail').value = user.email || '';
+            document.getElementById('modalSerial').value = ''; 
+            document.getElementById('modalServiceId').value = service.id;
+            document.getElementById('modalMessage').textContent = '';
+            document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        async function submitBypassOrder() {
+            const sn = document.getElementById('modalSerial').value.trim();
+            const email = document.getElementById('modalEmail').value.trim();
+            const serviceId = document.getElementById('modalServiceId').value;
+            const service = imeiServicesData.find(s => s.id == serviceId);
+            
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const modalMessage = document.getElementById('modalMessage');
+            
+            if (!user) {
+                modalMessage.style.color = 'red';
+                modalMessage.textContent = 'Error de sesión. Intente iniciar sesión de nuevo.';
+                return;
+            }
+
+            if (!sn || !email) {
+                modalMessage.style.color = 'red';
+                modalMessage.textContent = 'Complete el SN y el Correo Electrónico.';
+                return;
+            }
+            if (!service) {
+                modalMessage.style.color = 'red';
+                modalMessage.textContent = 'Error: Servicio no encontrado.';
+                return;
+            }
+
+            modalMessage.style.color = 'yellow';
+            modalMessage.textContent = 'Enviando orden...';
+
+            const { error } = await supabase
+                .from('orders')
+                .insert([{
+                    user_id: user.id,
+                    service_id: serviceId,
+                    service_name: service.name,
+                    device_name: sn, 
+                    imei: sn, 
+                    contact_email: email,
+                    status: 'Pendiente', 
+                }]);
+
+            if (error) {
+                modalMessage.style.color = 'red';
+                // Si el error es 429, mostramos un mensaje específico, aunque la aplicación no pueda resolver el rate limiting.
+                if (error.status === 429) {
+                    modalMessage.textContent = 'Error 429 (Too Many Requests). La API está sobrecargada. Por favor, espere un momento antes de intentarlo de nuevo.';
+                } else {
+                    modalMessage.textContent = `Error: ${error.message}. Revise sus políticas RLS de INSERT en la tabla 'orders'.`;
+                }
+                console.error(error);
+            } else {
+                modalMessage.style.color = '#25d366';
+                modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
+                if (user.email === ADMIN_EMAIL) {
+                    fetchOrdersHistory(); 
+                }
+                setTimeout(() => {
+                    document.getElementById('orderModal').classList.add('hidden');
+                }, 2000);
+            }
+        }
+
+        async function fetchOrdersHistory() {
+            const container = document.getElementById('adminOrderHistory');
+            if (!container) return;
+            
+            container.innerHTML = '<p>Cargando historial...</p>';
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error al cargar historial: ${error.message}. Verifique RLS de SELECT para admin en 'orders'.</p>`;
+                return;
+            }
+
+            if (orders.length === 0) {
+                container.innerHTML = '<p>No hay pedidos registrados aún.</p>';
+                return;
+            }
+
+            container.innerHTML = ''; // Limpiar
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
+                card.dataset.orderId = order.id;
+
+                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
+                
+                card.innerHTML = `
+                    <div class="order-details">
+                        <p><strong>Servicio:</strong> ${order.service_name}</p>
+                        <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
+                        <p><strong>Contacto:</strong> ${order.contact_email}</p>
+                        <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="order-actions">
+                        <select onchange="updateOrderStatus(${order.id}, this.value)">
+                            ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
+
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (error) {
+                alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
+            } else {
+                fetchOrdersHistory(); 
+            }
         }
         
         async function addNewService(event) {
@@ -818,11 +971,9 @@
         async function checkUser() {
             if (!supabase) return;
             
-            // Usar getSession para obtener el estado actual de la sesión
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
-            // Ocultar todas las secciones para preparar el renderizado correcto
             hideAllSections();
 
             navAdminPanel.classList.add('hidden');
@@ -852,82 +1003,11 @@
                 };
             }
             
-            // Aseguramos que la Hero Section sea visible si no hay otra activa.
             if (document.getElementById('imeiServiceSection').classList.contains('hidden') && 
                 document.getElementById('loginSection').classList.contains('hidden') &&
                 document.getElementById('adminSection').classList.contains('hidden')) {
                 heroSection.classList.remove('hidden');
             }
-        }
-        
-        async function signInWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            loginMessage.style.color = 'yellow';
-            loginMessage.textContent = 'Iniciando sesión...';
-            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; return; }
-            
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                console.error('Error al hacer login:', error);
-                loginMessage.style.color = 'red';
-                let msg = error.message;
-                
-                // Manejo explícito del error 429 para dar un mensaje claro
-                if (error.status === 429) {
-                     msg = 'Demasiadas solicitudes (429). Por favor, espere un momento antes de intentarlo de nuevo.';
-                } else if (error.message.includes('Invalid login credentials')) { 
-                    msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; 
-                } else if (error.message.includes('Email not confirmed')) { 
-                    msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
-                }
-                
-                loginMessage.textContent = `Error de inicio: ${msg}`;
-            } else if (data.user) {
-                loginMessage.style.color = '#25d366';
-                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
-                
-                hideAllSections();
-                heroSection.classList.remove('hidden'); 
-            } else {
-                loginMessage.style.color = 'red';
-                loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
-            }
-        }
-        
-        async function signUpWithEmail() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            loginMessage.style.color = 'yellow';
-            loginMessage.textContent = 'Registrando usuario...';
-            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                console.error('Error al registrar:', error);
-                loginMessage.style.color = 'red';
-                loginMessage.textContent = `Error: ${error.message}`;
-            } else {
-                loginMessage.style.color = '#4dc2f2'; 
-                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
-            }
-        }
-
-        async function signOut() {
-            if (!supabase) return;
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error al hacer logout:', error);
-            } else {
-                loginMessage.textContent = '';
-            }
-        }
-
-        function hideAllSections() {
-            heroSection.classList.add('hidden');
-            loginSection.classList.add('hidden');
-            adminSection.classList.add('hidden');
-            imeiServiceSection.classList.add('hidden');
         }
 
         async function handleNavigationClick(event) {
@@ -987,7 +1067,68 @@
             }
         }
         
+        async function signInWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Iniciando sesión...';
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; return; }
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                console.error('Error al hacer login:', error);
+                loginMessage.style.color = 'red';
+                let msg = error.message;
+                
+                if (error.status === 429) {
+                     msg = 'Demasiadas solicitudes (429). Por favor, espere un momento antes de intentarlo de nuevo.';
+                } else if (error.message.includes('Invalid login credentials')) { 
+                    msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; 
+                } else if (error.message.includes('Email not confirmed')) { 
+                    msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
+                }
+                
+                loginMessage.textContent = `Error de inicio: ${msg}`;
+            } else if (data.user) {
+                loginMessage.style.color = '#25d366';
+                loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                
+                hideAllSections();
+                heroSection.classList.remove('hidden'); 
+            } else {
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
+            }
+        }
         
+        async function signUpWithEmail() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginMessage.style.color = 'yellow';
+            loginMessage.textContent = 'Registrando usuario...';
+            if (!supabase) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialização da API.'; return; }
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                console.error('Error al registrar:', error);
+                loginMessage.style.color = 'red';
+                loginMessage.textContent = `Error: ${error.message}`;
+            } else {
+                loginMessage.style.color = '#4dc2f2'; 
+                loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
+            }
+        }
+
+        async function signOut() {
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error al hacer logout:', error);
+            } else {
+                loginMessage.textContent = '';
+            }
+        }
+
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', async () => {
             
@@ -1034,6 +1175,8 @@
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             document.getElementById('closeModal').addEventListener('click', () => { document.getElementById('orderModal').classList.add('hidden'); });
+            
+            // Se elimina el evento de submitBypassOrder del DOMContentLoaded, ya está en el ámbito global.
             document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
             
             // Listeners de Navegación y Admin
