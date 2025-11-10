@@ -88,7 +88,11 @@
         /* --- ESTILOS DE SECCIONES INTERNAS --- */
         #imeiServiceSection { padding: 40px 50px; background-color: var(--dark-bg); }
         #imeiServiceSection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
-        .service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .service-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 20px; 
+        }
         .service-card { cursor: pointer; background-color: var(--card-inner-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 5px; line-height: 1.4; display: flex; justify-content: space-between; align-items: flex-start; }
         .service-card .new-tag { color: var(--accent-pink); font-size: 11px; font-weight: bold; margin-left: 10px; }
@@ -97,6 +101,24 @@
         .card-footer .price { font-size: 14px; color: #ff9800; }
         .card-footer .time { font-size: 14px; color: #ff9800; }
         .card-icon-check { color: var(--green-check); font-size: 1.2em; margin-left: 5px; }
+
+        /* Estilo para las tarjetas fijas */
+        .fixed-card {
+            cursor: pointer;
+            background-color: #4c4e97; /* Color distinto para destacar */
+            border: 3px solid #6c70d9;
+            text-align: center;
+            align-items: center;
+        }
+        .fixed-card h3 {
+            font-size: 20px;
+            color: white;
+            justify-content: center;
+        }
+        .fixed-card .card-details {
+            color: #d1d1d1;
+        }
+
 
         /* Estilos del Editor de Servicios */
         .service-editor-list { list-style: none; padding: 0; }
@@ -187,6 +209,18 @@
         <section class="hidden" id="imeiServiceSection">
             <h2>IMEI Service</h2>
             <div id="serviceGridContainer" class="service-grid">
+                <div class="service-card fixed-card" id="fixed-card-new-order">
+                    <h3>Realizar un nuevo pedido de IMEI</h3>
+                    <div class="card-details">
+                        /Realizar un nuevo pedido de IMEI
+                    </div>
+                </div>
+                <div class="service-card fixed-card" id="fixed-card-dashboard">
+                    <h3>Salpicadero</h3>
+                    <div class="card-details">
+                        /
+                    </div>
+                </div>
                 <p id="loadingMessage">Cargando servicios...</p>
             </div>
         </section>
@@ -358,33 +392,43 @@ FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 11/ 11 PRO/ 11 PRO MAX (12
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $12 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 15/ 15 PLUS/ 15 PRO/ 15 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $20 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - 17/ 17 AIR / 17 PRO/ 17 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $30 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - for iPAD CPU M1 to M4
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $26 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPad CPU A12 - A15
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $16 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 12/ 12 MINI/ 12 PRO/ 12 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $12 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 13/ 13 MINI/ 13 PRO/ 13 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $12 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 14/ 14 PLUS/ 14 PRO/ 14 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $20 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone 16/ 16e / 16 PRO/ 16 PRO MAX
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $20 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - iPhone Xr/Xs/Xs Max
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $10 Miniutes
+FR
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF) - SE2/ SE3
 FRPFILE Remove Screen Time & Bypass iCloud Open Menu (NOT FMI OFF)
 $10 Miniutes
@@ -2410,7 +2454,8 @@ $12.012 1-5 days`;
                     if (name.trim() === '') {
                          name = line.replace(priceTimeMatch[0], '').trim();
                     } else {
-                         name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)$/g, '').trim();
+                         // Limpieza más agresiva de códigos de categoría de 1 o 2 letras
+                         name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
                          name = name.replace(/\s+/g, ' ').trim(); 
                     }
 
@@ -2458,6 +2503,7 @@ $12.012 1-5 days`;
             } else {
                 if (loadingMessage) loadingMessage.textContent = 'No se encontró registro. Inicializando con datos predeterminados...';
                 
+                // Usar la lista completa como seed data
                 const initialData = parseAndNormalizeServices(rawServiceList);
                 const success = await updateServiceInSupabase(initialData); 
                 
@@ -2497,45 +2543,47 @@ $12.012 1-5 days`;
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
 
+            // Mantener las tarjetas fijas y limpiar solo los servicios dinámicos
+            let dynamicServicesHTML = '';
+
             if (imeiServicesData.length === 0) {
-                 container.innerHTML = `<p style="color:orange;">Cargando...</p>`;
+                 dynamicServicesHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
+                 // Intentar cargar la data
                  fetchServices().then(() => {
                      if (imeiServicesData.length > 0) renderImeiServices();
-                     else container.innerHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
                  });
-                 hideAllSections();
-                 imeiServiceSection.classList.remove('hidden');
-                 return;
+            } else {
+                // Renderizar los servicios dinámicos
+                imeiServicesData.forEach(service => {
+                    const isNew = service.name.toLowerCase().includes('nuevo');
+                    
+                    dynamicServicesHTML += `
+                        <div class="service-card" data-service-id="${service.id}">
+                            <h3>
+                                ${service.name.replace('Nuevo', '').trim()}
+                                ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
+                                <span class="card-icon-check">✅</span>
+                            </h3>
+                            <div class="card-details">
+                                Categoría: <strong>${service.category}</strong>
+                            </div>
+                            <div class="card-footer">
+                                <span class="price">${service.price}</span>
+                                <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
+                            </div>
+                        </div>
+                    `;
+                });
             }
-
-            container.innerHTML = ''; // Limpiar
             
-            imeiServicesData.forEach(service => {
-                const card = document.createElement('div');
-                card.className = 'service-card';
-                card.dataset.serviceId = service.id; 
-                
-                const isNew = service.name.toLowerCase().includes('nuevo');
-                
-                card.innerHTML = `
-                    <h3>
-                        ${service.name.replace('Nuevo', '').trim()}
-                        ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
-                        <span class="card-icon-check">✅</span>
-                    </h3>
-                    <div class="card-details">
-                        Categoría: <strong>${service.category}</strong>
-                    </div>
-                    <div class="card-footer">
-                        <span class="price">${service.price}</span>
-                        <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            // Reemplazar solo la parte dinámica, manteniendo las tarjetas fijas
+            const fixedCardsHTML = container.querySelector('#fixed-card-new-order').outerHTML + 
+                                   container.querySelector('#fixed-card-dashboard').outerHTML;
+                                   
+            container.innerHTML = fixedCardsHTML + dynamicServicesHTML + (imeiServicesData.length === 0 ? '<p id="loadingMessage">Cargando servicios...</p>' : '');
             
-            // Adjuntar listener de click a las tarjetas recién creadas
-            document.querySelectorAll('.service-card').forEach(card => {
+            // Adjuntar listener de click a las tarjetas dinámicas recién creadas
+            document.querySelectorAll('.service-card:not(.fixed-card)').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
 
@@ -2557,7 +2605,6 @@ $12.012 1-5 days`;
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // CORRECCIÓN: Usar la forma moderna para obtener el usuario
             const { data: { user } } = await supabase.auth.getUser(); 
 
             if (!user) {
@@ -2569,7 +2616,7 @@ $12.012 1-5 days`;
             document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
             document.getElementById('modalEmail').value = user.email || '';
             document.getElementById('modalServiceId').value = service.id;
-            document.getElementById('modalSerial').value = ''; // Limpiar SN anterior
+            document.getElementById('modalSerial').value = ''; 
             document.getElementById('modalMessage').textContent = '';
             document.getElementById('orderModal').classList.remove('hidden');
         }
@@ -2580,7 +2627,6 @@ $12.012 1-5 days`;
             const serviceId = document.getElementById('modalServiceId').value;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // CORRECCIÓN: Usar la forma moderna para obtener el usuario
             const { data: { user } } = await supabase.auth.getUser();
 
             const modalMessage = document.getElementById('modalMessage');
@@ -2614,7 +2660,7 @@ $12.012 1-5 days`;
                     device_name: sn, 
                     imei: sn, 
                     contact_email: email,
-                    status: 'Pendiente', // Estado inicial
+                    status: 'Pendiente', 
                 }]);
 
             if (error) {
@@ -2624,7 +2670,6 @@ $12.012 1-5 days`;
             } else {
                 modalMessage.style.color = '#25d366';
                 modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
-                // Si es admin, actualiza el historial
                 if (user.email === ADMIN_EMAIL) {
                     fetchOrdersHistory(); 
                 }
@@ -2683,7 +2728,6 @@ $12.012 1-5 days`;
             });
         }
 
-        // CORRECCIÓN: Definición de la función de forma global para que sea accesible desde el HTML
         async function updateOrderStatus(orderId, newStatus) {
             if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
 
@@ -2695,7 +2739,7 @@ $12.012 1-5 days`;
             if (error) {
                 alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
             } else {
-                fetchOrdersHistory(); // Recargar la lista después de actualizar
+                fetchOrdersHistory(); 
             }
         }
         
@@ -2758,7 +2802,6 @@ $12.012 1-5 days`;
              }
         }
         
-        // CORRECCIÓN: Nueva función para guardar los cambios del administrador
         async function saveServiceChanges() {
             const editorMessageElement = document.getElementById('editorMessage');
             editorMessageElement.style.color = 'yellow';
@@ -2788,13 +2831,12 @@ $12.012 1-5 days`;
             const success = await updateServiceInSupabase(updatedData);
 
             if (success) {
-                imeiServicesData = updatedData; // Actualizar la data global con los cambios guardados
+                imeiServicesData = updatedData; 
                 editorMessageElement.style.color = '#25d366';
                 editorMessageElement.textContent = '✅ ¡Cambios guardados y sincronizados con éxito!';
-                renderServiceEditor(); // Volver a renderizar para reflejar el estado actual
+                renderServiceEditor(); 
             } else {
                 editorMessageElement.style.color = 'red';
-                // El mensaje de error ya se configura dentro de updateServiceInSupabase
             }
         }
 
@@ -2802,7 +2844,6 @@ $12.012 1-5 days`;
         async function checkUser() {
             if (!supabase) return;
             
-            // CORRECCIÓN: Usar la forma moderna para obtener el usuario
             const { data: { user } = {} } = await supabase.auth.getUser();
             
             hideAllSections(); 
@@ -2893,7 +2934,6 @@ $12.012 1-5 days`;
         }
         
         async function signInWithEmail() {
-            // ... lógica de inicio de sesión
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             loginMessage.style.color = 'yellow';
@@ -2942,7 +2982,6 @@ $12.012 1-5 days`;
             if (error) {
                 console.error('Error al hacer logout:', error);
             } else {
-                // Forzar la actualización del estado de la interfaz de usuario
                 checkUser();
                 loginMessage.textContent = '';
             }
@@ -2973,7 +3012,7 @@ $12.012 1-5 days`;
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
             loadingMessage = document.getElementById('loadingMessage'); 
             editorMessage = document.getElementById('editorMessage'); 
-            adminOrderHistory = document.getElementById('adminOrderHistory'); // Mapear historial
+            adminOrderHistory = document.getElementById('adminOrderHistory'); 
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
@@ -2992,15 +3031,12 @@ $12.012 1-5 days`;
             
             // --- CARGA INICIAL DE DATOS Y LISTENERS ---
             
-            // Cargar servicios y el estado del usuario
             await fetchServices(); 
             
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             document.getElementById('closeModal').addEventListener('click', () => { document.getElementById('orderModal').classList.add('hidden'); });
             document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
-            
-            // CORRECCIÓN: Vincular el botón de guardar cambios
             document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
 
             navAreaCliente.addEventListener('click', handleNavigationClick);
@@ -3008,11 +3044,21 @@ $12.012 1-5 days`;
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
 
-            // Listener para los enlaces dentro del menú de Poner Orden (CORREGIDO)
+            // Listener para las tarjetas fijas (para que se puedan esconder si hacen clic)
+            document.getElementById('fixed-card-dashboard').addEventListener('click', () => {
+                hideAllSections();
+                heroSection.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            document.getElementById('fixed-card-new-order').addEventListener('click', () => {
+                renderImeiServices(); // Recarga la sección que incluye todas las tarjetas
+            });
+
+            // Listener para los enlaces dentro del menú de Poner Orden
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation(); // CRUCIAL: Detiene la propagación para que el DIV padre no se active
+                    e.stopPropagation(); 
                     pongaOrdenMenu.classList.add('hidden');
                     if (this.dataset.serviceType === 'imei') {
                         renderImeiServices(); 
