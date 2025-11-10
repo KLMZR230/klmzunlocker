@@ -1043,6 +1043,7 @@
         async function checkUser() {
             if (!supabase) return;
             
+            // Obtener la sesión
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
@@ -1221,6 +1222,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             
             if (window.supabase) {
+                 // --- CAMBIO CLAVE: Inicializar con NO AUTO REFRESH para evitar el ciclo ---
+                 // Esto detiene el refresh loop y asegura que la sesión se obtenga de la cookie.
                  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                  console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
@@ -1300,13 +1303,23 @@
                 });
             });
 
-            // El listener de estado de auth es la única llamada para actualizar la UI.
-            supabase.auth.onAuthStateChange((event, session) => {
-                checkUser();
-            });
+            // 1. Obtener la sesión ANTES de configurar el listener
+            const { data: { session }, error: initialError } = await supabase.auth.getSession();
             
-            // Llamada inicial para establecer el estado de la UI 
+            if (initialError || !session) {
+                console.warn('Advertencia: No se pudo cargar la sesión inicial o falló la API. Se ejecutará checkUser() para mostrar la pantalla de login.');
+            }
+
+            // 2. Ejecutar checkUser una vez (después de intentar cargar la sesión)
             checkUser(); 
+
+            // 3. Configurar el listener para cambios futuros (logout manual, expiración, etc.)
+            supabase.auth.onAuthStateChange((event, session) => {
+                // Prevenir el doble manejo de la carga inicial
+                if (event !== 'INITIAL_SESSION') {
+                     checkUser();
+                }
+            });
         });
     </script>
 </body>
