@@ -161,7 +161,8 @@
 
     <div class="top-info-bar">
         <span class="contact-info">
-            </span>
+            +503 68957466 (Whatsapp)
+        </span>
         <div class="info-group">
             </div>
     </div>
@@ -395,8 +396,16 @@
             
             const url = data?.publicUrl;
             
+            // Si la URL generada incluye la ruta del archivo (lo que indica que es una URL funcional, 
+            // aunque no garantice que el archivo exista), o si es la URL base vacía, usamos el fallback.
             if (!url || url.includes('not-found') || url.endsWith(filePath)) {
-                return fallbackUrl;
+                // Hacemos una comprobación simple: si la URL de Supabase es idéntica a la ruta base + filename, 
+                // pero no hay un archivo, usamos el fallback (o null si no hay fallback).
+                // Para simplificar, si la URL no parece ser un recurso usable (por ejemplo, si termina en la ruta del archivo sin contenido), usamos el fallback.
+                if (url && url.endsWith(filePath)) {
+                    return fallbackUrl;
+                }
+                return url || fallbackUrl;
             }
             return url;
         }
@@ -406,14 +415,14 @@
             const bgUrl = await getPublicUrl(
                 BACKGROUND_BUCKET_NAME, 
                 BACKGROUND_FILE_PATH, 
-                null // Sin URL de reserva de fondo (usará el color CSS)
+                null 
             );
             if (bgUrl) {
                 heroSection.style.backgroundImage = `url('${bgUrl}')`;
                 heroSection.style.backgroundColor = 'transparent';
             } else {
                 heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = '#161a20'; // Color de fondo por defecto
+                heroSection.style.backgroundColor = '#161a20';
             }
 
             // 2. Cargar Imagen de Dispositivos (Se aplica al <img> src)
@@ -486,6 +495,23 @@
 
             messageElement.style.color = '#25d366';
             
+        }
+        
+        // Definiciones de funciones de gestión de imágenes (ahora globales para evitar ReferenceError)
+        async function handleUploadBackground() {
+            await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
+        }
+
+        async function handleClearBackground() {
+            await clearImage(BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
+        }
+
+        async function handleUploadDevices() {
+            await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
+        }
+
+        async function handleClearDevices() {
+            await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
         }
 
         // --- FUNCIÓN PARA PARSEAR LA DATA BRUTA ---
@@ -955,11 +981,17 @@
         async function checkUser() {
             if (!supabase) return;
             
-            // CORRECCIÓN CLAVE: Usamos getSession para ver el estado, pero la autenticación se maneja por el listener.
             const { data: { session } = {} } = await supabase.auth.getSession();
             const user = session?.user;
             
-            hideAllSections(); 
+            // Solo ocultamos todo si estamos en la raíz o la carga inicial
+            if (!document.getElementById('imeiServiceSection').classList.contains('hidden') ||
+                !document.getElementById('adminSection').classList.contains('hidden')) {
+                // No tocamos secciones si el usuario está activamente en una vista (IMEI Services, Admin)
+            } else {
+                hideAllSections();
+            }
+
             navAdminPanel.classList.add('hidden');
             adminNameDisplay.classList.add('hidden');
 
@@ -987,7 +1019,7 @@
                 };
             }
             
-            // Esto asegura que la página base se renderice después de la verificación inicial.
+            // Aseguramos que la Hero Section sea visible si no hay otra activa.
             if (document.getElementById('imeiServiceSection').classList.contains('hidden') && 
                 document.getElementById('loginSection').classList.contains('hidden') &&
                 document.getElementById('adminSection').classList.contains('hidden')) {
@@ -1014,7 +1046,6 @@
                 case 'navPongaOrden':
                     if (isLoggedIn) {
                         pongaOrdenMenu.classList.toggle('hidden');
-                        // No mostramos hero si el menú está visible
                         if(pongaOrdenMenu.classList.contains('hidden')) {
                             heroSection.classList.remove('hidden'); 
                         }
@@ -1163,7 +1194,7 @@
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
 
-            // Listeners de Gestión de Imágenes
+            // Listeners de Gestión de Imágenes (Usando las funciones ahora globales)
             document.getElementById('uploadBackgroundButton').addEventListener('click', handleUploadBackground);
             document.getElementById('clearBackgroundButton').addEventListener('click', handleClearBackground);
             document.getElementById('uploadDevicesButton').addEventListener('click', handleUploadDevices);
@@ -1187,12 +1218,11 @@
                 });
             });
 
-            // Verificar estado de autenticación (La llamada inicial y el listener ahora son más robustos)
+            // Verificar estado de autenticación (Se ejecuta una vez y luego por el listener)
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser();
             });
             
-            // Realizamos una verificación manual inicial en caso de que el listener no se dispare al cargar.
             checkUser(); 
         });
     </script>
