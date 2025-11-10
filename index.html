@@ -199,7 +199,7 @@
         <div class="modal hidden" id="orderModal">
             <div class="modal-content">
                 <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
-                <input type="text" id="modalSerial" placeholder="Número de Serie (SN)">
+                <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)">
                 <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
                 <input type="hidden" id="modalServiceId">
 
@@ -677,7 +677,7 @@
                 container.appendChild(card);
             });
             
-            // **ARREGLO #2: Añadir el evento de clic a las tarjetas dinámicas**
+            // Añadir el evento de clic a las tarjetas dinámicas
             document.querySelectorAll('.service-card').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
@@ -763,11 +763,11 @@
                 return;
             }
 
-            // Aquí se usa RLS para filtrar automáticamente por el user_id
+            // Filtra por el ID del usuario logueado
             const { data: orders, error } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('user_id', user.id) // Filtra por el ID del usuario logueado
+                .eq('user_id', user.id) 
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -797,9 +797,6 @@
             }
         }
 
-        // El resto de las funciones (openOrderModal, submitBypassOrder, addNewService, renderServiceEditor, etc.) permanecen igual que en la corrección anterior.
-        // Se pegarán abajo para tener el código completo.
-        
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
@@ -845,7 +842,7 @@
 
             if (!sn || !email) {
                 modalMessage.style.color = 'red';
-                modalMessage.textContent = 'Complete el SN y el Correo Electrónico.';
+                modalMessage.textContent = 'Complete el SN/IMEI y el Correo Electrónico.';
                 return;
             }
             if (!service) {
@@ -881,13 +878,10 @@
                 modalMessage.style.color = '#25d366';
                 modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
                 
-                // Mantiene al usuario en la vista de servicios si está allí, o lo dirige a su historial.
+                // Muestra el historial del cliente después de un pedido exitoso
                 setTimeout(() => {
                     document.getElementById('orderModal').classList.add('hidden');
-                    // Si el usuario no es admin y está en la vista de servicios, lo mandamos al historial.
-                    if (user.email !== ADMIN_EMAIL) {
-                        fetchClientOrdersHistory();
-                    }
+                    fetchClientOrdersHistory();
                 }, 2000);
             }
         }
@@ -1124,7 +1118,7 @@
                              fetchAdminOrdersHistory(); 
                              adminSection.classList.remove('hidden');
                         } else {
-                            // **ARREGLO #1: Mostrar Historial del Cliente Regular**
+                            // Mostrar Historial del Cliente Regular
                             fetchClientOrdersHistory();
                         }
                     } else {
@@ -1157,12 +1151,17 @@
                 loginMessage.style.color = 'red';
                 let msg = error.message;
                 
+                // Manejo de Error 429 (Rate Limit)
                 if (error.status === 429) {
-                     msg = 'Demasiadas solicitudes (429). Por favor, espere un momento antes de intentarlo de nuevo.';
-                } else if (error.message.includes('Invalid login credentials')) { 
-                    msg = 'Credenciales de inicio de sesión inválidas. Comprueba el correo/contraseña.'; 
-                } else if (error.message.includes('Email not confirmed')) { 
-                    msg = 'Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
+                     msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
+                } 
+                // Manejo de Error 400 (Credenciales)
+                else if (error.message.includes('Invalid login credentials')) { 
+                    msg = '❌ Credenciales de inicio de sesión inválidas. Comprueba el correo y la contraseña.'; 
+                } 
+                // Manejo de Correo no confirmado
+                else if (error.message.includes('Email not confirmed')) { 
+                    msg = '📧 Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
                 }
                 
                 loginMessage.textContent = `Error de inicio: ${msg}`;
@@ -1278,7 +1277,6 @@
                     e.stopPropagation(); 
                     pongaOrdenMenu.classList.add('hidden');
                     if (this.dataset.serviceType === 'imei') {
-                        // **ARREGLO #2: Si el usuario está logueado, permite ver la sección IMEI Service.**
                         renderImeiServices(); 
                     } else {
                         hideAllSections();
@@ -1289,12 +1287,12 @@
                 });
             });
 
-            // **ARREGLO #1: El listener de estado de auth es la única llamada para actualizar la UI.**
+            // El listener de estado de auth es la única llamada para actualizar la UI.
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser();
             });
             
-            // Llamada inicial para establecer el estado de la UI (sin esperar al onAuthStateChange)
+            // Llamada inicial para establecer el estado de la UI 
             checkUser(); 
         });
     </script>
