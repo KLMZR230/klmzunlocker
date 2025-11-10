@@ -391,7 +391,7 @@
         let imeiServicesData = []; 
         const SERVICES_RECORD_ID = 1; 
 
-        // NUEVA VARIABLE GLOBAL PARA ALMACENAR EL USUARIO LOGUEADO
+        // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEO
         let currentUser = null; 
 
         // Función de parseo (mantenida por si acaso)
@@ -451,13 +451,22 @@
         async function getPublicUrl(bucketName, filePath, fallbackUrl) {
             if (!supabase) return fallbackUrl;
 
+            // Arreglo Clave: Usar getPublicUrl para obtener la URL base
             const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
             
-            const url = data?.publicUrl;
+            let url = data?.publicUrl;
             
+            // Verificación estándar de URL
             if (!url || url.includes('not-found') || (url.endsWith(filePath) && url.length > SUPABASE_URL.length + bucketName.length + filePath.length)) {
                 return fallbackUrl;
             }
+            
+            // ARREGLO PARA FORZAR LA RECARGA Y EVITAR CACHÉ (CACHE-BUSTER)
+            // Agrega un parámetro de tiempo único a la URL pública.
+            const cacheBuster = Date.now();
+            const separator = url.includes('?') ? '&' : '?';
+            url = `${url}${separator}v=${cacheBuster}`;
+
             return url || fallbackUrl;
         }
 
@@ -759,7 +768,7 @@
             
             container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
 
-            // USAR LA VARIABLE GLOBAL PARA COMPROBAR EL ID
+            // USAMOS LA VARIABLE GLOBAL currentUser
             if (!currentUser) {
                 container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
                 return;
@@ -809,17 +818,13 @@
             if (!currentUser) {
                 alert('Debe iniciar sesión para realizar un pedido.');
                 
-                // Si la variable global es nula, intentamos forzar una recarga de estado
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    hideAllSections();
-                    loginSection.classList.remove('hidden');
-                    loginSection.scrollIntoView({ behavior: 'smooth' });
-                    loginMessage.style.color = 'orange';
-                    loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
-                    return;
-                }
-                // Si la sesión existe pero la variable global es nula (lag), checkUser() la actualizará.
+                // Si la variable global es nula, mostramos la pantalla de login.
+                hideAllSections();
+                loginSection.classList.remove('hidden');
+                loginSection.scrollIntoView({ behavior: 'smooth' });
+                loginMessage.style.color = 'orange';
+                loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
+                return;
             }
             
             const user = currentUser; // Usamos el usuario almacenado en la variable global
