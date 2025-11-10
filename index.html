@@ -35,23 +35,12 @@
         .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
         .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
         #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
-        .hero-section { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            padding: 60px 50px 0px 50px; 
-            min-height: 500px; 
-            position: relative; 
-            /* Se elimina background-color: #161a20; de aquí para evitar conflictos CSS */
-            overflow: hidden; 
-            background-size: cover; 
-            background-position: center bottom; 
-        }
+        .hero-section { display: flex; justify-content: space-between; align-items: flex-end; padding: 60px 50px 0px 50px; min-height: 500px; position: relative; background-color: #161a20; overflow: hidden; background-size: cover; background-position: center bottom; }
         .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
         .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
         .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
         .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
-        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
+        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
         .contact-info-hero { margin-top: 40px; line-height: 1.8; font-size: 16px; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
@@ -462,24 +451,18 @@
         async function getPublicUrl(bucketName, filePath, fallbackUrl) {
             if (!supabase) return fallbackUrl;
 
-            // 1. Obtener la URL pública de Supabase
+            // Arreglo Clave: Usar getPublicUrl para obtener la URL base
             const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
             
             let url = data?.publicUrl;
             
-            // 2. Verificación de URL
+            // Verificación estándar de URL
             if (!url || url.includes('not-found') || (url.endsWith(filePath) && url.length > SUPABASE_URL.length + bucketName.length + filePath.length)) {
                 return fallbackUrl;
             }
             
-            // 3. ARREGLO PARA FORZAR LA RECARGA (CACHE-BUSTER)
-            try {
-                // Intenta decodificar/limpiar el URL por si acaso
-                url = decodeURI(url);
-            } catch(e) {
-                // Ignorar error de decodificación si la URL ya es correcta
-            }
-            
+            // ARREGLO PARA FORZAR LA RECARGA Y EVITAR CACHÉ (CACHE-BUSTER)
+            // Agrega un parámetro de tiempo único a la URL pública.
             const cacheBuster = Date.now();
             const separator = url.includes('?') ? '&' : '?';
             url = `${url}${separator}v=${cacheBuster}`;
