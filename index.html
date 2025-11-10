@@ -129,6 +129,34 @@
         .modal-content h3 { color: var(--accent-pink); margin-bottom: 20px; }
         .modal-content input { margin-bottom: 15px; }
         .modal-content button { margin: 10px; }
+        
+        /* Estilo para el nuevo formulario de añadir servicio */
+        #newServiceForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #newServiceForm input {
+            width: 100%;
+            margin: 0;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        #newServiceForm label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: left;
+        }
+        #newServiceForm .full-width {
+            grid-column: span 2;
+        }
+        #addServiceButton {
+            grid-column: span 2;
+            background-color: var(--whatsapp-green) !important;
+        }
     </style>
 </head>
 <body>
@@ -242,6 +270,32 @@
             </div>
 
             <div class="admin-options" style="margin-top: 30px;">
+                <h4>➕ Añadir Nuevo Servicio Rápido</h4>
+                <div class="form-container">
+                    <form id="newServiceForm">
+                        <div class="full-width">
+                            <label for="newServiceName">Nombre Completo del Servicio:</label>
+                            <input type="text" id="newServiceName" placeholder="Ej: FRPFILE A12+ Bypass iPhone XR To 17ProMax (Windows Tool) OFFER ✅" required>
+                        </div>
+                        <div>
+                            <label for="newServicePrice">Precio (Ej: $5.00):</label>
+                            <input type="text" id="newServicePrice" placeholder="$5" required>
+                        </div>
+                        <div>
+                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 days):</label>
+                            <input type="text" id="newServiceTime" placeholder="Miniutes" required>
+                        </div>
+                        <div class="full-width">
+                            <label for="newServiceCategory">Categoría (Ej: Hello A12+ iCloud Bypass Windows Tool — SPECIAL OFFER):</label>
+                            <input type="text" id="newServiceCategory" placeholder="Categoría del servicio" required>
+                        </div>
+                        <button type="submit" id="addServiceButton">Añadir Servicio y Sincronizar</button>
+                    </form>
+                    <p id="addServiceMessage" class="form-message"></p>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
                 <h4>⚙️ Editar Tarjetas de Servicios IMEI</h4>
                 <div class="form-container">
                     <ul id="serviceEditorList" class="service-editor-list">
@@ -329,7 +383,7 @@
         let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
-        let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage;
+        let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage;
         let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
@@ -2491,7 +2545,7 @@ $12.012 1-5 days`;
         }
         
         async function updateServiceInSupabase(dataToSave) {
-            const editorMessageElement = document.getElementById('editorMessage') || loadingMessage;
+            const editorMessageElement = document.getElementById('editorMessage') || document.getElementById('addServiceMessage') || loadingMessage;
             
             const { error } = await supabase
                 .from('store_services')
@@ -2521,6 +2575,8 @@ $12.012 1-5 days`;
             
             if (imeiServicesData.length === 0) {
                  container.innerHTML = `<p id="loadingMessage" style="color:orange;">Cargando...</p>`;
+                 // Volver a mapear loadingMessage si fue borrado
+                 loadingMessage = document.getElementById('loadingMessage'); 
                  fetchServices().then(() => {
                      if (imeiServicesData.length > 0) renderImeiServices();
                      else container.innerHTML = `<p style="color:red;">Error: No se pudo cargar ningún servicio.</p>`;
@@ -2716,7 +2772,61 @@ $12.012 1-5 days`;
             }
         }
         
-        // --- FUNCIÓN DE EDICIÓN DE SERVICIOS (ADMIN) ---
+        // --- GESTIÓN DE SERVICIOS (ADMIN) ---
+
+        // Función para añadir un nuevo servicio
+        async function addNewService(event) {
+            event.preventDefault(); 
+
+            const name = document.getElementById('newServiceName').value.trim();
+            const price = document.getElementById('newServicePrice').value.trim();
+            const time = document.getElementById('newServiceTime').value.trim();
+            const category = document.getElementById('newServiceCategory').value.trim();
+
+            if (!name || !price || !time || !category) {
+                addServiceMessage.style.color = 'red';
+                addServiceMessage.textContent = 'Todos los campos deben ser completados.';
+                return;
+            }
+
+            addServiceMessage.style.color = 'yellow';
+            addServiceMessage.textContent = 'Añadiendo servicio...';
+            
+            // Determinar el nuevo ID (el último ID + 1)
+            const nextId = imeiServicesData.length > 0 
+                ? Math.max(...imeiServicesData.map(s => s.id)) + 1 
+                : 1;
+
+            const newService = {
+                id: nextId,
+                name: name,
+                price: price.startsWith('$') ? price : `$${price}`,
+                time: time,
+                category: category
+            };
+
+            // 1. Añadir el nuevo servicio a la lista en memoria
+            imeiServicesData.push(newService);
+
+            // 2. Sincronizar la lista completa (incluyendo el nuevo servicio) con Supabase
+            const success = await updateServiceInSupabase(imeiServicesData);
+
+            if (success) {
+                addServiceMessage.style.color = '#25d366';
+                addServiceMessage.textContent = `✅ Servicio "${newService.name.substring(0, 30)}..." añadido y guardado con éxito!`;
+                
+                // Limpiar el formulario
+                document.getElementById('newServiceForm').reset();
+                
+                // Recargar el editor de servicios para que aparezca el nuevo
+                renderServiceEditor(); 
+            } else {
+                // Si falla, revertir la adición en memoria (opcional, ya que el mensaje de error de updateServiceInSupabase ya lo indica)
+                imeiServicesData.pop(); 
+                // El mensaje de error ya se muestra en updateServiceInSupabase
+            }
+        }
+
 
         function renderServiceEditor() {
             const editorList = document.getElementById('serviceEditorList');
@@ -2736,7 +2846,7 @@ $12.012 1-5 days`;
                     listItem.innerHTML = `
                         <div style="flex-grow: 1; margin-right: 15px;">
                             <div class="input-group">
-                                <p>Nombre Completo:</p>
+                                <p>Nombre Completo (ID: ${service.id}):</p>
                                 <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
                             </div>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
@@ -2769,7 +2879,7 @@ $12.012 1-5 days`;
         }
         
         function deleteService(id) {
-             if (confirm(`¿Seguro que quieres eliminar el servicio ID ${id}?`)) {
+             if (confirm(`¿Seguro que quieres eliminar el servicio ID ${id}? (Recuerda guardar los cambios)`)) {
                 imeiServicesData = imeiServicesData.filter(s => s.id !== id);
                 renderServiceEditor(); 
              }
@@ -2986,6 +3096,7 @@ $12.012 1-5 days`;
             loadingMessage = document.getElementById('loadingMessage'); 
             editorMessage = document.getElementById('editorMessage'); 
             adminOrderHistory = document.getElementById('adminOrderHistory'); 
+            addServiceMessage = document.getElementById('addServiceMessage'); // Mapear nuevo mensaje
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
@@ -3011,6 +3122,9 @@ $12.012 1-5 days`;
             document.getElementById('closeModal').addEventListener('click', () => { document.getElementById('orderModal').classList.add('hidden'); });
             document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
             document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
+            
+            // Nuevo listener para el formulario de añadir servicio
+            document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
 
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
