@@ -68,7 +68,7 @@
         .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
-        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
+        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5ps; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
         .admin-options { text-align: left; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
         .admin-options h4 { font-size: 20px; margin-bottom: 15px; color: var(--text-light); }
         .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
@@ -119,7 +119,7 @@
         .order-card.Rechazado { border-left-color: red; }
         .order-details p { margin: 2px 0; }
         .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; }
-        .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; }
+        .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
 
         /* Modal Styles */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -161,8 +161,7 @@
 
     <div class="top-info-bar">
         <span class="contact-info">
-            +503 68957466 (Whatsapp)
-        </span>
+            </span>
         <div class="info-group">
             </div>
     </div>
@@ -394,12 +393,9 @@
 
             const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
             
-            // Supabase devuelve una URL válida incluso si el archivo no existe.
-            // Para verificar, se puede intentar cargar la URL. Aquí nos basamos en la URL generada.
             const url = data?.publicUrl;
             
-            // Si la URL generada contiene 'not found' o es la URL base vacía, usamos el fallback.
-            if (!url || url.includes('not-found')) {
+            if (!url || url.includes('not-found') || url.endsWith(filePath)) {
                 return fallbackUrl;
             }
             return url;
@@ -427,8 +423,6 @@
                 DEFAULT_DEVICES_IMAGE_URL
             );
             mainDevicesImage.src = devicesUrl;
-
-            // Nota: La lógica anterior de LocalStorage ha sido eliminada.
         }
 
         // --- LÓGICA DEL ADMIN PARA SUBIR IMAGENES ---
@@ -447,7 +441,6 @@
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Subiendo imagen...';
 
-            // Subir la imagen, reemplazando la existente
             const { error } = await supabase.storage
                 .from(bucketName)
                 .upload(filePath, file, {
@@ -462,7 +455,6 @@
                 messageElement.style.color = '#25d366';
                 messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
                 
-                // Recargar las imágenes para aplicar los cambios en el cliente
                 await loadImages();
             }
         }
@@ -473,24 +465,20 @@
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Eliminando imagen...';
 
-            // Eliminar el archivo del Storage
             const { error } = await supabase.storage
                 .from(bucketName)
                 .remove([filePath]);
 
             if (error && error.statusCode !== '404') {
-                // Si el error no es "no encontrado", mostrar error
                 messageElement.style.color = 'red';
                 messageElement.textContent = `Error al eliminar: ${error.message}`;
                 return;
             }
             
-            // Si es la imagen de dispositivos, restaurar el src por defecto
             if (!isBackground) {
                 mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL;
                 messageElement.textContent = 'Imagen de dispositivos restaurada por defecto.';
             } else {
-                 // Si es el fondo, quitar el estilo
                 heroSection.style.backgroundImage = 'none';
                 heroSection.style.backgroundColor = '#161a20';
                 messageElement.textContent = 'Fondo de imagen eliminado.';
@@ -500,7 +488,7 @@
             
         }
 
-        // --- FUNCIÓN PARA PARSEAR LA DATA BRUTA (Se mantiene por si acaso) ---
+        // --- FUNCIÓN PARA PARSEAR LA DATA BRUTA ---
         function parseAndNormalizeServices(rawText) {
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             const services = [];
@@ -510,14 +498,12 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
                 
-                // Intentar detectar si la línea es un nuevo encabezado de categoría
                 if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
                     if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
                        currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
                     }
                 }
                 
-                // Buscar la combinación de Precio y Tiempo
                 const priceTimeMatch = line.match(/(\$[0-9,.]+)[\s\u00A0]+([0-9-.\s\u00A0A-Za-z]+)$/);
                 
                 if (priceTimeMatch) {
@@ -527,7 +513,6 @@
                     let name = '';
                     let k = i - 1;
                     
-                    // Buscar hacia atrás hasta encontrar el nombre del servicio (antes del precio y tiempo)
                     while (k >= 0 && !lines[k].startsWith('$') && lines[k].length > 3) {
                          name = lines[k] + ' ' + name;
                          k--;
@@ -537,7 +522,6 @@
                     if (name.trim() === '') {
                          name = line.replace(priceTimeMatch[0], '').trim();
                     } else {
-                         // Limpieza de los códigos de categoría abreviados (He, F, Mr, etc.) que se filtran en las líneas
                          name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
                          name = name.replace(/\s+/g, ' ').trim(); 
                     }
@@ -625,7 +609,7 @@
             const container = document.getElementById('serviceGridContainer');
             if (!container) return;
 
-            container.innerHTML = ''; // Limpiar el contenedor completamente
+            container.innerHTML = ''; 
             
             if (imeiServicesData.length === 0) {
                  container.innerHTML = `<p id="loadingMessage" style="color:orange;">No hay servicios cargados. Si eres administrador, usa el Panel de Administración para agregar tarjetas.</p>`;
@@ -640,7 +624,6 @@
                  return;
             }
 
-            // Renderizar los servicios dinámicos
             imeiServicesData.forEach(service => {
                 const card = document.createElement('div');
                 card.className = 'service-card';
@@ -665,7 +648,6 @@
                 container.appendChild(card);
             });
             
-            // Adjuntar listener de click a las tarjetas recién creadas
             document.querySelectorAll('.service-card').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
@@ -828,7 +810,6 @@
         
         // --- FUNCIÓN DE GESTIÓN DE SERVICIOS (ADMIN) ---
 
-        // Función para añadir un nuevo servicio
         async function addNewService(event) {
             event.preventDefault(); 
 
@@ -846,7 +827,6 @@
             addServiceMessage.style.color = 'yellow';
             addServiceMessage.textContent = 'Añadiendo servicio...';
             
-            // Determinar el nuevo ID (el último ID + 1)
             const nextId = imeiServicesData.length > 0 
                 ? Math.max(...imeiServicesData.map(s => s.id)) + 1 
                 : 1;
@@ -859,10 +839,8 @@
                 category: category
             };
 
-            // 1. Añadir el nuevo servicio a la lista en memoria
             imeiServicesData.push(newService);
 
-            // 2. Sincronizar la lista completa (incluyendo el nuevo servicio) con Supabase
             const success = await updateServiceInSupabase(imeiServicesData);
 
             if (success) {
@@ -977,7 +955,9 @@
         async function checkUser() {
             if (!supabase) return;
             
-            const { data: { user } = {} } = await supabase.auth.getUser();
+            // CORRECCIÓN CLAVE: Usamos getSession para ver el estado, pero la autenticación se maneja por el listener.
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            const user = session?.user;
             
             hideAllSections(); 
             navAdminPanel.classList.add('hidden');
@@ -1006,6 +986,13 @@
                     loginSection.scrollIntoView({ behavior: 'smooth' });
                 };
             }
+            
+            // Esto asegura que la página base se renderice después de la verificación inicial.
+            if (document.getElementById('imeiServiceSection').classList.contains('hidden') && 
+                document.getElementById('loginSection').classList.contains('hidden') &&
+                document.getElementById('adminSection').classList.contains('hidden')) {
+                heroSection.classList.remove('hidden');
+            }
         }
 
         async function handleNavigationClick(event) {
@@ -1027,15 +1014,15 @@
                 case 'navPongaOrden':
                     if (isLoggedIn) {
                         pongaOrdenMenu.classList.toggle('hidden');
-                        heroSection.classList.remove('hidden'); 
+                        // No mostramos hero si el menú está visible
+                        if(pongaOrdenMenu.classList.contains('hidden')) {
+                            heroSection.classList.remove('hidden'); 
+                        }
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
                         loginMessage.style.color = 'orange';
                         loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
-                    }
-                    if (pongaOrdenMenu.classList.contains('hidden')) {
-                         heroSection.classList.remove('hidden');
                     }
                     break;
                 case 'navAdminPanel':
@@ -1047,10 +1034,10 @@
                     break;
                 case 'navHistorialPedidos':
                     if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
-                        fetchOrdersHistory(); // Solo si es admin, carga el historial
+                        fetchOrdersHistory(); 
                         adminSection.classList.remove('hidden');
                     } else if (isLoggedIn) {
-                         heroSection.classList.remove('hidden'); // Clientes vuelven al inicio
+                         heroSection.classList.remove('hidden'); 
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -1115,29 +1102,11 @@
             if (error) {
                 console.error('Error al hacer logout:', error);
             } else {
-                checkUser();
+                // El listener onAuthStateChange llamará a checkUser()
                 loginMessage.textContent = '';
             }
         }
         
-        // --- Funciones de Gestión de Imágenes (vinculadas a los botones del Admin) ---
-        
-        async function handleUploadBackground() {
-            await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
-        }
-
-        async function handleClearBackground() {
-            await clearImage(BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
-        }
-
-        async function handleUploadDevices() {
-            await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
-        }
-
-        async function handleClearDevices() {
-            await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
-        }
-
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', async () => {
             
@@ -1174,12 +1143,10 @@
             devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
             loginMessage = document.getElementById('loginMessage');
             
-            // --- CARGA INICIAL DE DATOS Y LISTENERS ---
-            
-            // Cargar imágenes desde Supabase Storage (hace que sean persistentes)
+            // --- CARGA DE IMAGENES ---
             await loadImages();
             
-            // Cargar servicios desde Supabase
+            // --- CARGA DE DATOS ---
             await fetchServices(); 
             
             // Listeners de Autenticación y Modal
@@ -1220,11 +1187,12 @@
                 });
             });
 
-            // Verificar estado de autenticación (Al final de la carga)
+            // Verificar estado de autenticación (La llamada inicial y el listener ahora son más robustos)
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser();
             });
             
+            // Realizamos una verificación manual inicial en caso de que el listener no se dispare al cargar.
             checkUser(); 
         });
     </script>
