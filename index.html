@@ -797,17 +797,16 @@
             }
         }
 
-        // FUNCIÓN CORREGIDA PARA MANEJAR EL ERROR 429 EN LA APERTURA DEL MODAL
+        // FUNCIÓN CORREGIDA PARA MANEJAR EL ERROR 429 EN LA APERTURA DEL MODAL Y VERIFICACIÓN DE SESIÓN
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
             // 1. Uso de getSession para verificar el estado de la sesión actual
-            // Esto es más robusto que solo getUser() para verificar la sesión.
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             const user = session?.user;
             
-            // Nuevo manejo de error de red (como 429)
+            // Manejo de error de red (como 429) o fallos de sesión
             if (sessionError) {
                 console.error("Error al obtener la sesión para el modal:", sessionError);
                 if (sessionError.status === 429) {
