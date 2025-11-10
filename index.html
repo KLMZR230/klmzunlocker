@@ -797,11 +797,24 @@
             }
         }
 
+        // FUNCIÓN CORREGIDA PARA MANEJAR EL ERROR 429 EN LA APERTURA DEL MODAL
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            const { data: { user } } = await supabase.auth.getUser(); 
+            // 1. Uso de getSession para verificar el estado de la sesión actual
+            // Esto es más robusto que solo getUser() para verificar la sesión.
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            const user = session?.user;
+            
+            // Nuevo manejo de error de red (como 429)
+            if (sessionError) {
+                console.error("Error al obtener la sesión para el modal:", sessionError);
+                if (sessionError.status === 429) {
+                    alert('⛔ ERROR 429 (Límite de Solicitudes): El servidor está sobrecargado. Espera un minuto y recarga la página antes de intentar hacer un pedido.');
+                    return;
+                }
+            }
 
             if (!user) {
                 alert('Debe iniciar sesión para realizar un pedido.');
@@ -1137,6 +1150,7 @@
             }
         }
         
+        // FUNCIÓN CORREGIDA PARA MANEJAR ERRORES DE AUTENTICACIÓN
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
