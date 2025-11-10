@@ -307,12 +307,12 @@
                     <p id="backgroundResponseMessage" class="form-message"></p>
                     <button id="clearBackgroundButton" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
                 </div>
-                 <div class="form-container" style="margin-top: 20px;">
+                   <div class="form-container" style="margin-top: 20px;">
                     <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
                     <input type="file" id="devicesImageFile" accept="image/*">
                     <button id="uploadDevicesButton">Subir Imagen de Dispositivos</button>
                     <p id="devicesImageResponseMessage" class="form-message"></p>
-                     <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
+                    <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
                 </div>
             </div>
 
@@ -367,7 +367,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
-        // DECLARACIONES GLOBALES (ACCESIBLES POR HTML ONCLICK)
+        // DECLARACIONES GLOBALES
         let supabase;
         let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; 
         let loginLogoutBtn;
@@ -383,9 +383,6 @@
         
         let imeiServicesData = []; 
         const SERVICES_RECORD_ID = 1; 
-
-        // Datos Brutos Eliminados para Forzar Carga de Supabase
-        const rawServiceList = ``; 
 
         // Función de parseo (mantenida por si acaso)
         function parseAndNormalizeServices(rawText) {
@@ -672,6 +669,7 @@
                 container.appendChild(card);
             });
             
+            // **ARREGLO #2: Añadir el evento de clic a las tarjetas dinámicas**
             document.querySelectorAll('.service-card').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
@@ -689,6 +687,13 @@
 
             if (!user) {
                 alert('Debe iniciar sesión para realizar un pedido.');
+                
+                // Muestra la sección de login si no está logeado
+                hideAllSections();
+                loginSection.classList.remove('hidden');
+                loginSection.scrollIntoView({ behavior: 'smooth' });
+                loginMessage.style.color = 'orange';
+                loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
                 return;
             }
             if (!service) return;
@@ -924,8 +929,8 @@
         
         function deleteService(id) {
              if (confirm(`¿Seguro que quieres eliminar el servicio ID ${id}? (Recuerda guardar los cambios)`)) {
-                imeiServicesData = imeiServicesData.filter(s => s.id !== id);
-                renderServiceEditor(); 
+                 imeiServicesData = imeiServicesData.filter(s => s.id !== id);
+                 renderServiceEditor(); 
              }
         }
         
@@ -1022,6 +1027,7 @@
 
             const { data: { session } = {} } = await supabase.auth.getSession();
             const isLoggedIn = !!session; 
+            const isAdmin = isLoggedIn && session.user.email === ADMIN_EMAIL;
             
             hideAllSections();
             
@@ -1040,18 +1046,25 @@
                     }
                     break;
                 case 'navAdminPanel':
-                    if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
+                    if (isAdmin) {
+                        // Se asegura de cargar la lista de servicios para el editor
+                        await fetchServices();
                         renderServiceEditor(); 
+                    } else if (isLoggedIn) {
+                         heroSection.classList.remove('hidden'); 
                     } else {
-                        heroSection.classList.remove('hidden'); 
+                        loginSection.classList.remove('hidden');
+                        loginSection.scrollIntoView({ behavior: 'smooth' });
                     }
                     break;
                 case 'navHistorialPedidos':
-                    if (isLoggedIn && session.user.email === ADMIN_EMAIL) {
+                    if (isAdmin) {
                         fetchOrdersHistory(); 
                         adminSection.classList.remove('hidden');
                     } else if (isLoggedIn) {
+                         // Lógica de Historial para Cliente Regular (No implementada, por ahora va a hero)
                          heroSection.classList.remove('hidden'); 
+                         alert('La vista de historial para clientes regulares no está implementada aún, solo para Admin.');
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -1094,8 +1107,7 @@
                 loginMessage.style.color = '#25d366';
                 loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
                 
-                hideAllSections();
-                heroSection.classList.remove('hidden'); 
+                // La redirección/actualización de UI la maneja el onAuthStateChange listener
             } else {
                 loginMessage.style.color = 'red';
                 loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
@@ -1126,6 +1138,7 @@
                 console.error('Error al hacer logout:', error);
             } else {
                 loginMessage.textContent = '';
+                // La actualización de UI la maneja el onAuthStateChange listener
             }
         }
 
@@ -1176,7 +1189,6 @@
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
             document.getElementById('closeModal').addEventListener('click', () => { document.getElementById('orderModal').classList.add('hidden'); });
             
-            // Se elimina el evento de submitBypassOrder del DOMContentLoaded, ya está en el ámbito global.
             document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
             
             // Listeners de Navegación y Admin
@@ -1211,11 +1223,12 @@
                 });
             });
 
-            // Verificar estado de autenticación (Se ejecuta una vez y luego por el listener)
+            // **ARREGLO #1: El listener de estado de auth es la única llamada para actualizar la UI.**
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser();
             });
             
+            // Llamada inicial para establecer el estado de la UI (sin esperar al onAuthStateChange)
             checkUser(); 
         });
     </script>
