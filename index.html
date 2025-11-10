@@ -84,8 +84,8 @@
         .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
 
         /* --- ESTILOS DE SECCIONES INTERNAS --- */
-        #imeiServiceSection { padding: 40px 50px; background-color: var(--dark-bg); }
-        #imeiServiceSection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
+        #imeiServiceSection, #clientOrderHistorySection { padding: 40px 50px; background-color: var(--dark-bg); }
+        #imeiServiceSection h2, #clientOrderHistorySection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
         .service-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
@@ -216,6 +216,13 @@
             </div>
         </section>
 
+        <section class="hidden" id="clientOrderHistorySection">
+            <h2>📜 Mi Historial de Pedidos</h2>
+            <div id="clientOrderHistoryContainer" class="order-history-grid">
+                <p>Cargando sus pedidos...</p>
+            </div>
+        </section>
+
         <section class="hero-section" id="heroSection">
             <div class="services-content">
                 <div class="services-box">
@@ -255,7 +262,7 @@
             <div class="admin-options">
                 <h4>Gestión de Órdenes</h4>
                 <div class="form-container">
-                     <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos</h3>
+                     <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
                     <div id="adminOrderHistory" class="order-history-grid">
                         <p>Cargando pedidos...</p>
                     </div>
@@ -369,11 +376,11 @@
         
         // DECLARACIONES GLOBALES
         let supabase;
-        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection; 
+        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, clientOrderHistorySection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
         let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage;
-        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory;
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
         const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
@@ -624,6 +631,7 @@
             loginSection.classList.add('hidden');
             adminSection.classList.add('hidden');
             imeiServiceSection.classList.add('hidden');
+            clientOrderHistorySection.classList.add('hidden');
         }
 
         function renderImeiServices() {
@@ -678,7 +686,120 @@
             imeiServiceSection.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        
+        // Función genérica para mostrar el historial
+        function displayOrders(containerElement, orders, isAdminView = false) {
+            containerElement.innerHTML = '';
 
+            if (orders.length === 0) {
+                containerElement.innerHTML = '<p>No hay pedidos registrados en su historial.</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
+                card.dataset.orderId = order.id;
+
+                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
+                
+                let orderActionsHtml = '';
+                if (isAdminView) {
+                    orderActionsHtml = `
+                        <select onchange="updateOrderStatus(${order.id}, this.value)">
+                            ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                    `;
+                } else {
+                    orderActionsHtml = `<p><strong>Estado:</strong> ${order.status}</p>`;
+                }
+
+                card.innerHTML = `
+                    <div class="order-details">
+                        <p><strong>Servicio:</strong> ${order.service_name}</p>
+                        <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
+                        ${isAdminView ? `<p><strong>Contacto:</strong> ${order.contact_email}</p>` : ''}
+                        <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="order-actions">
+                        ${orderActionsHtml}
+                    </div>
+                `;
+                containerElement.appendChild(card);
+            });
+        }
+
+
+        // Modificada: Función para cargar historial de TODOS (Admin)
+        async function fetchAdminOrdersHistory() {
+            const container = document.getElementById('adminOrderHistory');
+            if (!container) return;
+            
+            container.innerHTML = '<p>Cargando historial de todos los pedidos...</p>';
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error al cargar historial: ${error.message}. Verifique RLS de SELECT para admin en 'orders'.</p>`;
+                return;
+            }
+            displayOrders(container, orders, true);
+        }
+
+        // NUEVA FUNCIÓN: Cargar historial de un usuario específico
+        async function fetchClientOrdersHistory() {
+            const container = document.getElementById('clientOrderHistoryContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
+
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
+                return;
+            }
+
+            // Aquí se usa RLS para filtrar automáticamente por el user_id
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('user_id', user.id) // Filtra por el ID del usuario logueado
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error al cargar su historial: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado en 'orders' permitiendo ver solo sus propios pedidos (user_id = auth.uid()).</p>`;
+                return;
+            }
+
+            displayOrders(container, orders, false);
+
+            hideAllSections();
+            clientOrderHistorySection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
+
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (error) {
+                alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
+            } else {
+                fetchAdminOrdersHistory(); 
+            }
+        }
+
+        // El resto de las funciones (openOrderModal, submitBypassOrder, addNewService, renderServiceEditor, etc.) permanecen igual que en la corrección anterior.
+        // Se pegarán abajo para tener el código completo.
+        
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
@@ -750,84 +871,24 @@
 
             if (error) {
                 modalMessage.style.color = 'red';
-                // Si el error es 429, mostramos un mensaje específico, aunque la aplicación no pueda resolver el rate limiting.
                 if (error.status === 429) {
                     modalMessage.textContent = 'Error 429 (Too Many Requests). La API está sobrecargada. Por favor, espere un momento antes de intentarlo de nuevo.';
                 } else {
-                    modalMessage.textContent = `Error: ${error.message}. Revise sus políticas RLS de INSERT en la tabla 'orders'.`;
+                    modalMessage.textContent = `Error: ${error.message}. Revise sus políticas RLS de INSERT en la tabla 'orders' (debe permitir insertar si auth.uid() = user_id).`;
                 }
                 console.error(error);
             } else {
                 modalMessage.style.color = '#25d366';
                 modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
-                if (user.email === ADMIN_EMAIL) {
-                    fetchOrdersHistory(); 
-                }
+                
+                // Mantiene al usuario en la vista de servicios si está allí, o lo dirige a su historial.
                 setTimeout(() => {
                     document.getElementById('orderModal').classList.add('hidden');
+                    // Si el usuario no es admin y está en la vista de servicios, lo mandamos al historial.
+                    if (user.email !== ADMIN_EMAIL) {
+                        fetchClientOrdersHistory();
+                    }
                 }, 2000);
-            }
-        }
-
-        async function fetchOrdersHistory() {
-            const container = document.getElementById('adminOrderHistory');
-            if (!container) return;
-            
-            container.innerHTML = '<p>Cargando historial...</p>';
-
-            const { data: orders, error } = await supabase
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                container.innerHTML = `<p style="color:red;">Error al cargar historial: ${error.message}. Verifique RLS de SELECT para admin en 'orders'.</p>`;
-                return;
-            }
-
-            if (orders.length === 0) {
-                container.innerHTML = '<p>No hay pedidos registrados aún.</p>';
-                return;
-            }
-
-            container.innerHTML = ''; // Limpiar
-
-            orders.forEach(order => {
-                const card = document.createElement('div');
-                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
-                card.dataset.orderId = order.id;
-
-                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
-                
-                card.innerHTML = `
-                    <div class="order-details">
-                        <p><strong>Servicio:</strong> ${order.service_name}</p>
-                        <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
-                        <p><strong>Contacto:</strong> ${order.contact_email}</p>
-                        <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
-                    </div>
-                    <div class="order-actions">
-                        <select onchange="updateOrderStatus(${order.id}, this.value)">
-                            ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
-                        </select>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        async function updateOrderStatus(orderId, newStatus) {
-            if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
-
-            const { error } = await supabase
-                .from('orders')
-                .update({ status: newStatus })
-                .eq('id', orderId);
-
-            if (error) {
-                alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
-            } else {
-                fetchOrdersHistory(); 
             }
         }
         
@@ -1010,7 +1071,8 @@
             
             if (document.getElementById('imeiServiceSection').classList.contains('hidden') && 
                 document.getElementById('loginSection').classList.contains('hidden') &&
-                document.getElementById('adminSection').classList.contains('hidden')) {
+                document.getElementById('adminSection').classList.contains('hidden') &&
+                document.getElementById('clientOrderHistorySection').classList.contains('hidden')) {
                 heroSection.classList.remove('hidden');
             }
         }
@@ -1047,7 +1109,6 @@
                     break;
                 case 'navAdminPanel':
                     if (isAdmin) {
-                        // Se asegura de cargar la lista de servicios para el editor
                         await fetchServices();
                         renderServiceEditor(); 
                     } else if (isLoggedIn) {
@@ -1058,17 +1119,19 @@
                     }
                     break;
                 case 'navHistorialPedidos':
-                    if (isAdmin) {
-                        fetchOrdersHistory(); 
-                        adminSection.classList.remove('hidden');
-                    } else if (isLoggedIn) {
-                         // Lógica de Historial para Cliente Regular (No implementada, por ahora va a hero)
-                         heroSection.classList.remove('hidden'); 
-                         alert('La vista de historial para clientes regulares no está implementada aún, solo para Admin.');
+                    if (isLoggedIn) {
+                        if (isAdmin) {
+                             fetchAdminOrdersHistory(); 
+                             adminSection.classList.remove('hidden');
+                        } else {
+                            // **ARREGLO #1: Mostrar Historial del Cliente Regular**
+                            fetchClientOrdersHistory();
+                        }
                     } else {
                         loginSection.classList.remove('hidden');
                         loginSection.scrollIntoView({ behavior: 'smooth' });
-                        loginMessage.textContent = '';
+                        loginMessage.textContent = 'Inicia sesión para ver tu historial de pedidos.';
+                        loginMessage.style.color = 'orange';
                     }
                     break;
                 case 'navAreaCliente':
@@ -1158,9 +1221,11 @@
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
+            clientOrderHistorySection = document.getElementById('clientOrderHistorySection');
             loadingMessage = document.getElementById('loadingMessage'); 
             editorMessage = document.getElementById('editorMessage'); 
             adminOrderHistory = document.getElementById('adminOrderHistory'); 
+            clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
             addServiceMessage = document.getElementById('addServiceMessage');
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
@@ -1213,6 +1278,7 @@
                     e.stopPropagation(); 
                     pongaOrdenMenu.classList.add('hidden');
                     if (this.dataset.serviceType === 'imei') {
+                        // **ARREGLO #2: Si el usuario está logueado, permite ver la sección IMEI Service.**
                         renderImeiServices(); 
                     } else {
                         hideAllSections();
