@@ -1017,10 +1017,10 @@ AT
 At&t Usa ATT - IPhone & Genric ( All Model Support ) Clean Service(No Refund For Denial) Level 2 ✅
 AT&T USA ATT - All iPhone Models Checker + Unlock (No Refund) ✅
 $0.042 1-24 Hours
-EMEA Networck Unlock ✅
+EMEA Networck Unklock ✅
 EM
 EMEA - iPhone All Models Supported Premium Unlock Service
-EMEA Networck Unlock ✅
+EMEA Networck Unklock ✅
 $0.858 1-12 Hours
 MDM Bypass (iPhone/iPad & Macbook) - Support ✅
 M
@@ -2683,6 +2683,7 @@ $12.012 1-5 days`;
             });
         }
 
+        // CORRECCIÓN: Definición de la función de forma global para que sea accesible desde el HTML
         async function updateOrderStatus(orderId, newStatus) {
             if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
 
@@ -2766,7 +2767,7 @@ $12.012 1-5 days`;
             const updatedData = [];
             const serviceEditorList = document.getElementById('serviceEditorList');
             
-            // Recorremos los elementos de la lista generada
+            // 1. Recorrer los inputs y actualizar los datos en memoria
             serviceEditorList.querySelectorAll('li').forEach(listItem => {
                 const id = parseInt(listItem.querySelector('input[data-field="name"]').dataset.id);
                 const nameInput = listItem.querySelector(`#name-${id}`).value.trim();
@@ -2783,7 +2784,7 @@ $12.012 1-5 days`;
                 });
             });
             
-            // Sincronizar con Supabase
+            // 2. Sincronizar con Supabase
             const success = await updateServiceInSupabase(updatedData);
 
             if (success) {
