@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
+    <title>KLMZ UNLOCKER - Plataforma de Pedidos</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -277,25 +277,25 @@
         </div>
         
         <div class="nav-links">
-            <div class="nav-item" id="navAreaCliente">Area del Cliente</div>
+            <div class="nav-item" id="navAreaCliente">Área del Cliente</div>
             
             <div class="nav-item" id="navPongaOrden">
-                Ponga la orden
+                Realizar Pedido
                 <div class="dropdown-menu hidden" id="pongaOrdenMenu">
                     <ul>
-                        <li><a href="#" class="order-type-link" data-service-type="imei">IMEI Service</a></li> 
-                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Box/Dongle/Tool/Credit - Activation</a></li>
-                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Digital Tool Rent & Remote Service</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="imei">Servicios por IMEI</a></li> 
+                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Activaciones Box/Dongle/Créditos</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Renta de Herramientas Digitales y Servicios Remotos</a></li>
                     </ul>
                 </div>
             </div>
             
-            <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
+            <div class="nav-item" id="navHistorialPedidos">Historial de Pedidos</div>
 
             <div class="nav-item hidden" id="navAdminPanel">Panel de Administración</div>
             
             <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
-            <a href="#" id="loginLogoutBtn">Login / Register</a>
+            <a href="#" id="loginLogoutBtn">Ingresar / Registrarse</a>
         </div>
     </nav>
 
@@ -314,7 +314,8 @@
                 
                 <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
                 <input type="hidden" id="modalServiceId">
-                <input type="hidden" id="modalServiceType"> <div class="modal-footer-actions">
+                <input type="hidden" id="modalServiceType"> 
+                <div class="modal-footer-actions">
                     <button id="submitModalOrder">Confirmar Pedido</button>
                     <button id="closeModal">Cancelar</button>
                 </div>
@@ -323,21 +324,21 @@
         </div>
 
         <section class="hidden" id="imeiServiceSection">
-            <h2>IMEI Service</h2>
+            <h2>Servicios por IMEI</h2>
             <div id="imeiServiceGridContainer" class="service-grid">
                 <p id="loadingMessageIMEI">Cargando servicios...</p>
             </div>
         </section>
 
         <section class="hidden" id="boxDongleServiceSection">
-            <h2>Box/Dongle/Tool/Credit - Activation</h2>
+            <h2>Activaciones Box/Dongle/Créditos</h2>
             <div id="boxDongleServiceGridContainer" class="service-grid">
                 <p id="loadingMessageBoxDongle">Cargando servicios...</p>
             </div>
         </section>
 
         <section class="hidden" id="digitalRentServiceSection">
-            <h2>Digital Tool Rent & Remote Service</h2>
+            <h2>Renta de Herramientas Digitales y Servicios Remotos</h2>
             <div id="digitalRentServiceGridContainer" class="service-grid">
                 <p id="loadingMessageDigitalRent">Cargando servicios...</p>
             </div>
@@ -352,11 +353,11 @@
         <section class="hero-section" id="heroSection">
             <div class="services-content">
                 <div class="services-box">
-                    <div class="services-title">IPHONE SERVICES</div>
-                    <div class="service-item">IPHONE CARRIER UNLOCK</div>
-                    <div class="service-item">IPHONE ICLOUD UNLOCK</div>
-                    <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
-                    <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
+                    <div class="services-title">SERVICIOS EXCLUSIVOS IPHONE</div>
+                    <div class="service-item">Liberación de Operador (Factory Unlock)</div>
+                    <div class="service-item">Remoción de Bloqueo de iCloud (FMI OFF)</div>
+                    <div class="service-item">Bypass de iCloud con SIM Funcional</div>
+                    <div class="service-item">Eliminación de MDM (Mobile Device Management)</div>
                 </div>
             </div>
 
@@ -365,7 +366,7 @@
 
         <section class="login-section hidden" id="loginSection">
             <h3>Iniciar Sesión / Registrarse</h3>
-            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="email" id="loginEmail" placeholder="Correo Electrónico">
             <input type="password" id="loginPassword" placeholder="Contraseña">
             <button id="signInButton">Iniciar Sesión</button>
             <button id="signUpButton">Registrarse</button>
@@ -392,9 +393,9 @@
                 <div class="form-container">
                     <h4 style="color: var(--accent-pink);">Seleccionar Categoría a Editar:</h4>
                     <select id="serviceCategorySelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: #333; color: white; border-radius: 4px;">
-                        <option value="imei">IMEI Service</option>
-                        <option value="box-dongle">Box/Dongle/Tool/Credit - Activation</option>
-                        <option value="digital-rent">Digital Tool Rent & Remote Service</option>
+                        <option value="imei">Servicios por IMEI</option>
+                        <option value="box-dongle">Activaciones Box/Dongle/Créditos</option>
+                        <option value="digital-rent">Renta de Herramientas Digitales y Servicios Remotos</option>
                     </select>
                     
                     <p id="editorMessage" class="form-message"></p>
@@ -410,14 +411,14 @@
                             <input type="text" id="newServicePrice" placeholder="$5" required>
                         </div>
                         <div>
-                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 days):</label>
-                            <input type="text" id="newServiceTime" placeholder="Miniutes" required>
+                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 días):</label>
+                            <input type="text" id="newServiceTime" placeholder="Minutos" required>
                         </div>
                         <div class="full-width">
                             <label for="newServiceCategory">Sub-Categoría (Ej: Hello A12+ iCloud Bypass Windows Tool):</label>
                             <input type="text" id="newServiceCategory" placeholder="Categoría del servicio" required>
                         </div>
-                        <button type="submit" id="addServiceButton">Añadir Servicio a <span id="currentCategoryAddBtn">IMEI Service</span></button>
+                        <button type="submit" id="addServiceButton">Añadir Servicio a <span id="currentCategoryAddBtn">Servicios por IMEI</span></button>
                     </form>
                     <p id="addServiceMessage" class="form-message"></p>
 
@@ -461,12 +462,12 @@
     
     <div class="chat-buttons">
         <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 689957466">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Icon">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="Icono de WhatsApp">
         </a>
     </div>
 
     <script>
-        // 🔑 TUS CLAVES SUPABASE (INSERTADAS)
+        // 🔑 CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
@@ -485,24 +486,24 @@
         const BACKGROUND_FILE_PATH = 'hero_background.jpg';
         const DEVICES_FILE_PATH = 'main_devices.png';
         
-        // IDs para las 3 categorías de servicio en la tabla 'store_services'
+        // Mapeo de IDs para las 3 categorías de servicio en la tabla 'store_services'
         const SERVICE_TYPES = {
-            'imei': { id: 1, title: 'IMEI Service' },
-            'box-dongle': { id: 2, title: 'Box/Dongle/Tool/Credit - Activation' },
-            'digital-rent': { id: 3, title: 'Digital Tool Rent & Remote Service' }
+            'imei': { id: 1, title: 'Servicios por IMEI' },
+            'box-dongle': { id: 2, title: 'Activaciones Box/Dongle/Créditos' },
+            'digital-rent': { id: 3, title: 'Renta de Herramientas Digitales y Servicios Remotos' }
         };
 
-        // Almacenamiento local de datos: Object para las 3 listas
+        // Almacenamiento local de datos para las 3 categorías
         let serviceDataStore = {
             'imei': [],
             'box-dongle': [],
             'digital-rent': []
         };
 
-        // Variable para rastrear qué categoría se está editando
+        // Categoría de servicio actualmente seleccionada en el panel de Admin
         let currentEditingCategory = 'imei'; 
 
-        // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
+        // Variable para rastrear el estado de sesión del usuario
         let currentUser = null; 
 
         // --- FUNCIONES DE MENSAJERÍA ---
@@ -523,7 +524,7 @@
                     }, 5000);
                 }
             } else {
-                console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
+                console.error(`MENSAJE DE ADMIN (${isError ? 'ERROR' : 'INFO'}):`, message);
             }
         }
 
@@ -538,7 +539,7 @@
             
             if (!url) return fallbackUrl;
 
-            // 2. Add Cache-Buster to force browser to load new version after upsert/update
+            // 2. Agregar Cache-Buster para forzar la recarga
             try {
                 const parsedUrl = new URL(url);
                 const cacheBuster = Date.now();
@@ -571,7 +572,7 @@
 
             } else if (heroSection) {
                 heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = 'var(--dark-bg)'; // Color definido en CSS :root
+                heroSection.style.backgroundColor = 'var(--dark-bg)'; 
             }
 
             // 3. Cargar Imagen de Dispositivos (Se aplica al <img> src)
@@ -585,7 +586,6 @@
             }
         }
         
-        // Funciones de subir y limpiar imagen (no se modifican)
         async function uploadImage(fileInputId, bucketName, filePath, responseElementId) { 
             const fileInput = document.getElementById(fileInputId);
             const messageElement = document.getElementById(responseElementId);
@@ -660,7 +660,7 @@
         async function handleClearDevices() { await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false); }
 
 
-        // --- SINCRONIZACIÓN DE SERVICIOS (MEJORADA PARA 3 CATEGORÍAS) ---
+        // --- SINCRONIZACIÓN DE SERVICIOS (3 CATEGORÍAS) ---
 
         async function fetchServices() {
             const loadingMessageIMEI = document.getElementById('loadingMessageIMEI');
@@ -701,7 +701,7 @@
             });
 
             if (missingRecords.length > 0) {
-                 // Si faltan records, intentamos crearlos (solo si es Admin, pero se hace con ANON key por ahora)
+                 // Si faltan records, intentamos crearlos
                  console.warn(`Registros de servicios faltantes (${missingRecords.join(', ')}). Inicializando...`);
                  await initializeMissingRecords(missingRecords);
             }
@@ -881,7 +881,7 @@
                 
                 let orderActionsHtml = '';
                 if (isAdminView) {
-                    // FIX: El select llama a la función global window.updateOrderStatus
+                    // El select llama a la función global window.updateOrderStatus
                     orderActionsHtml = `
                         <select onchange="window.updateOrderStatus(${order.id}, this.value)"> 
                             ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
@@ -913,7 +913,6 @@
             });
         }
 
-        // Funciones de historial (se dejan en el script para completar)
         async function fetchAdminOrdersHistory() {
              const container = document.getElementById('adminOrderHistory');
             if (!container) return;
@@ -1034,7 +1033,7 @@
         
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
-            const serviceType = event.currentTarget.dataset.serviceType; // Nuevo: obtener el tipo de servicio
+            const serviceType = event.currentTarget.dataset.serviceType; 
             
             // Buscar el servicio en el almacén de datos correcto
             const serviceList = serviceDataStore[serviceType] || [];
@@ -1058,10 +1057,10 @@
 
             if (!service) return;
 
-            // --- Lógica para mostrar/ocultar SN/IMEI ---
+            // --- Lógica para mostrar/ocultar SN/IMEI (CORRECCIÓN) ---
             if (serviceType === 'digital-rent') {
                 if (modalSerialInput) modalSerialInput.classList.add('hidden');
-                // IMPORTANTE: Si ocultas el campo, también remueve el atributo 'required' para que el envío funcione.
+                // Si ocultas el campo, remueve el atributo 'required' para que el envío funcione.
                 if (modalSerialField) modalSerialField.removeAttribute('required');
             } else {
                 if (modalSerialInput) modalSerialInput.classList.remove('hidden');
@@ -1076,7 +1075,7 @@
             document.getElementById('modalWhatsapp').value = '';
             
             document.getElementById('modalServiceId').value = service.id;
-            document.getElementById('modalServiceType').value = serviceType; // Guardar el tipo de servicio en el hidden input
+            document.getElementById('modalServiceType').value = serviceType; 
 
             if (document.getElementById('modalMessage')) document.getElementById('modalMessage').textContent = '';
             if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.remove('hidden');
@@ -1089,7 +1088,7 @@
             const whatsapp = document.getElementById('modalWhatsapp').value.trim();
             
             const serviceId = document.getElementById('modalServiceId').value;
-            const serviceType = document.getElementById('modalServiceType').value; // Obtener el tipo de servicio
+            const serviceType = document.getElementById('modalServiceType').value; 
             
             // Buscar el servicio en el almacén de datos correcto
             const serviceList = serviceDataStore[serviceType] || [];
@@ -1136,7 +1135,7 @@
                     service_id: serviceId,
                     service_type: serviceType, 
                     service_name: service.name,
-                    // Si es digital-rent, device_name/imei será vacío, sino será el valor de SN
+                    // Si es digital-rent, device_name/imei será "N/A", sino será el valor de SN
                     device_name: serviceType === 'digital-rent' ? 'N/A - Digital Rent' : sn, 
                     imei: serviceType === 'digital-rent' ? 'N/A' : sn, 
                     contact_email: email,
@@ -1168,12 +1167,12 @@
             }
         }
         
-        // --- LÓGICA DE ADMINISTRACIÓN DE SERVICIOS (ACTUALIZADA) ---
+        // --- LÓGICA DE ADMINISTRACIÓN DE SERVICIOS ---
 
         async function addNewService(event) {
             event.preventDefault(); 
 
-            const categoryKey = currentEditingCategory; // Usar la categoría activa
+            const categoryKey = currentEditingCategory; 
             const dataList = serviceDataStore[categoryKey];
 
             const name = document.getElementById('newServiceName').value.trim();
@@ -1251,7 +1250,7 @@
 
             dataList.forEach((service) => {
                 const listItem = document.createElement('li');
-                // FIX: El botón de eliminar llama a la función global window.deleteService
+                // El botón de eliminar llama a la función global window.deleteService
                 listItem.innerHTML = `
                     <div style="flex-grow: 1; margin-right: 15px;">
                         <div class="input-group">
@@ -1284,7 +1283,7 @@
             if (editorMessage) editorMessage.textContent = `${dataList.length} servicios listados para ${categoryTitle}.`;
         }
         
-        // FIX: Se adjunta al objeto window para ser accesible desde el atributo onclick del HTML.
+        // Se adjunta al objeto window para ser accesible desde el atributo onclick del HTML.
         window.deleteService = function(id) {
             const categoryKey = currentEditingCategory;
             let dataList = serviceDataStore[categoryKey];
@@ -1388,7 +1387,7 @@
                 const isAdmin = user.email === ADMIN_EMAIL;
                 
                 if (loginLogoutBtn) {
-                    loginLogoutBtn.textContent = 'Logout';
+                    loginLogoutBtn.textContent = 'Cerrar Sesión';
                     loginLogoutBtn.onclick = signOut;
                 }
                 
@@ -1401,7 +1400,7 @@
                 
             } else {
                 if (loginLogoutBtn) {
-                    loginLogoutBtn.textContent = 'Login / Register';
+                    loginLogoutBtn.textContent = 'Ingresar / Registrarse';
                     loginLogoutBtn.onclick = () => {
                         hideAllSections();
                         if (loginSection) loginSection.classList.remove('hidden');
@@ -1443,7 +1442,7 @@
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                         if (loginMessage) {
                             loginMessage.style.color = 'var(--orange-pending)';
-                            loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
+                            loginMessage.textContent = 'Inicia sesión para realizar un pedido.';
                         }
                     }
                     break;
@@ -1499,7 +1498,7 @@
             }
         }
         
-        // Funciones de Auth (no se modifican)
+        // Funciones de Autenticación
         async function signInWithEmail() { 
              const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -1557,7 +1556,11 @@
                 console.error('Error al registrar:', error);
                 if (loginMessage) {
                     loginMessage.style.color = 'var(--red-error)';
-                    loginMessage.textContent = `Error: ${error.message}`;
+                    if (error.message.includes('User already registered')) {
+                        loginMessage.textContent = '❌ Este correo ya está registrado.';
+                    } else {
+                        loginMessage.textContent = `Error: ${error.message}`;
+                    }
                 }
             } else {
                 if (loginMessage) {
@@ -1576,9 +1579,10 @@
             }
         }
 
-        // --- Inicialización (IIFE para evitar Race Condition) ---
+        // --- Inicialización de la Aplicación (IIFE) ---
         (async function initApp() {
             
+            // Desactivar restauración de scroll para controlar mejor la navegación
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual'; 
             }
@@ -1595,7 +1599,6 @@
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
-            // Mapeo de las 3 secciones
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
             boxDongleServiceSection = document.getElementById('boxDongleServiceSection'); 
             digitalRentServiceSection = document.getElementById('digitalRentServiceSection'); 
@@ -1651,7 +1654,7 @@
             document.getElementById('uploadDevicesButton').addEventListener('click', handleUploadDevices);
             document.getElementById('clearDevicesButton').addEventListener('click', handleClearDevices);
 
-            // NUEVO: Listener para el selector de categoría en el Admin
+            // Listener para el selector de categoría en el Admin
             const categorySelector = document.getElementById('serviceCategorySelector');
             if (categorySelector) {
                 categorySelector.addEventListener('change', (e) => {
@@ -1660,7 +1663,7 @@
                 });
             }
 
-            // CORRECCIÓN CLAVE: Listener para los enlaces dentro del menú "Ponga la orden"
+            // Listener para los enlaces dentro del menú "Realizar Pedido"
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1681,7 +1684,7 @@
                         return;
                     }
                     
-                    // LLAMADA FINAL: renderServices se encarga de todo.
+                    // Renderiza la sección de servicios seleccionada
                     renderServices(serviceType); 
                 });
             });
@@ -1690,14 +1693,14 @@
             const { data: { session } } = await supabase.auth.getSession();
             await checkUser(session); 
             
-            // LÓGICA INICIAL: Siempre mostrar la Hero Section/Area del Cliente al inicio.
+            // LÓGICA INICIAL: Siempre mostrar la Hero Section/Área del Cliente al inicio.
             hideAllSections();
             if (heroSection) heroSection.classList.remove('hidden');
 
 
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser(session);
-                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección Hero/Area del Cliente
+                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección Hero/Área del Cliente
                 if (session && event === 'SIGNED_IN') {
                     hideAllSections();
                     if (heroSection) heroSection.classList.remove('hidden');
