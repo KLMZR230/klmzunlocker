@@ -1105,9 +1105,14 @@
 
             displayOrders(container, orders, false);
 
-            hideAllSections();
-            if (clientOrderHistorySection) clientOrderHistorySection.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Solo ocultamos todas las secciones si la vista de historial de cliente
+            // es la que fue pedida por el usuario a través del menú de navegación.
+            const isNavigating = document.getElementById('navHistorialPedidos').classList.contains('active-nav')
+            if (isNavigating) {
+                hideAllSections();
+                if (clientOrderHistorySection) clientOrderHistorySection.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
         
         // --- FUNCIÓN CORREGIDA PARA ACTUALIZACIÓN EN TIEMPO REAL ---
@@ -1321,7 +1326,10 @@
                 
                 setTimeout(() => {
                     if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden');
+                    // Marcamos que la navegación a historial se forzó después del pedido.
+                    if (navHistorialPedidos) navHistorialPedidos.classList.add('active-nav'); 
                     fetchClientOrdersHistory();
+                    if (navHistorialPedidos) navHistorialPedidos.classList.remove('active-nav');
                 }, 2000);
             }
         }
@@ -1576,6 +1584,10 @@
             
             const elementId = clickedElement.id;
             
+            // Limpiar la clase 'active-nav' de todos los elementos de navegación y marcar el actual.
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-nav'));
+            clickedElement.classList.add('active-nav');
+            
             // Ocultar el menú desplegable si se hace clic en otro elemento de la barra de navegación.
             if (elementId !== 'navPongaOrden') {
                 if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden');
@@ -1622,10 +1634,13 @@
                 case 'navHistorialPedidos':
                     if (isLoggedIn) {
                         if (isAdmin) {
+                            // Si es admin y pide historial, mostrar panel de admin con historial cargado
                             fetchAdminOrdersHistory(); 
                             if (adminSection) adminSection.classList.remove('hidden');
                         } else {
+                            // Si es cliente, mostrar historial de cliente (fetchClientOrdersHistory manejará la vista)
                             fetchClientOrdersHistory();
+                            shouldScrollToTop = false; // Ya se maneja el scroll dentro de fetchClientOrdersHistory
                         }
                     } else {
                         if (loginSection) loginSection.classList.remove('hidden');
@@ -1761,13 +1776,17 @@
                     
                     if (currentUser) {
                         const isAdmin = currentUser.email === ADMIN_EMAIL;
+                        const isUpdateForCurrentUser = payload.new?.user_id === currentUser.id;
 
                         // 1. Recarga para el ADMIN si está viendo el panel de gestión
                         if (isAdmin && currentSectionId === 'adminSection') {
                             fetchAdminOrdersHistory();
                         } 
-                        // 2. Recarga para el CLIENTE (incluido el admin viendo su propio historial) si está en su historial
-                        if (currentSectionId === 'clientOrderHistorySection') {
+                        
+                        // 2. Recarga para el CLIENTE si:
+                        //    a) Está viendo activamente la sección de historial DE CLIENTE.
+                        //    b) La actualización pertenece a SU pedido.
+                        if (currentSectionId === 'clientOrderHistorySection' || isUpdateForCurrentUser) {
                             fetchClientOrdersHistory();
                         }
                     }
