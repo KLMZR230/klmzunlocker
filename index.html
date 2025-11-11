@@ -18,15 +18,12 @@
             --card-border: #292d34;
             --card-inner-bg: #1a1e25; 
             --green-check: #00ff00; 
-
-            /* Colores para Estados */
-            --status-success: var(--whatsapp-green);
-            --status-pending: #ff9800; /* Naranja/Ámbar */
-            --status-rejected: #ff5555; /* Rojo vibrante */
+            --red-error: #f44336;
+            --orange-pending: #ff9800;
         }
 
         /* Estilos Globales */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
         body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
         a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
         a:hover { color: var(--accent-pink); }
@@ -51,29 +48,16 @@
             overflow: hidden; 
             background-size: cover; 
             background-position: center bottom; 
-            /* Fix para asegurar color de fallback si no hay imagen */
             background-color: var(--dark-bg);
-            background-image: none; /* Asegura que se respete el background-color por defecto */
+            background-image: none;
         }
         .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
         .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
         .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
         .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
         .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
-        .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
         .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
-        .footer-content { display: flex; justify-content: space-around; padding-bottom: 30px; }
-        .footer-col { flex-basis: 20%; }
-        .footer-col h3 { font-size: 18px; margin-bottom: 20px; text-transform: uppercase; }
-        .footer-col ul { list-style: none; }
-        .footer-col ul li { margin-bottom: 10px; }
-        .social-icons { display: flex; gap: 15px; font-size: 20px; }
-        .social-icons a { color: var(--text-muted); }
-        .social-icons a:hover { color: var(--accent-pink); }
-        .subscribe-text { color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
-        .subscribe-button { background-color: #4c4e97; color: var(--text-light); padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; display: block; text-align: center; }
-        .contact-footer-info { line-height: 1.8; }
         .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
         .chat-buttons { position: fixed; bottom: 20px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
         .chat-button { 
@@ -82,7 +66,7 @@
         .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
         .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        .admin-section { max-width: 900px; }
+        .admin-section { max-width: 1000px; }
         .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
         .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
         .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
@@ -128,122 +112,110 @@
         .service-editor-list li .input-group p { font-size: 10px; color: #aaa; margin-bottom: 2px; }
         .service-editor-list li .full-name-input { width: 95%; } 
         .service-editor-list li .service-editor-actions { margin-left: auto; }
+        .service-editor-list button { background-color: var(--red-error); font-size: 12px; padding: 5px 10px; margin-top: 5px; }
         
-        /* Estilos para el Historial de Pedidos (MEJORADO) */
+        /* Estilos para el Historial de Pedidos */
         .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
         .order-card { 
             background-color: #1a1e25; 
             padding: 15px; 
             border-left: 5px solid gray; 
-            border-radius: 8px; /* Ligeramente más redondeado */
+            border-radius: 4px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            transition: all 0.2s;
-            border: 1px solid var(--card-border);
+            transition: all 0.3s ease-in-out;
         }
-        /* ESTILOS VISUALMENTE ATRACTIVOS POR ESTADO */
+
+        /* Colores de Estado de Pedidos */
         .order-card.Exitoso { 
-            border-left-color: var(--status-success); 
-            box-shadow: 0 0 12px rgba(37, 211, 102, 0.3); /* Sombra verde */
-            background-color: #16241a; /* Tinte verde oscuro */
-            border-color: #16241a;
+            border-left-color: var(--whatsapp-green); 
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); 
+            background-color: #1a251f;
         }
         .order-card.Pendiente { 
-            border-left-color: var(--status-pending); 
-            box-shadow: 0 0 12px rgba(255, 152, 0, 0.3); /* Sombra naranja */
-            background-color: #262416; /* Tinte naranja oscuro */
-            border-color: #262416;
+            border-left-color: var(--orange-pending); 
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.2); 
+            background-color: #25231a;
         }
         .order-card.Rechazado { 
-            border-left-color: var(--status-rejected); 
-            box-shadow: 0 0 12px rgba(255, 85, 85, 0.3); /* Sombra roja */
-            background-color: #241616; /* Tinte rojo oscuro */
-            border-color: #241616;
+            border-left-color: var(--red-error); 
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.2); 
+            background-color: #251a1a;
         }
+        
         .order-details p { margin: 2px 0; }
-        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; }
+        .order-actions { text-align: right; }
+        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
         .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
 
-        /* Modal Styles */
+        /* Estilo del Badge de Estado */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        .status-badge.Exitoso { background-color: var(--whatsapp-green); color: black; }
+        .status-badge.Pendiente { background-color: var(--orange-pending); color: black; }
+        .status-badge.Rechazado { background-color: var(--red-error); color: white; }
+
+
+        /* Modal Styles - Mejorado */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { 
-            background-color: #22252a; 
-            padding: 30px; 
-            border-radius: 8px; 
-            max-width: 400px; 
+            background: linear-gradient(145deg, #1c2025, #22252a);
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 450px; 
             width: 90%; 
-            text-align: center; 
-        }
-
-        /* --- ESTILOS DE MODAL DE PEDIDO (MEJORADO) --- */
-        
-        /* Contenedor del Título del Servicio */
-        #modalServiceName {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-light);
-            background-color: #2b2f36; /* Darker background for service info */
-            padding: 15px;
-            margin-top: -30px; /* Pull it slightly above the modal top margin */
-            margin-left: -30px;
-            margin-right: -30px;
-            margin-bottom: 25px;
-            border-radius: 8px 8px 0 0;
-            border-bottom: 4px solid var(--accent-pink);
             text-align: center;
-            line-height: 1.5;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--card-border);
         }
-
-        /* Estilos para el campo de entrada */
-        .modal-input-group {
-            text-align: left;
-            margin-bottom: 20px;
+        .modal-content h3 { 
+            color: var(--accent-pink); 
+            margin-bottom: 25px; 
+            font-size: 22px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
         }
-        .modal-input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: var(--accent-pink); /* Highlight label */
-            font-weight: bold;
-        }
-        .modal-input-group input {
+        .modal-content input { 
+            margin-bottom: 15px; 
             width: 100%;
-            box-sizing: border-box;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #2e353f;
             border: 1px solid #444;
-            background-color: #333;
-            color: white;
-            font-size: 16px;
-        }
-        
-        /* Estilos de botones del modal (Sobrescribe estilos genéricos) */
-        .modal-content button {
-            transition: background-color 0.3s, transform 0.1s;
-            font-size: 16px;
-            padding: 12px 25px; /* Larger click target */
+            padding: 10px;
             border-radius: 6px;
-            width: 100%; /* Make them full width of modal content */
-            margin-left: 0; /* Clear margin from general button style */
-            margin-right: 0;
-            margin-top: 10px;
+            color: white;
+            font-size: 14px;
         }
-        #submitModalOrder {
-            background-color: var(--accent-pink); /* Pink for Confirm */
-            margin-bottom: 5px; 
+        .modal-content button { 
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.2s, transform 0.1s;
         }
-        #submitModalOrder:hover {
-            background-color: #f069bb; /* Lighter pink */
-            transform: translateY(-1px);
+        .modal-content button:active { transform: scale(0.98); }
+        .modal-content #submitModalOrder { background-color: var(--whatsapp-green); color: black; }
+        .modal-content #closeModal { background-color: #4a4a58; color: white; }
+        .modal-footer-actions { margin-top: 20px; display: flex; justify-content: space-around; }
+        .modal-serial-input { 
+            margin-top: 20px;
+            background-color: #161a20;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #4a4a58;
         }
-        #closeModal {
-            background-color: #4a4a58 !important; /* Muted color for Cancel */
-        }
-        #closeModal:hover {
-            background-color: #6a6a78 !important;
-            transform: translateY(-1px);
-        }
+        .modal-serial-input p { font-size: 12px; color: var(--text-muted); margin-bottom: 5px;}
         
         /* Estilo para el nuevo formulario de añadir servicio */
         #newServiceForm {
@@ -271,11 +243,23 @@
         #addServiceButton {
             grid-column: span 2;
             background-color: var(--whatsapp-green) !important;
+            color: black !important;
+        }
+
+        /* Estilo para el mensaje de administración */
+        #adminOrderHistoryMessage { 
+            text-align: left; 
+            padding: 10px; 
+            background-color: #2e353f;
+            border-left: 3px solid var(--accent-pink);
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
+    <!-- CAMBIO: Barra superior de información vacía -->
     <div class="top-info-bar">
         <div class="info-group">
             </div>
@@ -312,29 +296,20 @@
     <main>
         <div class="modal hidden" id="orderModal">
             <div class="modal-content">
+                <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
                 
-                <!-- Título del Servicio Prominente (Contenido se llena con JS) -->
-                <h3 id="modalServiceName"></h3>
-                
-                <h4 style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
-                    Confirme el número de serie (SN/IMEI) para continuar:
-                </h4>
-
-                <div class="modal-input-group">
-                    <label for="modalSerial">Número de Serie (SN/IMEI):</label>
-                    <input type="text" id="modalSerial" placeholder="Ingresa SN/IMEI" required>
+                <div class="modal-serial-input">
+                    <p>Ingrese el SN/IMEI para este servicio:</p>
+                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" required>
                 </div>
                 
-                <div class="modal-input-group">
-                    <label for="modalEmail">Correo de Contacto (Usuario Actual):</label>
-                    <!-- El valor de este input se llena automáticamente al abrir el modal -->
-                    <input type="email" id="modalEmail" placeholder="Tu correo (no editable)" readonly>
-                </div>
-
+                <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
                 <input type="hidden" id="modalServiceId">
 
-                <button id="submitModalOrder">Confirmar Pedido</button>
-                <button id="closeModal">Cancelar</button>
+                <div class="modal-footer-actions">
+                    <button id="submitModalOrder">Confirmar Pedido</button>
+                    <button id="closeModal">Cancelar</button>
+                </div>
                 <p id="modalMessage" class="form-message"></p>
             </div>
         </div>
@@ -357,13 +332,11 @@
             <div class="services-content">
                 <div class="services-box">
                     <div class="services-title">IPHONE SERVICES</div>
-                    <!-- Se mantienen las descripciones estáticas ya que son solo parte del diseño del Hero -->
                     <div class="service-item">IPHONE CARRIER UNLOCK</div>
                     <div class="service-item">IPHONE ICLOUD UNLOCK</div>
                     <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
                     <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
                 </div>
-                
             </div>
 
             <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
@@ -386,8 +359,7 @@
                 <h4>Gestión de Órdenes</h4>
                 <div class="form-container">
                     <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
-                    <!-- NUEVO ELEMENTO DE MENSAJE PARA EL ADMIN ORDER HISTORY -->
-                    <p id="adminOrderHistoryMessage" class="form-message"></p>
+                    <div id="adminOrderHistoryMessage"></div>
                     <div id="adminOrderHistory" class="order-history-grid">
                         <p>Cargando pedidos...</p>
                     </div>
@@ -423,14 +395,11 @@
             <div class="admin-options" style="margin-top: 30px;">
                 <h4>⚙️ Editar Tarjetas de Servicios IMEI</h4>
                 <div class="form-container">
-                    <!-- MENSAJE DE ESTADO DEL EDITOR, FUERA DE UL -->
-                    <p id="editorMessage">Cargando editor...</p>
+                    <p id="editorMessage" class="form-message"></p>
                     <ul id="serviceEditorList" class="service-editor-list">
-                        <!-- Los elementos <li> se renderizarán aquí -->
                     </ul>
                     <button id="saveServiceChanges">Guardar Cambios y Sincronizar (Supabase)</button>
-                    <!-- NUEVO BOTÓN PARA ELIMINAR TODOS LOS SERVICIOS -->
-                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;" onclick="clearAllServices()">
+                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
                         🚨 Eliminar TODOS los Servicios (Irreversible en Supabase)
                     </button>
                 </div>
@@ -480,7 +449,7 @@
         let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, clientOrderHistorySection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
-        let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
+        let backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
         let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
@@ -489,78 +458,26 @@
         const BACKGROUND_FILE_PATH = 'hero_background.jpg';
         const DEVICES_FILE_PATH = 'main_devices.png';
         
-        // CORRECCIÓN CLAVE: Inicializar con una lista vacía para borrar los servicios inmediatamente.
-        let imeiServicesData = []; 
+        let imeiServicesData = []; // Se inicializa vacío a petición del usuario.
         const SERVICES_RECORD_ID = 1; 
 
         // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
         let currentUser = null; 
 
-        // --- UTILIDAD DE MENSAJERÍA ADMIN (NUEVA) ---
-        function displayAdminMessage(message, color = 'red', targetId) {
-            const el = document.getElementById(targetId);
-            if (el) {
-                el.style.color = color;
-                el.textContent = message;
-                // Borrar el mensaje después de 8 segundos, pero solo si no ha sido reemplazado por otro
-                setTimeout(() => {
-                    if (el.textContent === message) el.textContent = '';
-                }, 8000);
+        // --- FUNCIONES DE MENSAJERÍA ---
+
+        function displayAdminMessage(message, color = 'red', isError = true) {
+            const container = document.getElementById('adminOrderHistoryMessage');
+            if (container) {
+                container.style.color = color;
+                container.style.borderColor = color;
+                container.innerHTML = `<p>${isError ? '❌ ERROR RLS/API: ' : '✅ INFORMACIÓN: '}${message}</p>`;
+                if (!isError) {
+                    setTimeout(() => container.innerHTML = '', 5000);
+                }
             } else {
-                console.warn(`Admin Message (${targetId}): ${message}`);
+                console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
             }
-        }
-        
-        // Función de parseo (mantenida por si acaso)
-        function parseAndNormalizeServices(rawText) {
-             const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-             const services = [];
-             let currentCategory = 'Todo Grupo';
-             let nextId = 1;
-
-             for (let i = 0; i < lines.length; i++) {
-                 const line = lines[i];
-                 
-                 if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
-                     if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
-                         currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
-                     }
-                 }
-                 
-                 const priceTimeMatch = line.match(/(\$[0-9,.]+)[\s\u00A0]+([0-9-.\s\u00A0A-Za-z]+)$/);
-                 
-                 if (priceTimeMatch) {
-                     const price = priceTimeMatch[1];
-                     const time = priceTimeMatch[2].trim().replace(/\u00A0/g, ' '); 
-                     
-                     let name = '';
-                     let k = i - 1;
-                     
-                     while (k >= 0 && !lines[k].startsWith('$') && lines[k].length > 3) {
-                          name = lines[k] + ' ' + name;
-                          k--;
-                          if (k < 0) break;
-                     }
-                     
-                     if (name.trim() === '') {
-                          name = line.replace(priceTimeMatch[0], '').trim();
-                     } else {
-                          name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
-                          name = name.replace(/\s+/g, ' ').trim(); 
-                     }
-
-                     if (name.length > 5 && !name.includes('Discounted')) {
-                         services.push({
-                             id: nextId++,
-                             name: name.substring(0, 100).trim(), 
-                             price: price,
-                             time: time,
-                             category: currentCategory.substring(0, 50).trim(),
-                         });
-                     }
-                 }
-             }
-             return services;
         }
 
         // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
@@ -582,7 +499,6 @@
                 url = parsedUrl.toString();
 
             } catch (e) {
-                // Fallback if URL constructor fails
                 const cacheBuster = Date.now();
                 const separator = url.includes('?') ? '&' : '?';
                 url = `${url}${separator}v=${cacheBuster}`;
@@ -601,14 +517,12 @@
 
             // 2. Aplicar el fondo a la sección hero
             if (bgUrl && heroSection) {
-                // Forzar la imagen de fondo con alta prioridad
                 heroSection.style.backgroundImage = `url('${bgUrl}')`;
                 heroSection.style.backgroundColor = 'transparent'; 
                 heroSection.style.backgroundSize = 'cover';
                 heroSection.style.backgroundPosition = 'center bottom';
 
             } else if (heroSection) {
-                // Si no hay URL (se eliminó o nunca se subió), restaurar el fondo al color sólido
                 heroSection.style.backgroundImage = 'none';
                 heroSection.style.backgroundColor = 'var(--dark-bg)'; // Color definido en CSS :root
             }
@@ -626,16 +540,16 @@
 
         // --- LÓGICA DEL ADMIN PARA SUBIR IMAGENES (GLOBAL) ---
         
-        async function uploadImage(fileInputId, bucketName, filePath, responseElementId, isBackground = false) {
+        async function uploadImage(fileInputId, bucketName, filePath, responseElementId) {
             const fileInput = document.getElementById(fileInputId);
             const messageElement = document.getElementById(responseElementId);
 
-            if (!messageElement) { return; } // Safety check
+            if (!messageElement) { return; } 
 
             const file = fileInput.files[0];
 
             if (!file) {
-                messageElement.style.color = 'red';
+                messageElement.style.color = 'var(--red-error)';
                 messageElement.textContent = 'Seleccione un archivo primero.';
                 return;
             }
@@ -643,7 +557,6 @@
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Subiendo imagen...';
 
-            // 1. Subida del archivo al Storage
             const { error: uploadError } = await supabase.storage
                 .from(bucketName)
                 .upload(filePath, file, {
@@ -652,9 +565,7 @@
                 });
 
             if (uploadError) {
-                messageElement.style.color = 'red';
-                
-                // MANEJO MEJORADO DE RLS PARA EVITAR EL CIERRE DEL PANEL
+                messageElement.style.color = 'var(--red-error)';
                 if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
                     messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
                 } else {
@@ -664,8 +575,7 @@
                 return;
             }
 
-            // 2. Si la subida fue exitosa, forzar la recarga de las imágenes en la UI
-            messageElement.style.color = '#25d366';
+            messageElement.style.color = 'var(--whatsapp-green)';
             messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
             await loadImages();
         }
@@ -673,7 +583,7 @@
         async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
             const messageElement = document.getElementById(responseElementId);
             
-            if (!messageElement) { return; } // Safety check
+            if (!messageElement) { return; } 
             
             messageElement.style.color = 'yellow';
             messageElement.textContent = 'Eliminando imagen...';
@@ -683,8 +593,7 @@
                 .remove([filePath]);
 
             if (deleteError && deleteError.statusCode !== '404') {
-                messageElement.style.color = 'red';
-                // MANEJO MEJORADO DE RLS PARA EVITAR EL CIERRE DEL PANEL
+                messageElement.style.color = 'var(--red-error)';
                 if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
                     messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
                 } else {
@@ -694,8 +603,7 @@
                 return;
             }
             
-            // FIX: Llamar a loadImages para forzar la actualización del estado y el restablecimiento al color/default URL.
-            messageElement.style.color = '#25d366';
+            messageElement.style.color = 'var(--whatsapp-green)';
             messageElement.textContent = isBackground 
                 ? 'Fondo de imagen eliminado y restaurado.' 
                 : 'Imagen de dispositivos restaurada por defecto.';
@@ -703,8 +611,7 @@
         }
         
         async function handleUploadBackground() {
-            // Se sube la imagen. El manejo de error previene la salida del panel.
-            await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true);
+            await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage');
         }
 
         async function handleClearBackground() {
@@ -712,7 +619,7 @@
         }
 
         async function handleUploadDevices() {
-            await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false);
+            await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage');
         }
 
         async function handleClearDevices() {
@@ -722,7 +629,6 @@
         // --- SINCRONIZACIÓN DE SERVICIOS ---
 
         async function fetchServices() {
-            // FIX: Obtener el elemento localmente para mayor robustez en un contexto asíncrono.
             const msgEl = document.getElementById('loadingMessage');
             if (msgEl) msgEl.textContent = 'Cargando servicios desde Supabase...';
             
@@ -734,23 +640,20 @@
 
             if (error) { 
                 console.error("Error al cargar servicios de Supabase:", error);
-                if (error.code !== 'PGRST116') {
-                     if (msgEl) {
-                        msgEl.style.color = 'red';
-                        msgEl.textContent = `ERROR DE ACCESO: Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
-                    }
-                    return false;
+                if (msgEl) {
+                    msgEl.style.color = 'var(--red-error)';
+                    msgEl.textContent = `ERROR DE ACCESO: Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
                 }
+                return false;
             }
             
             if (data && data.service_data && data.service_data.length > 0) {
-                // Solo cargamos si hay datos; de lo contrario, mantenemos imeiServicesData = []
-                imeiServicesData = data.service_data; 
+                imeiServicesData = data.service_data;
                 if (msgEl) msgEl.textContent = `✅ ${imeiServicesData.length} servicios cargados correctamente.`;
                 return true;
             } else {
                 if (msgEl) msgEl.textContent = 'No se encontró registro. Inicializando con lista vacía...';
-                // Si no hay datos, forzamos un upsert con lista vacía para establecer el registro
+                
                 const initialData = []; 
                 const success = await updateServiceInSupabase(initialData); 
                 
@@ -764,12 +667,11 @@
         }
         
         async function updateServiceInSupabase(dataToSave) {
-            // FIX: Usar el lookup local ya que las variables globales pueden no ser estables.
             const editorMessageElement = document.getElementById('editorMessage') || document.getElementById('addServiceMessage') || document.getElementById('loadingMessage');
             
             if (!editorMessageElement) {
-                 console.error("Error: Elemento de mensaje de sincronización no encontrado.");
-                 return false;
+                console.error("Error: Elemento de mensaje de sincronización no encontrado.");
+                return false;
             }
 
             const { error } = await supabase
@@ -783,7 +685,7 @@
 
             if (error) {
                 console.error("Error al guardar servicios en Supabase:", error);
-                editorMessageElement.style.color = 'red';
+                editorMessageElement.style.color = 'var(--red-error)';
                 editorMessageElement.textContent = `Error al guardar: ${error.message}. Verifique la política RLS (UPDATE/INSERT para admin) en 'store_services'.`;
                 return false;
             }
@@ -808,13 +710,11 @@
             container.innerHTML = ''; 
             
             if (imeiServicesData.length === 0) {
-                 // FIX: La etiqueta p con id=loadingMessage se recrea aquí
-                 container.innerHTML = `<p id="loadingMessage" style="color:orange;">No hay servicios cargados. Si eres administrador, usa el Panel de Administración para agregar tarjetas.</p>`;
-                 loadingMessage = document.getElementById('loadingMessage'); // Re-map global variable
-                 // No intentamos re-fetch, asumimos que fetchServices ya se llamó en init
-                 hideAllSections();
-                 if (imeiServiceSection) imeiServiceSection.classList.remove('hidden');
-                 return;
+                container.innerHTML = `<p id="loadingMessage" style="color:orange;">No hay servicios cargados. Si eres administrador, usa el Panel de Administración para agregar tarjetas.</p>`;
+                loadingMessage = document.getElementById('loadingMessage'); 
+                hideAllSections();
+                if (imeiServiceSection) imeiServiceSection.classList.remove('hidden');
+                return;
             }
 
             imeiServicesData.forEach(service => {
@@ -841,18 +741,15 @@
                 container.appendChild(card);
             });
             
-            // Añadir el evento de clic a las tarjetas dinámicas
             document.querySelectorAll('.service-card').forEach(card => {
                 card.addEventListener('click', openOrderModal);
             });
 
             hideAllSections();
             if (imeiServiceSection) imeiServiceSection.classList.remove('hidden');
-            // ARREGLO: Solo hacemos scroll la primera vez que se carga la sección
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // Función genérica para mostrar el historial
         function displayOrders(containerElement, orders, isAdminView = false) {
             containerElement.innerHTML = '';
 
@@ -863,35 +760,21 @@
 
             orders.forEach(order => {
                 const card = document.createElement('div');
-                // Usamos el estado normalizado para la clase CSS
                 card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
                 card.dataset.orderId = order.id;
 
-                // Determinar el color para el texto de la etiqueta (badge)
-                let statusTextColor = 'var(--text-light)';
-                let statusBadgeBg = 'var(--button-bg)';
-                let statusText = order.status;
-
-                if (order.status === 'Exitoso') {
-                    statusTextColor = 'var(--status-success)';
-                    statusBadgeBg = 'rgba(37, 211, 102, 0.1)';
-                } else if (order.status === 'Pendiente') {
-                    statusTextColor = 'var(--status-pending)';
-                    statusBadgeBg = 'rgba(255, 152, 0, 0.1)';
-                } else if (order.status === 'Rechazado') {
-                    statusTextColor = 'var(--status-rejected)';
-                    statusBadgeBg = 'rgba(255, 85, 85, 0.1)';
-                }
-
-                // Generar las opciones de acción (select para admin, nada para cliente)
+                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
+                
                 let orderActionsHtml = '';
                 if (isAdminView) {
-                    const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
                     orderActionsHtml = `
                         <select onchange="updateOrderStatus(${order.id}, this.value)">
                             ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
                         </select>
+                        <button onclick="window.deleteOrder(${order.id})" style="background-color: var(--red-error);">Eliminar</button>
                     `;
+                } else {
+                    orderActionsHtml = `<span class="status-badge ${order.status.replace(/[^a-zA-Z0-9]/g, '')}">${order.status}</span>`;
                 }
 
                 card.innerHTML = `
@@ -899,15 +782,6 @@
                         <p><strong>Servicio:</strong> ${order.service_name}</p>
                         <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
                         ${isAdminView ? `<p><strong>Contacto:</strong> ${order.contact_email}</p>` : ''}
-                        
-                        <!-- ESTADO CON ETIQUETA DE COLOR -->
-                        <p style="margin: 5px 0;">
-                            <strong>Estado:</strong> 
-                            <span style="color: ${statusTextColor}; background-color: ${statusBadgeBg}; font-weight: bold; padding: 4px 10px; border-radius: 9999px; font-size: 13px;">
-                                ${statusText}
-                            </span>
-                        </p>
-                        
                         <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
                     </div>
                     <div class="order-actions">
@@ -918,15 +792,12 @@
             });
         }
 
-
         // MEJORA: Función para cargar historial de TODOS (Admin)
         async function fetchAdminOrdersHistory() {
             const container = document.getElementById('adminOrderHistory');
-            const messageEl = document.getElementById('adminOrderHistoryMessage');
-            if (!container || !messageEl) return;
+            if (!container) return;
             
-            container.innerHTML = '<p>Cargando historial de todos los pedidos...</p>';
-            messageEl.textContent = ''; // Limpiar mensaje anterior
+            displayAdminMessage('Cargando historial de todos los pedidos...', 'yellow', false);
 
             const { data: orders, error } = await supabase
                 .from('orders')
@@ -934,17 +805,12 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                // Mensaje de error detallado
-                messageEl.style.color = 'red';
-                messageEl.innerHTML = `
-                    ❌ Error al cargar pedidos del Admin: ${error.message}. 
-                    <br>
-                    **¡IMPORTANTE!** Verifique la política RLS (SELECT) en la tabla 'orders' para su administrador ('${ADMIN_EMAIL}').
-                `;
-                container.innerHTML = `<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error anterior.</p>`;
+                displayAdminMessage(`❌ Error al cargar pedidos del Admin: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado para ver todos los pedidos (auth.email() = '${ADMIN_EMAIL}').`, 'var(--red-error)', true);
                 console.error("RLS/API Error al cargar pedidos del Admin:", error);
+                container.innerHTML = '<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error de RLS arriba.</p>';
                 return;
             }
+            displayAdminMessage(`✅ ${orders.length} pedidos cargados.`, 'var(--whatsapp-green)', false);
             displayOrders(container, orders, true);
         }
 
@@ -955,14 +821,12 @@
             
             container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
 
-            // USAMOS LA VARIABLE GLOBAL currentUser
             if (!currentUser) {
                 container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
                 return;
             }
             const userId = currentUser.id;
 
-            // Filtra por el ID del usuario logueado
             const { data: orders, error } = await supabase
                 .from('orders')
                 .select('*')
@@ -981,42 +845,57 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // FUNCIÓN GLOBAL PARA INLINE HTML (ACTUALIZACIÓN DE ESTADO DE ORDEN)
-        window.updateOrderStatus = async function (orderId, newStatus) {
-            displayAdminMessage(`Cambiando estado del pedido #${orderId} a ${newStatus}...`, 'yellow', 'adminOrderHistoryMessage');
+        async function updateOrderStatus(orderId, newStatus) {
+            displayAdminMessage(`Actualizando pedido #${orderId} a ${newStatus}...`, 'yellow', false);
 
-            // 1. Ejecución sin confirmación de diálogo (por restricción de la plataforma)
             const { error } = await supabase
                 .from('orders')
                 .update({ status: newStatus })
                 .eq('id', orderId);
 
             if (error) {
-                displayAdminMessage(`❌ Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`, 'red', 'adminOrderHistoryMessage');
+                displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
             } else {
-                displayAdminMessage(`✅ Estado del pedido #${orderId} cambiado a ${newStatus}.`, 'var(--status-success)', 'adminOrderHistoryMessage');
+                displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
                 fetchAdminOrdersHistory(); 
             }
         }
 
-        // FUNCIÓN CORREGIDA PARA USAR LA VARIABLE GLOBAL currentUser (Removido Alert)
+        // FUNCIÓN GLOBAL PARA ELIMINAR PEDIDO (ACCESIBLE DESDE EL HTML)
+        window.deleteOrder = async function(orderId) {
+            displayAdminMessage(`Eliminando pedido #${orderId} permanentemente...`, 'yellow', false);
+
+            const { error } = await supabase
+                .from('orders')
+                .delete()
+                .eq('id', orderId);
+
+            if (error) {
+                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. Revise los permisos RLS de DELETE.`, 'var(--red-error)', true);
+                console.error("Error al eliminar pedido:", error);
+            } else {
+                displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
+                fetchAdminOrdersHistory(); 
+            }
+        }
+        
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // 1. VERIFICACIÓN CRÍTICA: Redirección silenciosa sin alert()
             if (!currentUser) {
+                // No usar alert(), redirigir a login con mensaje
                 hideAllSections();
                 if (loginSection) loginSection.classList.remove('hidden');
                 if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                 if (loginMessage) {
-                    loginMessage.style.color = 'orange';
-                    loginMessage.textContent = 'Inicia sesión para realizar tu pedido de servicio IMEI.';
+                    loginMessage.style.color = 'var(--orange-pending)';
+                    loginMessage.textContent = 'Inicia sesión para realizar un pedido.';
                 }
                 return;
             }
             
-            const user = currentUser; // Usamos el usuario almacenado en la variable global
+            const user = currentUser; 
 
             if (!service) return;
 
@@ -1034,14 +913,13 @@
             const serviceId = document.getElementById('modalServiceId').value;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // Usamos la variable global
             const user = currentUser;
 
             const modalMessage = document.getElementById('modalMessage');
             
             if (!user) {
                 if (modalMessage) {
-                    modalMessage.style.color = 'red';
+                    modalMessage.style.color = 'var(--red-error)';
                     modalMessage.textContent = 'Error de sesión. Por favor, vuelva a iniciar sesión.';
                 }
                 return;
@@ -1049,14 +927,14 @@
 
             if (!sn || !email) {
                 if (modalMessage) {
-                    modalMessage.style.color = 'red';
+                    modalMessage.style.color = 'var(--red-error)';
                     modalMessage.textContent = 'Complete el SN/IMEI y el Correo Electrónico.';
                 }
                 return;
             }
             if (!service) {
                 if (modalMessage) {
-                    modalMessage.style.color = 'red';
+                    modalMessage.style.color = 'var(--red-error)';
                     modalMessage.textContent = 'Error: Servicio no encontrado.';
                 }
                 return;
@@ -1070,7 +948,7 @@
             const { error } = await supabase
                 .from('orders')
                 .insert([{
-                    user_id: user.id, // Usamos el ID de la variable global
+                    user_id: user.id, 
                     service_id: serviceId,
                     service_name: service.name,
                     device_name: sn, 
@@ -1081,7 +959,7 @@
 
             if (error) {
                 if (modalMessage) {
-                    modalMessage.style.color = 'red';
+                    modalMessage.style.color = 'var(--red-error)';
                     if (error.status === 429) {
                         modalMessage.textContent = 'Error 429 (Too Many Requests). La API está sobrecargada. Por favor, espere un momento antes de intentarlo de nuevo.';
                     } else {
@@ -1091,11 +969,10 @@
                 console.error(error);
             } else {
                 if (modalMessage) {
-                    modalMessage.style.color = 'var(--status-success)';
+                    modalMessage.style.color = 'var(--whatsapp-green)';
                     modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
                 }
                 
-                // Muestra el historial del cliente después de un pedido exitoso
                 setTimeout(() => {
                     if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden');
                     fetchClientOrdersHistory();
@@ -1113,7 +990,7 @@
 
             if (!name || !price || !time || !category) {
                 if (addServiceMessage) {
-                    addServiceMessage.style.color = 'red';
+                    addServiceMessage.style.color = 'var(--red-error)';
                     addServiceMessage.textContent = 'Todos los campos deben ser completados.';
                 }
                 return;
@@ -1142,7 +1019,7 @@
 
             if (success) {
                 if (addServiceMessage) {
-                    addServiceMessage.style.color = 'var(--status-success)';
+                    addServiceMessage.style.color = 'var(--whatsapp-green)';
                     addServiceMessage.textContent = `✅ Servicio "${newService.name.substring(0, 30)}..." añadido y guardado con éxito!`;
                 }
                 
@@ -1150,28 +1027,28 @@
                 
                 renderServiceEditor(); 
             } else {
-                if (addServiceMessage) addServiceMessage.style.color = 'red'; // Asegura que el error RLS de guardado se muestre
+                if (addServiceMessage) addServiceMessage.style.color = 'var(--red-error)';
                 imeiServicesData.pop(); 
             }
         }
 
 
-        // FUNCIÓN CORREGIDA: Ahora solo renderiza el estado actual, sin llamadas asíncronas anidadas.
         function renderServiceEditor() {
             const editorList = document.getElementById('serviceEditorList');
             if (!editorList) return;
 
             editorList.innerHTML = '';
             
-            // Re-mapear el elemento de mensaje global por si fue reemplazado dinámicamente
             editorMessage = document.getElementById('editorMessage');
             if (!editorMessage) return;
 
-            editorMessage.textContent = ''; // Limpiar mensaje anterior
+            editorMessage.textContent = ''; 
             
             if (imeiServicesData.length === 0) {
-                editorMessage.style.color = 'orange';
-                editorMessage.textContent = 'No hay servicios para editar. Intente usar el formulario superior para agregar uno.';
+                editorList.innerHTML = `<p style="color:orange; padding: 10px; text-align: center;">No hay servicios para editar. Usa la sección "Añadir Nuevo Servicio Rápido" para empezar.</p>`;
+                
+                hideAllSections();
+                if (adminSection) adminSection.classList.remove('hidden');
                 return;
             }
 
@@ -1183,7 +1060,7 @@
                             <p>Nombre Completo (ID: ${service.id}):</p>
                             <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
                         </div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
                             <div class="input-group">
                                 <p>Precio:</p>
                                 <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
@@ -1199,51 +1076,54 @@
                         </div>
                     </div>
                     <div class="service-editor-actions">
-                        <button onclick="deleteService(${service.id})" style="background-color: #f44336;">Eliminar</button>
+                        <button onclick="deleteService(${service.id})">Eliminar</button>
                     </div>
                 `;
                 editorList.appendChild(listItem);
             });
             
+            hideAllSections();
+            if (adminSection) adminSection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             if (editorMessage) editorMessage.textContent = `${imeiServicesData.length} servicios listados y listos para editar.`;
         }
         
-        // FUNCIÓN GLOBAL (REEMPLAZANDO CONFIRM)
-        window.deleteService = function (id) {
-             // 1. Reemplazando confirm() con ejecución directa y mensaje
-             displayAdminMessage(`⚠️ Servicio ID ${id} ELIMINADO LOCALMENTE. Presiona "Guardar Cambios" para sincronizar.`, 'var(--status-pending)', 'editorMessage');
-
-             imeiServicesData = imeiServicesData.filter(s => s.id !== id);
-             renderServiceEditor(); 
+        function deleteService(id) {
+            imeiServicesData = imeiServicesData.filter(s => s.id !== id);
+            renderServiceEditor(); 
+            if (editorMessage) {
+                editorMessage.style.color = 'yellow';
+                editorMessage.textContent = `Servicio ID ${id} eliminado de la lista local. Pulse GUARDAR para sincronizar.`;
+            }
         }
 
-        // FUNCIÓN CORREGIDA (REEMPLAZANDO CONFIRM)
         async function clearAllServices() {
-            // 1. Reemplazando confirm() con ejecución directa y mensaje
-            displayAdminMessage('🚨 Eliminando TODOS los servicios... El botón de "Guardar Cambios" realizará la eliminación total en Supabase.', 'red', 'editorMessage');
-            
             const editorMessageElement = document.getElementById('editorMessage');
             
-            // FIX: Agregar null check para prevenir el crash
             if (!editorMessageElement) {
                 console.error("Error: Elemento de mensaje del editor no encontrado.");
                 return;
             }
 
-            imeiServicesData = []; // Clear local data
+            editorMessageElement.style.color = 'yellow';
+            editorMessageElement.textContent = 'Eliminando todos los servicios...';
             
-            // FIX: Antes se hacía upsert aquí, pero lo he movido para que el usuario confirme con 'Guardar Cambios'
-            // Ya que si elimina accidentalmente, puede recargar antes de guardar.
-            editorMessageElement.style.color = 'red';
-            editorMessageElement.textContent = '✅ Lista local vaciada. Pulsa "Guardar Cambios y Sincronizar" para hacer la eliminación total permanente.';
-            renderServiceEditor(); 
+            imeiServicesData = []; 
+            
+            const success = await updateServiceInSupabase([]);
+            
+            if (success) {
+                editorMessageElement.style.color = 'var(--whatsapp-green)';
+                editorMessageElement.textContent = '✅ ¡Todos los servicios eliminados y sincronizados con éxito! Ahora puedes agregar tus propios servicios.';
+                renderServiceEditor(); 
+            } else {
+                editorMessageElement.style.color = 'var(--red-error)';
+            }
         }
         
-        // FUNCIÓN CORREGIDA
         async function saveServiceChanges() {
             const editorMessageElement = document.getElementById('editorMessage');
             
-            // FIX: Agregar null check para prevenir el crash
             if (!editorMessageElement) {
                 console.error("Error: Elemento de mensaje del editor no encontrado.");
                 return;
@@ -1255,7 +1135,6 @@
             const updatedData = [];
             const serviceEditorList = document.getElementById('serviceEditorList');
             
-            // 1. Recorrer los inputs y actualizar los datos en memoria
             serviceEditorList.querySelectorAll('li').forEach(listItem => {
                 const id = parseInt(listItem.querySelector('input[data-field="name"]').dataset.id);
                 const nameInput = listItem.querySelector(`#name-${id}`).value.trim();
@@ -1272,26 +1151,23 @@
                 });
             });
             
-            // 2. Sincronizar con Supabase
             const success = await updateServiceInSupabase(updatedData);
 
             if (success) {
                 imeiServicesData = updatedData; 
-                editorMessageElement.style.color = 'var(--status-success)';
-                editorMessageElement.textContent = `✅ ¡Cambios guardados y sincronizados con éxito! Total: ${imeiServicesData.length} servicios.`;
+                editorMessageElement.style.color = 'var(--whatsapp-green)';
+                editorMessageElement.textContent = '✅ ¡Cambios guardados y sincronizados con éxito!';
                 renderServiceEditor(); 
-                renderImeiServices(); // Sincroniza la vista de cliente para reflejar los cambios
+                renderImeiServices(); // Forzar recarga de tarjetas de cliente
             } else {
-                editorMessageElement.style.color = 'red';
+                editorMessageElement.style.color = 'var(--red-error)';
             }
         }
 
 
         async function checkUser(userSession) {
-            // Recibe la sesión del listener o de la carga inicial
             const user = userSession?.user;
             
-            // **ACTUALIZACIÓN CRÍTICA**: Almacenar en la variable global
             currentUser = user || null;
             
             hideAllSections();
@@ -1327,7 +1203,6 @@
                 }
             }
             
-            // Si no hay ninguna sección visible, mostramos el home
             if (document.getElementById('imeiServiceSection')?.classList.contains('hidden') && 
                 document.getElementById('loginSection')?.classList.contains('hidden') &&
                 document.getElementById('adminSection')?.classList.contains('hidden') &&
@@ -1346,46 +1221,39 @@
                 if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden');
             }
 
-            // USAMOS LA VARIABLE GLOBAL PARA LA VERIFICACIÓN INSTANTÁNEA
             const isLoggedIn = !!currentUser; 
             const isAdmin = isLoggedIn && currentUser.email === ADMIN_EMAIL;
             
             hideAllSections();
             
-            let shouldScrollToTop = true; // Control de scroll
+            let shouldScrollToTop = true; 
             
             switch (elementId) {
                 case 'navPongaOrden':
                     if (isLoggedIn) {
                         if (pongaOrdenMenu) pongaOrdenMenu.classList.toggle('hidden');
                         if(pongaOrdenMenu?.classList.contains('hidden')) {
-                            // Si se cierra el menú, no hacemos scroll
                             shouldScrollToTop = false; 
                             if (heroSection) heroSection.classList.remove('hidden'); 
                         } else {
-                            // Si se abre el menú, no hacemos scroll
                             shouldScrollToTop = false; 
                         }
                     } else {
                         if (loginSection) loginSection.classList.remove('hidden');
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                         if (loginMessage) {
-                            loginMessage.style.color = 'var(--status-pending)';
+                            loginMessage.style.color = 'var(--orange-pending)';
                             loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
                         }
                     }
                     break;
                 case 'navAdminPanel':
                     if (isAdmin) {
-                        // Asegura que los servicios estén cargados antes de renderizar el editor.
                         await fetchServices();
-                        
-                        // Carga de las órdenes y renderizado del editor
                         fetchAdminOrdersHistory(); 
                         renderServiceEditor(); 
-                        if (adminSection) adminSection.classList.remove('hidden');
                     } else if (isLoggedIn) {
-                         if (heroSection) heroSection.classList.remove('hidden'); 
+                        if (heroSection) heroSection.classList.remove('hidden'); 
                     } else {
                         if (loginSection) loginSection.classList.remove('hidden');
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -1394,10 +1262,9 @@
                 case 'navHistorialPedidos':
                     if (isLoggedIn) {
                         if (isAdmin) {
-                             fetchAdminOrdersHistory(); 
-                             if (adminSection) adminSection.classList.remove('hidden');
+                            fetchAdminOrdersHistory(); 
+                            if (adminSection) adminSection.classList.remove('hidden');
                         } else {
-                            // Mostrar Historial del Cliente Regular
                             fetchClientOrdersHistory();
                         }
                     } else {
@@ -1405,7 +1272,7 @@
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                         if (loginMessage) {
                             loginMessage.textContent = 'Inicia sesión para ver tu historial de pedidos.';
-                            loginMessage.style.color = 'var(--status-pending)';
+                            loginMessage.style.color = 'var(--orange-pending)';
                         }
                     }
                     break;
@@ -1417,13 +1284,11 @@
                     break;
             }
             
-            // ARREGLO: SOLO HACER SCROLL si estamos cambiando a una sección nueva
             if (shouldScrollToTop) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
         
-        // FUNCIÓN CORREGIDA PARA ACTUALIZAR LA VARIABLE GLOBAL DESPUÉS DEL LOGIN
         async function signInWithEmail() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -1433,24 +1298,21 @@
                 loginMessage.textContent = 'Iniciando sesión...';
             }
 
-            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Error de inicialización de la API.'; } return; }
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Error de inicialización de la API.'; } return; }
             
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             
             if (error) {
                 console.error('Error al hacer login:', error);
-                if (loginMessage) loginMessage.style.color = 'red';
+                if (loginMessage) loginMessage.style.color = 'var(--red-error)';
                 let msg = error.message;
                 
-                // Manejo de Error 429 (Rate Limit)
                 if (error.status === 429) {
                     msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
                 } 
-                // Manejo de Error 400 (Credenciales)
                 else if (error.message.includes('Invalid login credentials')) { 
                     msg = '❌ Credenciales de inicio de sesión inválidas. Comprueba el correo y la contraseña.'; 
                 } 
-                // Manejo de Correo no confirmado
                 else if (error.message.includes('Email not confirmed')) { 
                     msg = '📧 Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
                 }
@@ -1458,14 +1320,12 @@
                 if (loginMessage) loginMessage.textContent = `Error de inicio: ${msg}`;
             } else if (data.user) {
                 if (loginMessage) {
-                    loginMessage.style.color = 'var(--status-success)';
+                    loginMessage.style.color = 'var(--whatsapp-green)';
                     loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
                 }
-                
-                // La actualización de la UI se manejará mediante el listener onAuthStateChange
             } else {
                 if (loginMessage) {
-                    loginMessage.style.color = 'red';
+                    loginMessage.style.color = 'var(--red-error)';
                     loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
                 }
             }
@@ -1480,13 +1340,13 @@
                 loginMessage.textContent = 'Registrando usuario...';
             }
             
-            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'red'; loginMessage.textContent = 'Erro de inicialización de la API.'; } return; }
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Erro de inicialización de la API.'; } return; }
             
             const { error } = await supabase.auth.signUp({ email, password });
             if (error) {
                 console.error('Error al registrar:', error);
                 if (loginMessage) {
-                    loginMessage.style.color = 'red';
+                    loginMessage.style.color = 'var(--red-error)';
                     loginMessage.textContent = `Error: ${error.message}`;
                 }
             } else {
@@ -1504,40 +1364,37 @@
                 console.error('Error al hacer logout:', error);
             } else {
                 if (loginMessage) loginMessage.textContent = '';
-                // La actualización de UI la maneja el onAuthStateChange listener
             }
         }
 
-        // --- Inicialización ---
-        (async () => { // <--- CAMBIO CLAVE: Usando una IIFE asíncrona para iniciar inmediatamente
-
-            // Arreglo para que el navegador recuerde la posición al recargar
+        // --- Inicialización (IIFE para evitar Race Condition) ---
+        (async function initApp() {
+            
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual'; 
             }
 
             if (window.supabase) {
-                 // Inicialización estándar
-                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                 console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
-                 return; 
+                console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
+                return; 
             }
 
-            // Mapeo de Elementos DOM 
+            // Mapeo de Elementos DOM
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
             clientOrderHistorySection = document.getElementById('clientOrderHistorySection');
-            // Mapeo de mensajes de estado
+            
             loadingMessage = document.getElementById('loadingMessage'); 
             editorMessage = document.getElementById('editorMessage'); 
             adminOrderHistory = document.getElementById('adminOrderHistory'); 
             clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
             addServiceMessage = document.getElementById('addServiceMessage');
-            adminOrderHistoryMessage = document.getElementById('adminOrderHistoryMessage'); // Nuevo mensaje
+            adminOrderHistoryMessage = document.getElementById('adminOrderHistoryMessage');
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
@@ -1549,7 +1406,6 @@
             pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); 
             navAdminPanel = document.getElementById('navAdminPanel'); 
 
-            orderResponseMessage = document.getElementById('orderResponseMessage');
             backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
             devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
             loginMessage = document.getElementById('loginMessage');
@@ -1569,7 +1425,6 @@
             
             // Listeners de Navegación y Admin
             document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
-            // Listener para el nuevo botón de eliminar
             document.getElementById('clearAllServicesButton').addEventListener('click', clearAllServices);
             
             document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
@@ -1597,7 +1452,7 @@
                         hideAllSections();
                         if (heroSection) heroSection.classList.remove('hidden');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                        displayAdminMessage(`La función para ${this.textContent} aún no está implementada.`, 'var(--status-pending)', 'loginMessage');
+                        displayAdminMessage(`La función para ${this.textContent} aún no está implementada.`, 'var(--orange-pending)', true);
                     }
                 });
             });
@@ -1607,10 +1462,9 @@
             checkUser(session); 
 
             supabase.auth.onAuthStateChange((event, session) => {
-                 // El listener llama a checkUser para actualizar la UI y la variable global
-                 checkUser(session);
+                checkUser(session);
             });
-        })(); // <--- CIERRE DE LA IIFE
+        })();
     </script>
 </body>
 </html>
