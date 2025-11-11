@@ -3,1014 +3,543 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ Unlock - Panel de Servicios</title>
-    
+    <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
+        :root {
+            --dark-bg: #161a20; 
+            --header-bg: #11141a; 
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-pink: #d9429c; 
+            --service-box-bg: #1c2025; 
+            --button-bg: #4a4a58; 
+            --whatsapp-green: #25d366; 
+            --card-border: #292d34;
+            --card-inner-bg: #1a1e25; 
+            --green-check: #00ff00; 
+            --red-error: #f44336;
+            --orange-pending: #ff9800;
+        }
+
+        /* Estilos Globales */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+        body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
+        a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-pink); }
+        .top-info-bar { background-color: var(--header-bg); display: flex; justify-content: flex-end; align-items: center; padding: 8px 30px; font-size: 12px; border-bottom: 1px solid #292d34; }
+        .top-info-bar .info-group a { margin-left: 20px; padding: 5px 10px; border-radius: 3px; background-color: var(--button-bg); color: white; font-weight: bold; text-transform: uppercase; }
+        .top-info-bar .contact-info { color: var(--text-muted); margin-right: 20px; }
+        .main-nav { background-color: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
+        .logo .klmz { color: #4dc2f2; }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
+        .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
+        #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
+        .hero-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            padding: 60px 50px 0px 50px; 
+            min-height: 500px; 
+            height: 70vh; 
+            position: relative; 
+            overflow: hidden; 
+            background-size: cover; 
+            background-position: center bottom; 
+            background-color: var(--dark-bg);
+            background-image: none;
+        }
+        .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
+        .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
+        .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
+        .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
+        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
+        #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
+        .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
+        .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
+        .chat-buttons { position: fixed; bottom: 20px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
+        .chat-button { 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
+        }
+        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
+        .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+
+        .admin-section { max-width: 1000px; }
+        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
+        .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
+        .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
+        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5ps; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
+        .admin-options { text-align: left; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
+        .admin-options h4 { font-size: 20px; margin-bottom: 15px; color: var(--text-light); }
+        .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
+        .admin-options .form-container button { background-color: #4c4e97; }
+        .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
+        .hidden { display: none !important; }
+
+        /* Estilo para el Dropdown de Poner Orden */
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 350px; background-color: var(--header-bg); border: 1px solid #333; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); z-index: 20; padding: 10px 0; list-style: none; text-align: left; text-transform: none; 
+        }
+        .dropdown-menu li a { display: block; padding: 8px 15px; color: var(--text-light); font-weight: normal; }
+        .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
+
+        /* --- ESTILOS DE SECCIONES INTERNAS --- */
+        #imeiServiceSection, #boxDongleServiceSection, #digitalRentServiceSection, #clientOrderHistorySection { padding: 40px 50px; background-color: var(--dark-bg); }
+        #imeiServiceSection h2, #boxDongleServiceSection h2, #digitalRentServiceSection h2, #clientOrderHistorySection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
+        .service-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 20px; 
+        }
+        .service-card { cursor: pointer; background-color: var(--card-inner-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 5px; line-height: 1.4; display: flex; justify-content: space-between; align-items: flex-start; }
+        .service-card .new-tag { color: var(--accent-pink); font-size: 11px; font-weight: bold; margin-left: 10px; }
+        .card-details { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: none; font-weight: bold; }
+        .card-footer .price { font-size: 14px; color: #ff9800; }
+        .card-footer .time { font-size: 14px; color: #ff9800; }
+        .card-icon-check { color: var(--green-check); font-size: 1.2em; margin-left: 5px; }
+
+        /* Estilos del Editor de Servicios */
+        .service-editor-list { list-style: none; padding: 0; }
+        .service-editor-list li { 
+            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; 
+        }
+        .service-editor-list li input { display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; font-size: 12px; }
+        .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; flex-shrink: 0; }
+        .service-editor-list li .input-group p { font-size: 10px; color: #aaa; margin-bottom: 2px; }
+        .service-editor-list li .full-name-input { width: 95%; } 
+        .service-editor-list li .service-editor-actions { margin-left: auto; }
+        .service-editor-list button { background-color: var(--red-error); font-size: 12px; padding: 5px 10px; margin-top: 5px; }
+        
+        /* Estilos para el Historial de Pedidos */
+        .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
+        .order-card { 
+            background-color: #1a1e25; 
+            padding: 15px; 
+            border-left: 5px solid gray; 
+            border-radius: 4px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Colores de Estado de Pedidos */
+        .order-card.Exitoso { 
+            border-left-color: var(--whatsapp-green); 
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); 
+            background-color: #1a251f;
+        }
+        .order-card.Pendiente { 
+            border-left-color: var(--orange-pending); 
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.2); 
+            background-color: #25231a;
+        }
+        .order-card.Rechazado { 
+            border-left-color: var(--red-error); 
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.2); 
+            background-color: #251a1a;
+        }
+        
+        .order-details p { margin: 2px 0; }
+        .order-actions { text-align: right; }
+        /* FIX: Asegurar que el select llama a la función global */
+        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
+        .order-actions .admin-order-buttons { display: flex; flex-direction: column; align-items: flex-end; }
+        .order-actions .admin-order-buttons button { margin-top: 5px; background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
+
+        /* Estilo del Badge de Estado */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        .status-badge.Exitoso { background-color: var(--whatsapp-green); color: black; }
+        .status-badge.Pendiente { background-color: var(--orange-pending); color: black; }
+        .status-badge.Rechazado { background-color: var(--red-error); color: white; }
+
+
+        /* Modal Styles - Mejorado */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { 
+            background: linear-gradient(145deg, #1c2025, #22252a);
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 450px; 
+            width: 90%; 
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--card-border);
+        }
+        .modal-content h3 { 
+            color: var(--accent-pink); 
+            margin-bottom: 25px; 
+            font-size: 22px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .modal-content input { 
+            margin-bottom: 15px; 
+            width: 100%;
+            background-color: #2e353f;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        /* Estilos específicos para los campos requeridos en el modal */
+        .modal-content input.required-field {
+            border: 1px solid #555;
+        }
+
+        .modal-content button { 
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .modal-content button:active { transform: scale(0.98); }
+        .modal-content #submitModalOrder { background-color: var(--whatsapp-green); color: black; }
+        .modal-content #closeModal { background-color: #4a4a58; color: white; }
+        .modal-footer-actions { margin-top: 20px; display: flex; justify-content: space-around; }
+        .modal-serial-input { 
+            margin-top: 20px;
+            background-color: #161a20;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #4a4a58;
+        }
+        .modal-serial-input p { font-size: 12px; color: var(--text-muted); margin-bottom: 5px;}
+        
+        /* Estilo para el nuevo formulario de añadir servicio */
+        #newServiceForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #newServiceForm input {
+            width: 100%;
             margin: 0;
-            padding: 0;
+            padding: 8px;
             box-sizing: border-box;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        header h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            color: #666;
-            font-size: 1.2em;
-        }
-
-        nav {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        nav button {
-            padding: 12px 25px;
-            border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        nav button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        nav button.active {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .section {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            display: none;
-        }
-
-        .section.active {
+        #newServiceForm label {
             display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section h2 {
-            color: #667eea;
-            margin-bottom: 25px;
-            font-size: 2em;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 15px;
-        }
-
-        .admin-panel {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .service-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
-        }
-
-        .service-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-
-        .service-card .price {
-            color: #667eea;
-            font-size: 1.8em;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
-        .service-card .delivery-time {
-            color: #666;
-            font-size: 1em;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .service-card button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .service-card button:hover {
-            transform: scale(1.05);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 3% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #667eea;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #667eea;
-            font-size: 1.3em;
-        }
-
-        .error {
-            background-color: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 5px solid #c33;
-        }
-
-        .success {
-            background-color: #efe;
-            color: #3c3;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 5px solid #3c3;
-        }
-
-        .order-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-
-        .order-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .order-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .order-detail {
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .order-detail strong {
-            display: block;
-            color: #666;
-            font-size: 0.9em;
             margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: left;
+        }
+        #newServiceForm .full-width {
+            grid-column: span 2;
+        }
+        #addServiceButton {
+            grid-column: span 2;
+            background-color: var(--whatsapp-green) !important;
+            color: black !important;
         }
 
-        .status-pending { color: #FFA500; font-weight: bold; }
-        .status-processing { color: #2196F3; font-weight: bold; }
-        .status-completed { color: #4CAF50; font-weight: bold; }
-        .status-cancelled { color: #F44336; font-weight: bold; }
-
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .file-input-label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            nav {
-                flex-direction: column;
-            }
-
-            nav button {
-                width: 100%;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                padding: 20px;
-            }
-
-            .order-details {
-                grid-template-columns: 1fr;
-            }
+        /* Estilo para el mensaje de administración */
+        #adminOrderHistoryMessage { 
+            text-align: left; 
+            padding: 10px; 
+            background-color: #2e353f;
+            border-left: 3px solid var(--accent-pink);
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔓 KLMZ Unlock</h1>
-            <p>Panel de Administración y Servicios Profesionales</p>
-        </header>
 
-        <nav>
-            <button onclick="showSection('pongaOrden')" class="active">Ponga la orden</button>
-            <button onclick="showSection('imeiService')">IMEI Service</button>
-            <button onclick="showSection('boxDongle')">Box/Dongle/Tool/Credit - Activation</button>
-            <button onclick="showSection('digitalTool')">Digital Tool Rent & Remote Service</button>
-            <button onclick="showSection('historialPedidos')">Mi Historial de Pedidos</button>
-        </nav>
-
-        <!-- Sección: Ponga la orden -->
-        <div id="pongaOrden" class="section active">
-            <h2>📱 Ponga la orden</h2>
-            <div class="services-grid" id="pongaOrdenServices">
-                <div class="loading">Cargando servicios...</div>
+    <div class="top-info-bar">
+        <div class="info-group">
             </div>
-        </div>
-
-        <!-- Sección: IMEI Service -->
-        <div id="imeiService" class="section">
-            <h2>## IMEI Service</h2>
-            <div class="services-grid" id="imeiServices">
-                <div class="loading">Cargando servicios...</div>
-            </div>
-        </div>
-
-        <!-- Sección: Box/Dongle/Tool -->
-        <div id="boxDongle" class="section">
-            <h2>## Box/Dongle/Tool/Credit - Activation</h2>
-            <div class="services-grid" id="boxDongleServices">
-                <div class="loading">Cargando servicios...</div>
-            </div>
-        </div>
-
-        <!-- Sección: Digital Tool Rent & Remote Service -->
-        <div id="digitalTool" class="section">
-            <h2>## Digital Tool Rent & Remote Service</h2>
-            <div class="services-grid" id="digitalToolServices">
-                <div class="loading">Cargando servicios...</div>
-            </div>
-        </div>
-
-        <!-- Sección: Historial de Pedidos -->
-        <div id="historialPedidos" class="section">
-            <h2>## 📜 Mi Historial de Pedidos</h2>
-            <div id="ordersContainer">
-                <div class="loading">Cargando sus pedidos...</div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Modal para Realizar Pedido -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeOrderModal()">&times;</span>
-            <h2>Realizar Pedido</h2>
-            <form id="orderForm">
-                <div class="form-group">
-                    <label>Servicio:</label>
-                    <input type="text" id="modalServiceName" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Precio:</label>
-                    <input type="text" id="modalServicePrice" readonly>
-                </div>
-                <div class="form-group">
-                    <label>IMEI / Serial Number:</label>
-                    <input type="text" id="orderImei" required placeholder="Ingrese IMEI o número de serie">
-                </div>
-                <div class="form-group">
-                    <label>Información Adicional:</label>
-                    <textarea id="orderAdditionalInfo" rows="4" placeholder="Marca, modelo, carrier, etc."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Email de Contacto:</label>
-                    <input type="email" id="orderEmail" required placeholder="su@email.com">
-                </div>
-                <button type="submit" class="btn">Enviar Pedido</button>
-            </form>
+    <nav class="main-nav">
+        <div class="logo">
+            <span class="klmz">KLMZ</span> UNLOCKER
         </div>
-    </div>
-
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-
-        const SUPABASE_URL = 'https://eqwcmzmbbpqdhyplbstb.supabase.co'
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxd2NtbW1iYnBxZGh5cGxic3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEwOTg0MTMsImV4cCI6MjA0NjY3NDQxM30.yqKMu3LrGG7yXdCNH_QAYq6-4q8GFYqqJ_Z5FhC5RoE'
         
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-        let currentServiceForOrder = null;
-
-        // Función para mostrar mensajes al admin
-        function displayAdminMessage(message, type = 'success') {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type;
-            messageDiv.textContent = message;
-            messageDiv.style.position = 'fixed';
-            messageDiv.style.top = '20px';
-            messageDiv.style.right = '20px';
-            messageDiv.style.zIndex = '10000';
-            messageDiv.style.padding = '15px 25px';
-            messageDiv.style.borderRadius = '8px';
-            messageDiv.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            document.body.appendChild(messageDiv);
-            setTimeout(() => messageDiv.remove(), 5000);
-        }
-
-        // Función para obtener URL pública de R2
-        async function getPublicUrl(filePath) {
-            if (!filePath) return null;
+        <div class="nav-links">
+            <div class="nav-item" id="navAreaCliente">Area del Cliente</div>
             
-            try {
-                const { data } = supabase.storage
-                    .from('klmz-images')
-                    .getPublicUrl(filePath);
-                
-                return data?.publicUrl || null;
-            } catch (error) {
-                console.error('Error getting public URL:', error);
-                return null;
-            }
-        }
-
-        // Función para cargar imágenes desde Supabase
-        async function loadImages() {
-            try {
-                const { data: images, error } = await supabase
-                    .from('site_images')
-                    .select('*')
-                    .single();
-
-                if (error) throw error;
-
-                if (images) {
-                    if (images.background_image) {
-                        const bgUrl = await getPublicUrl(images.background_image);
-                        if (bgUrl) {
-                            document.body.style.backgroundImage = `url('${bgUrl}')`;
-                            document.body.style.backgroundSize = 'cover';
-                            document.body.style.backgroundPosition = 'center';
-                            document.body.style.backgroundAttachment = 'fixed';
-                            const preview = document.getElementById('backgroundPreview');
-                            if (preview) {
-                                preview.src = bgUrl;
-                                preview.style.display = 'block';
-                            }
-                        }
-                    }
-
-                    if (images.devices_image) {
-                        const devicesUrl = await getPublicUrl(images.devices_image);
-                        if (devicesUrl) {
-                            const header = document.querySelector('header');
-                            if (header) {
-                                let devicesImg = document.getElementById('devicesImage');
-                                if (!devicesImg) {
-                                    devicesImg = document.createElement('img');
-                                    devicesImg.id = 'devicesImage';
-                                    devicesImg.style.maxWidth = '100%';
-                                    devicesImg.style.height = 'auto';
-                                    devicesImg.style.marginTop = '20px';
-                                    devicesImg.style.borderRadius = '10px';
-                                    header.appendChild(devicesImg);
-                                }
-                                devicesImg.src = devicesUrl;
-                            }
-                            const preview = document.getElementById('devicesPreview');
-                            if (preview) {
-                                preview.src = devicesUrl;
-                                preview.style.display = 'block';
-                            }
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading images:', error);
-            }
-        }
-
-        // Función para subir imagen
-        async function uploadImage(file, imageType) {
-            try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${imageType}-${Date.now()}.${fileExt}`;
-                const filePath = `${imageType}/${fileName}`;
-
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('klmz-images')
-                    .upload(filePath, file, {
-                        cacheControl: '3600',
-                        upsert: true
-                    });
-
-                if (uploadError) throw uploadError;
-
-                const { data: existingData } = await supabase
-                    .from('site_images')
-                    .select('*')
-                    .single();
-
-                const updateData = {
-                    [imageType === 'background' ? 'background_image' : 'devices_image']: filePath
-                };
-
-                if (existingData) {
-                    const { error: updateError } = await supabase
-                        .from('site_images')
-                        .update(updateData)
-                        .eq('id', existingData.id);
-
-                    if (updateError) throw updateError;
-                } else {
-                    const { error: insertError } = await supabase
-                        .from('site_images')
-                        .insert([updateData]);
-
-                    if (insertError) throw insertError;
-                }
-
-                displayAdminMessage('Imagen subida exitosamente', 'success');
-                await loadImages();
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                displayAdminMessage('Error al subir la imagen', 'error');
-            }
-        }
-
-        // Función para limpiar imagen
-        async function clearImage(imageType) {
-            try {
-                const { data: existingData } = await supabase
-                    .from('site_images')
-                    .select('*')
-                    .single();
-
-                if (existingData) {
-                    const imagePath = imageType === 'background' ? existingData.background_image : existingData.devices_image;
-                    
-                    if (imagePath) {
-                        await supabase.storage
-                            .from('klmz-images')
-                            .remove([imagePath]);
-                    }
-
-                    const updateData = {
-                        [imageType === 'background' ? 'background_image' : 'devices_image']: null
-                    };
-
-                    const { error } = await supabase
-                        .from('site_images')
-                        .update(updateData)
-                        .eq('id', existingData.id);
-
-                    if (error) throw error;
-                }
-
-                if (imageType === 'background') {
-                    document.body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    const preview = document.getElementById('backgroundPreview');
-                    if (preview) preview.style.display = 'none';
-                } else {
-                    const devicesImg = document.getElementById('devicesImage');
-                    if (devicesImg) devicesImg.remove();
-                    const preview = document.getElementById('devicesPreview');
-                    if (preview) preview.style.display = 'none';
-                }
-
-                displayAdminMessage('Imagen eliminada exitosamente', 'success');
-            } catch (error) {
-                console.error('Error clearing image:', error);
-                displayAdminMessage('Error al eliminar la imagen', 'error');
-            }
-        }
-
-        // Event handlers para imágenes
-        function handleUploadBackground() {
-            const fileInput = document.getElementById('backgroundImageInput');
-            if (fileInput && fileInput.files[0]) {
-                uploadImage(fileInput.files[0], 'background');
-            }
-        }
-
-        function handleClearBackground() {
-            clearImage('background');
-        }
-
-        function handleUploadDevices() {
-            const fileInput = document.getElementById('devicesImageInput');
-            if (fileInput && fileInput.files[0]) {
-                uploadImage(fileInput.files[0], 'devices');
-            }
-        }
-
-        function handleClearDevices() {
-            clearImage('devices');
-        }
-
-        // Hacer funciones globales
-        window.handleUploadBackground = handleUploadBackground;
-        window.handleClearBackground = handleClearBackground;
-        window.handleUploadDevices = handleUploadDevices;
-        window.handleClearDevices = handleClearDevices;
-
-        // Función para obtener servicios de Supabase
-        async function fetchServices() {
-            try {
-                const { data, error } = await supabase
-                    .from('services')
-                    .select('*')
-                    .order('service_name', { ascending: true });
-
-                if (error) throw error;
-
-                await initializeMissingRecords(data || []);
-                return data || [];
-            } catch (error) {
-                console.error('Error fetching services:', error);
-                return [];
-            }
-        }
-
-        // Función para inicializar registros faltantes en R2
-        async function initializeMissingRecords(services) {
-            for (const service of services) {
-                if (!service.r2_record) {
-                    await updateServiceInSupabase(service.id, { r2_record: true });
-                }
-            }
-        }
-
-        // Función para actualizar servicio en Supabase
-        async function updateServiceInSupabase(serviceId, updates) {
-            try {
-                const { error } = await supabase
-                    .from('services')
-                    .update(updates)
-                    .eq('id', serviceId);
-
-                if (error) throw error;
-            } catch (error) {
-                console.error('Error updating service:', error);
-            }
-        }
-
-        // Función para ocultar todas las secciones
-        function hideAllSections() {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.querySelectorAll('nav button').forEach(button => {
-                button.classList.remove('active');
-            });
-        }
-
-        // Función para renderizar servicios
-        function renderServices(services, containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            if (services.length === 0) {
-                container.innerHTML = '<div class="loading">No hay servicios disponibles en esta categoría.</div>';
-                return;
-            }
-
-            container.innerHTML = services.map(service => `
-                <div class="service-card">
-                    <h3>${service.service_name || 'Sin nombre'}</h3>
-                    <div class="price">$${service.price || '0.00'}</div>
-                    <div class="delivery-time">⏱️ ${service.delivery_time || 'Consultar'}</div>
-                    <button onclick="openOrderModal(${service.id})">Ordenar Ahora</button>
+            <div class="nav-item" id="navPongaOrden">
+                Ponga la orden
+                <div class="dropdown-menu hidden" id="pongaOrdenMenu">
+                    <ul>
+                        <li><a href="#" class="order-type-link" data-service-type="imei">IMEI Service</a></li> 
+                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Box/Dongle/Tool/Credit - Activation</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Digital Tool Rent & Remote Service</a></li>
+                    </ul>
                 </div>
-            `).join('');
-        }
-
-        // Función para mostrar pedidos
-        function displayOrders(orders, isAdmin = false) {
-            const container = document.getElementById('ordersContainer');
-            if (!container) return;
-
-            if (orders.length === 0) {
-                container.innerHTML = '<div class="loading">No hay pedidos disponibles.</div>';
-                return;
-            }
-
-            container.innerHTML = orders.map(order => {
-                const statusClass = `status-${order.status}`;
-                const statusText = {
-                    'pending': '⏳ Pendiente',
-                    'processing': '🔄 En Proceso',
-                    'completed': '✅ Completado',
-                    'cancelled': '❌ Cancelado'
-                }[order.status] || order.status;
-
-                return `
-                    <div class="order-card">
-                        <h3>${order.service_name}</h3>
-                        <div class="order-details">
-                            <div class="order-detail">
-                                <strong>IMEI/Serial:</strong>
-                                ${order.imei_serial}
-                            </div>
-                            <div class="order-detail">
-                                <strong>Precio:</strong>
-                                $${order.price}
-                            </div>
-                            <div class="order-detail">
-                                <strong>Estado:</strong>
-                                <span class="${statusClass}">${statusText}</span>
-                            </div>
-                            <div class="order-detail">
-                                <strong>Fecha:</strong>
-                                ${new Date(order.created_at).toLocaleDateString('es-ES')}
-                            </div>
-                        </div>
-                        ${order.additional_info ? `
-                            <div class="order-detail">
-                                <strong>Información Adicional:</strong>
-                                ${order.additional_info}
-                            </div>
-                        ` : ''}
-                        ${order.customer_email ? `
-                            <div class="order-detail">
-                                <strong>Email:</strong>
-                                ${order.customer_email}
-                            </div>
-                        ` : ''}
-                        ${order.result ? `
-                            <div class="order-detail" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-top: 10px;">
-                                <strong style="color: #2e7d32;">✅ Resultado:</strong>
-                                <div style="color: #1b5e20; font-weight: bold; margin-top: 5px;">${order.result}</div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Función para obtener historial de pedidos (Admin)
-        async function fetchAdminOrdersHistory() {
-            try {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                displayOrders(data || [], true);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                const container = document.getElementById('ordersContainer');
-                if (container) {
-                    container.innerHTML = '<div class="error">Error al cargar los pedidos.</div>';
-                }
-            }
-        }
-
-        // Función para obtener historial de pedidos (Cliente)
-        async function fetchClientOrdersHistory() {
-            const container = document.getElementById('ordersContainer');
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading">Cargando sus pedidos...</div>';
-
-            try {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-
-                if (error) throw error;
-
-                displayOrders(data || [], false);
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                container.innerHTML = '<div class="error">Error al cargar los pedidos.</div>';
-            }
-        }
-
-        // Función para abrir modal de pedido
-        window.openOrderModal = async function(serviceId) {
-            const services = await fetchServices();
-            currentServiceForOrder = services.find(s => s.id === serviceId);
+            </div>
             
-            if (!currentServiceForOrder) {
-                displayAdminMessage('Servicio no encontrado', 'error');
-                return;
-            }
+            <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
 
-            document.getElementById('modalServiceName').value = currentServiceForOrder.service_name;
-            document.getElementById('modalServicePrice').value = `$${currentServiceForOrder.price}`;
-            document.getElementById('orderModal').style.display = 'block';
-        };
+            <div class="nav-item hidden" id="navAdminPanel">Panel de Administración</div>
+            
+            <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
+            <a href="#" id="loginLogoutBtn">Login / Register</a>
+        </div>
+    </nav>
 
-        // Función para cerrar modal de pedido
-        window.closeOrderModal = function() {
-            document.getElementById('orderModal').style.display = 'none';
-            document.getElementById('orderForm').reset();
-            currentServiceForOrder = null;
-        };
-
-        // Manejar envío de formulario de pedido
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!currentServiceForOrder) {
-                displayAdminMessage('Error: Servicio no encontrado', 'error');
-                return;
-            }
-
-            const orderData = {
-                service_id: currentServiceForOrder.id,
-                service_name: currentServiceForOrder.service_name,
-                price: currentServiceForOrder.price,
-                imei_serial: document.getElementById('orderImei').value,
-                additional_info: document.getElementById('orderAdditionalInfo').value,
-                customer_email: document.getElementById('orderEmail').value,
-                status: 'pending',
-                created_at: new Date().toISOString()
-            };
-
-            try {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .insert([orderData])
-                    .select();
-
-                if (error) throw error;
-
-                displayAdminMessage('✅ Pedido realizado exitosamente! Recibirá un email de confirmación.', 'success');
-                closeOrderModal();
+    <main>
+        <div class="modal hidden" id="orderModal">
+            <div class="modal-content">
+                <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
                 
-                if (document.getElementById('historialPedidos').classList.contains('active')) {
-                    fetchClientOrdersHistory();
-                }
-            } catch (error) {
-                console.error('Error creating order:', error);
-                displayAdminMessage('❌ Error al procesar el pedido. Por favor intente nuevamente.', 'error');
-            }
-        });
+                <input type="text" id="modalClientName" placeholder="Tu Nombre Completo" class="required-field" required>
+                <input type="text" id="modalWhatsapp" placeholder="Número de WhatsApp (Ej: +50377778888)" class="required-field" required>
 
-        // Manejar envío de formulario de bypass
-        async function submitBypassOrder(formData) {
-            try {
-                const orderData = {
-                    service_name: 'iPhone Bypass Service',
-                    price: formData.get('price'),
-                    imei_serial: formData.get('serial'),
-                    additional_info: `Modelo: ${formData.get('model')}\nVersión iOS: ${formData.get('version')}\nTipo: ${formData.get('type')}\nObservaciones: ${formData.get('notes')}`,
-                    customer_email: formData.get('email'),
-                    status: 'pending',
-                    created_at: new Date().toISOString()
-                };
+                <div class="modal-serial-input">
+                    <p>Ingrese el SN/IMEI para este servicio:</p>
+                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" class="required-field" required>
+                </div>
+                
+                <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
+                <input type="hidden" id="modalServiceId">
+                <input type="hidden" id="modalServiceType"> <div class="modal-footer-actions">
+                    <button id="submitModalOrder">Confirmar Pedido</button>
+                    <button id="closeModal">Cancelar</button>
+                </div>
+                <p id="modalMessage" class="form-message"></p>
+            </div>
+        </div>
 
-                const { data, error } = await supabase
-                    .from('orders')
-                    .insert([orderData])
-                    .select();
+        <section class="hidden" id="imeiServiceSection">
+            <h2>IMEI Service</h2>
+            <div id="imeiServiceGridContainer" class="service-grid">
+                <p id="loadingMessageIMEI">Cargando servicios...</p>
+            </div>
+        </section>
 
-                if (error) throw error;
+        <section class="hidden" id="boxDongleServiceSection">
+            <h2>Box/Dongle/Tool/Credit - Activation</h2>
+            <div id="boxDongleServiceGridContainer" class="service-grid">
+                <p id="loadingMessageBoxDongle">Cargando servicios...</p>
+            </div>
+        </section>
 
-                displayAdminMessage('✅ Pedido de Bypass realizado exitosamente!', 'success');
-                document.getElementById('bypassOrderForm')?.reset();
-            } catch (error) {
-                console.error('Error creating bypass order:', error);
-                displayAdminMessage('❌ Error al procesar el pedido de Bypass.', 'error');
-            }
-        }
+        <section class="hidden" id="digitalRentServiceSection">
+            <h2>Digital Tool Rent & Remote Service</h2>
+            <div id="digitalRentServiceGridContainer" class="service-grid">
+                <p id="loadingMessageDigitalRent">Cargando servicios...</p>
+            </div>
+        </section>
+        <section class="hidden" id="clientOrderHistorySection">
+            <h2>📜 Mi Historial de Pedidos</h2>
+            <div id="clientOrderHistoryContainer" class="order-history-grid">
+                <p>Cargando sus pedidos...</p>
+            </div>
+        </section>
 
-        // Función para agregar nuevo servicio
-        async function addNewService(serviceData) {
-            try {
-                const { data, error } = await supabase
-                    .from('services')
-                    .insert([{ ...serviceData, r2_record: true }])
-                    .select();
+        <section class="hero-section" id="heroSection">
+            <div class="services-content">
+                <div class="services-box">
+                    <div class="services-title">IPHONE SERVICES</div>
+                    <div class="service-item">IPHONE CARRIER UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
+                    <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
+                </div>
+            </div>
 
-                if (error) throw error;
+            <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
+        </section>
 
-                displayAdminMessage('Servicio agregado exitosamente', 'success');
-                return data[0];
-            } catch (error) {
-                console.error('Error adding service:', error);
-                displayAdminMessage('Error al agregar servicio', 'error');
-                return null;
-            }
-        }
+        <section class="login-section hidden" id="loginSection">
+            <h3>Iniciar Sesión / Registrarse</h3>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Contraseña">
+            <button id="signInButton">Iniciar Sesión</button>
+            <button id="signUpButton">Registrarse</button>
+            <p id="loginMessage" class="form-message" style="color: red;"></p>
+        </section>
 
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('orderModal');
-            if (event.target === modal) {
-                closeOrderModal();
-            }
+        <section class="admin-section hidden" id="adminSection">
+            <h3>Panel de Administración</h3>
+            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold; color: yellow;">Admin</span>! (klmzr230@gmail.com)</p>
+
+            <div class="admin-options">
+                <h4>Gestión de Órdenes</h4>
+                <div class="form-container">
+                    <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
+                    <div id="adminOrderHistoryMessage"></div>
+                    <div id="adminOrderHistory" class="order-history-grid">
+                        <p>Cargando pedidos...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>⚙️ Editar Tarjetas de Servicios</h4>
+                <div class="form-container">
+                    <h4 style="color: var(--accent-pink);">Seleccionar Categoría a Editar:</h4>
+                    <select id="serviceCategorySelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: #333; color: white; border-radius: 4px;">
+                        <option value="imei">IMEI Service</option>
+                        <option value="box-dongle">Box/Dongle/Tool/Credit - Activation</option>
+                        <option value="digital-rent">Digital Tool Rent & Remote Service</option>
+                    </select>
+                    
+                    <p id="editorMessage" class="form-message"></p>
+
+                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px; color: #25d366;">➕ Añadir Nuevo Servicio Rápido</h4>
+                    <form id="newServiceForm">
+                        <div class="full-width">
+                            <label for="newServiceName">Nombre Completo del Servicio:</label>
+                            <input type="text" id="newServiceName" placeholder="Ej: FRPFILE A12+ Bypass iPhone XR To 17ProMax (Windows Tool) OFFER ✅" required>
+                        </div>
+                        <div>
+                            <label for="newServicePrice">Precio (Ej: $5.00):</label>
+                            <input type="text" id="newServicePrice" placeholder="$5" required>
+                        </div>
+                        <div>
+                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 days):</label>
+                            <input type="text" id="newServiceTime" placeholder="Miniutes" required>
+                        </div>
+                        <div class="full-width">
+                            <label for="newServiceCategory">Sub-Categoría (Ej: Hello A12+ iCloud Bypass Windows Tool):</label>
+                            <input type="text" id="newServiceCategory" placeholder="Categoría del servicio" required>
+                        </div>
+                        <button type="submit" id="addServiceButton">Añadir Servicio a <span id="currentCategoryAddBtn">IMEI Service</span></button>
+                    </form>
+                    <p id="addServiceMessage" class="form-message"></p>
+
+                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px;">Lista de Edición</h4>
+                    <ul id="serviceEditorList" class="service-editor-list">
+                    </ul>
+
+                    <button id="saveServiceChanges" style="background-color: #4c4e97; margin-top: 15px;">Guardar Cambios y Sincronizar</button>
+                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
+                        🚨 Eliminar TODOS los Servicios de la Categoría Activa
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>Gestión de Imágenes (Solo Admin)</h4>
+                <div class="form-container">
+                    <h3>📸 Subir Imagen de Fondo (Hero)</h3>
+                    <input type="file" id="backgroundImageFile" accept="image/*">
+                    <button id="uploadBackgroundButton">Subir Fondo</button>
+                    <p id="backgroundResponseMessage" class="form-message"></p>
+                    <button id="clearBackgroundButton" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
+                </div>
+                    <div class="form-container" style="margin-top: 20px;">
+                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
+                    <input type="file" id="devicesImageFile" accept="image/*">
+                    <button id="uploadDevicesButton">Subir Imagen de Dispositivos</button>
+                    <p id="devicesImageResponseMessage" class="form-message"></p>
+                    <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-bottom">
+            &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
+        </div>
+    </footer>
+    
+    <div class="chat-buttons">
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 689957466">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Icon">
+        </a>
+    </div>
+
+    <script>
+        // 🔑 TUS CLAVES SUPABASE (INSERTADAS)
+        const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
+        const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
+        
+        // DECLARACIONES GLOBALES
+        let supabase;
+        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, boxDongleServiceSection, digitalRentServiceSection, clientOrderHistorySection; 
+        let loginLogoutBtn;
+        let loggedInUserName, adminNameDisplay;
+        let backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
+
+        const BACKGROUND_BUCKET_NAME = 'background-images'; 
+        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_13_Pro.png/300px-IPhone_13_Pro.png'; 
+        const BACKGROUND_FILE_PATH = 'hero_background.jpg';
+        const DEVICES_FILE_PATH = 'main_devices.png';
+        
+        // IDs para las 3 categorías de servicio en la tabla 'store_services'
+        const SERVICE_TYPES = {
+            'imei': { id: 1, title: 'IMEI Service' },
+            'box-dongle': { id: 2, title: 'Box/Dongle/Tool/Credit - Activation' },
+            'digital-rent': { id: 3, title: 'Digital Tool Rent & Remote Service' }
         };
 
+        // Almacenamiento local de datos: Object para las 3 listas
+        let serviceDataStore = {
+            'imei': [],
+            'box-dongle': [],
+            'digital-rent': []
+        };
 
+        // Variable para rastrear qué categoría se está editando
+        let currentEditingCategory = 'imei'; 
+
+        // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
+        let currentUser = null; 
+
+        // --- FUNCIONES DE MENSAJERÍA ---
+
+        function displayAdminMessage(message, color = 'var(--red-error)', isError = true) {
+            const container = document.getElementById('adminOrderHistoryMessage');
+            if (container) {
+                container.style.color = color;
+                container.style.borderColor = color;
+                container.innerHTML = `<p>${isError ? '❌ ERROR RLS/API: ' : '✅ INFORMACIÓN: '}${message}</p>`;
+                if (!isError) {
+                    // Mantener mensajes informativos (no error) visibles por 5 segundos
+                    setTimeout(() => {
+                        if (container.innerHTML.includes(message)) {
+                             container.innerHTML = '';
+                             container.style.borderColor = 'var(--accent-pink)';
+                        }
+                    }, 5000);
+                }
+            } else {
+                console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
+            }
+        }
+
+        // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
+        
+        async function getPublicUrl(bucketName, filePath, fallbackUrl) {
+            if (!supabase) return fallbackUrl;
+
+            // 1. Obtener la URL pública de Supabase
+            const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+            let url = data?.publicUrl;
+            
+            if (!url) return fallbackUrl;
+
+            // 2. Add Cache-Buster to force browser to load new version after upsert/update
+            try {
                 const parsedUrl = new URL(url);
                 const cacheBuster = Date.now();
                 parsedUrl.searchParams.set('v', cacheBuster);
@@ -1265,17 +794,29 @@
         function renderServices(categoryKey) {
             const data = serviceDataStore[categoryKey] || [];
             
-            // CORRECCIÓN CLAVE: Capitalizar la primera letra después del guion si existe, o capitalizar solo la primera letra.
-            // Ejemplo: 'digital-rent' -> 'DigitalRent'
-            const formattedCategoryKey = categoryKey.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+            // CORRECCIÓN CLAVE: Mapear directamente las claves a los IDs exactos del HTML.
+            // Esto asegura que se encuentren los elementos con mayúsculas/minúsculas correctas:
+            // imeiServiceSection, boxDongleServiceSection, digitalRentServiceSection.
+            let sectionId;
+            let containerId;
 
-            const containerId = `${formattedCategoryKey.toLowerCase()}ServiceGridContainer`;
-            const sectionId = `${formattedCategoryKey}ServiceSection`;
+            if (categoryKey === 'imei') {
+                sectionId = 'imeiServiceSection';
+                containerId = 'imeiServiceGridContainer';
+            } else if (categoryKey === 'box-dongle') {
+                sectionId = 'boxDongleServiceSection';
+                containerId = 'boxDongleServiceGridContainer';
+            } else if (categoryKey === 'digital-rent') {
+                sectionId = 'digitalRentServiceSection';
+                containerId = 'digitalRentServiceGridContainer';
+            } else {
+                console.error(`Error de clave de categoría: ${categoryKey}`);
+                return;
+            }
 
             const container = document.getElementById(containerId);
             const section = document.getElementById(sectionId);
             
-            // El error provenía de aquí. Si no encuentra el elemento, muestra el error en consola.
             if (!container || !section) {
                  console.error(`Error al renderizar: Contenedor (${containerId}) o Sección (${sectionId}) no encontrados.`);
                  return;
@@ -1626,7 +1167,6 @@
             const category = document.getElementById('newServiceCategory').value.trim();
 
             if (!name || !price || !time || !category) {
-
                 if (addServiceMessage) {
                     addServiceMessage.style.color = 'var(--red-error)';
                     addServiceMessage.textContent = 'Todos los campos deben ser completados.';
@@ -2136,6 +1676,7 @@
             await checkUser(session); 
             
             // LÓGICA INICIAL CORREGIDA: Siempre mostrar la Hero Section/Area del Cliente al inicio.
+            hideAllSections();
             if (heroSection) heroSection.classList.remove('hidden');
 
 
@@ -2148,100 +1689,6 @@
                 }
             });
         })();
-    
-        // FUNCIONES AGREGADAS PARA NAVEGACIÓN Y CARGA DE SERVICIOS
-
-        // Función para mostrar/ocultar secciones
-        window.showSection = function(sectionId) {
-            // Ocultar todas las secciones
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-
-            // Remover clase active de todos los botones
-            const buttons = document.querySelectorAll('nav button');
-            buttons.forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Mostrar la sección seleccionada
-            const selectedSection = document.getElementById(sectionId);
-            if (selectedSection) {
-                selectedSection.classList.add('active');
-            }
-
-            // Activar el botón correspondiente
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-
-            // Cargar servicios de la sección
-            loadSectionServices(sectionId);
-        };
-
-        // Función para cargar servicios según la sección
-        async function loadSectionServices(sectionId) {
-            let containerId = '';
-            let categoryFilter = '';
-
-            switch(sectionId) {
-                case 'pongaOrden':
-                    containerId = 'pongaOrdenServices';
-                    categoryFilter = 'PongaOrden';
-                    break;
-                case 'imeiService':
-                    containerId = 'imeiServices';
-                    categoryFilter = 'IMEI';
-                    break;
-                case 'boxDongle':
-                    containerId = 'boxDongleServices';
-                    categoryFilter = 'Box/Dongle';
-                    break;
-                case 'digitalTool':
-                    containerId = 'digitalToolServices';
-                    categoryFilter = 'Digital Tool';
-                    break;
-                case 'historialPedidos':
-                    fetchClientOrdersHistory();
-                    return;
-                default:
-                    return;
-            }
-
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            // Mostrar loading
-            container.innerHTML = '<div class="loading">Cargando servicios...</div>';
-
-            try {
-                const { data, error } = await supabase
-                    .from('services')
-                    .select('*')
-                    .order('service_name', { ascending: true });
-
-                if (error) throw error;
-
-                const filteredServices = (data || []).filter(service => 
-                    service.category && service.category.includes(categoryFilter)
-                );
-
-                if (filteredServices.length === 0) {
-                    container.innerHTML = '<div class="loading">No hay servicios disponibles en esta categoría.</div>';
-                    return;
-                }
-
-                renderServices(filteredServices, containerId);
-
-            } catch (error) {
-                console.error('Error al cargar servicios:', error);
-                container.innerHTML = '<div class="error">Error al cargar servicios.</div>';
-            }
-        }
-
-        // FIN DE FUNCIONES AGREGADAS
-
-</script>
+    </script>
 </body>
 </html>
