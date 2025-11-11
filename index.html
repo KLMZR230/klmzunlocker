@@ -793,14 +793,20 @@
          */
         function renderServices(categoryKey) {
             const data = serviceDataStore[categoryKey] || [];
-            // Las IDs de los contenedores son diferentes
-            const containerId = `${categoryKey.replace(/-/g, '')}ServiceGridContainer`;
-            const section = document.getElementById(`${categoryKey.replace(/-/g, '')}ServiceSection`);
             
+            // CORRECCIÓN CLAVE: Capitalizar la primera letra después del guion si existe, o capitalizar solo la primera letra.
+            // Ejemplo: 'digital-rent' -> 'DigitalRent'
+            const formattedCategoryKey = categoryKey.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+
+            const containerId = `${formattedCategoryKey.toLowerCase()}ServiceGridContainer`;
+            const sectionId = `${formattedCategoryKey}ServiceSection`;
+
             const container = document.getElementById(containerId);
+            const section = document.getElementById(sectionId);
             
+            // El error provenía de aquí. Si no encuentra el elemento, muestra el error en consola.
             if (!container || !section) {
-                 console.error(`Error al renderizar: Contenedor (${containerId}) o Sección no encontrados.`);
+                 console.error(`Error al renderizar: Contenedor (${containerId}) o Sección (${sectionId}) no encontrados.`);
                  return;
             }
 
@@ -1446,9 +1452,17 @@
                     }
                     break;
                 case 'navAreaCliente':
-                    if (isLoggedIn) { if (heroSection) heroSection.classList.remove('hidden'); } else { if (loginSection) loginSection.classList.remove('hidden'); if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' }); if (loginMessage) loginMessage.textContent = ''; }
+                    // Al hacer clic en Area Cliente, siempre mostramos la Hero Section (pantalla principal)
+                    if (isLoggedIn) { 
+                        if (heroSection) heroSection.classList.remove('hidden'); 
+                    } else { 
+                        if (loginSection) loginSection.classList.remove('hidden'); 
+                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' }); 
+                        if (loginMessage) loginMessage.textContent = ''; 
+                    }
                     break;
                 default:
+                    // Esto no debería ser alcanzado si todos los nav items están mapeados.
                     if (heroSection) heroSection.classList.remove('hidden');
                     break;
             }
@@ -1600,7 +1614,7 @@
             
             document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
             navAreaCliente.addEventListener('click', handleNavigationClick);
-            navPongaOrden.addEventListener('click', handleNavigationClick); // Vuelve al manejador principal para el clic del menú principal
+            navPongaOrden.addEventListener('click', handleNavigationClick); 
             navHistorialPedidos.addEventListener('click', handleNavigationClick);
             navAdminPanel.addEventListener('click', handleNavigationClick); 
 
@@ -1619,7 +1633,7 @@
                 });
             }
 
-            // CORRECCIÓN CLAVE para el menú desplegable: Este listener ahora maneja la visualización de la sección para las 3 categorías
+            // CORRECCIÓN CLAVE: Listener para los enlaces dentro del menú "Ponga la orden"
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1640,7 +1654,7 @@
                         return;
                     }
                     
-                    // LLAMADA CORREGIDA: renderServices se encarga de mostrar la sección y ocultar las demás.
+                    // LLAMADA FINAL: renderServices se encarga de todo.
                     renderServices(serviceType); 
                 });
             });
@@ -1649,20 +1663,16 @@
             const { data: { session } } = await supabase.auth.getSession();
             await checkUser(session); 
             
-            // LÓGICA INICIAL: Mostrar la sección IMEI por defecto si está logueado, sino Hero.
-            // Si el usuario está logueado, forzamos la vista de IMEI Service para la landing page inicial.
-            if (currentUser) {
-                renderServices('imei');
-            } else {
-                 if (heroSection) heroSection.classList.remove('hidden');
-            }
+            // LÓGICA INICIAL CORREGIDA: Siempre mostrar la Hero Section/Area del Cliente al inicio.
+            if (heroSection) heroSection.classList.remove('hidden');
 
 
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser(session);
-                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección IMEI por defecto
+                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección Hero/Area del Cliente
                 if (session && event === 'SIGNED_IN') {
-                    renderServices('imei');
+                    hideAllSections();
+                    if (heroSection) heroSection.classList.remove('hidden');
                 }
             });
         })();
