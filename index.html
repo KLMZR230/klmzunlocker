@@ -1348,10 +1348,6 @@
             
             currentUser = user || null;
             
-            // Ocultar solo si se cambia de estado o se navega explícitamente a un login/admin
-            // No ocultar aquí para permitir que initApp decida qué mostrar.
-            // hideAllSections(); 
-
             if (navAdminPanel) navAdminPanel.classList.add('hidden');
             if (adminNameDisplay) adminNameDisplay.classList.add('hidden');
 
@@ -1381,7 +1377,6 @@
                 }
             }
             
-            // Esta lógica ahora está en initApp y onAuthStateChange para manejar la visualización inicial.
         }
 
         async function handleNavigationClick(event) {
@@ -1624,13 +1619,13 @@
                 });
             }
 
-            // CORRECCIÓN CLAVE: Este listener ahora maneja la visualización de la sección para el menú desplegable
+            // CORRECCIÓN CLAVE para el menú desplegable: Este listener ahora maneja la visualización de la sección para las 3 categorías
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation(); 
                     
-                    if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden'); // Ocultar menú inmediatamente
+                    if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden'); // Ocultar menú
                     
                     const serviceType = this.dataset.serviceType;
                     
@@ -1655,6 +1650,7 @@
             await checkUser(session); 
             
             // LÓGICA INICIAL: Mostrar la sección IMEI por defecto si está logueado, sino Hero.
+            // Si el usuario está logueado, forzamos la vista de IMEI Service para la landing page inicial.
             if (currentUser) {
                 renderServices('imei');
             } else {
