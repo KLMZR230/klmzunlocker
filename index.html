@@ -173,10 +173,8 @@
 </head>
 <body>
 
+    <!-- CAMBIO: Barra superior de información vacía -->
     <div class="top-info-bar">
-        <span class="contact-info">
-            +503 68957466 (Whatsapp)
-        </span>
         <div class="info-group">
             </div>
     </div>
@@ -241,20 +239,15 @@
             <div class="services-content">
                 <div class="services-box">
                     <div class="services-title">IPHONE SERVICES</div>
+                    <!-- Se mantienen las descripciones estáticas ya que son solo parte del diseño del Hero -->
                     <div class="service-item">IPHONE CARRIER UNLOCK</div>
                     <div class="service-item">IPHONE ICLOUD UNLOCK</div>
                     <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
                     <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
                 </div>
                 
-                <div class="contact-info-hero">
-                    <span style="display: flex; align-items: center;">
-                        <span class="icon">📞</span> +503 68957466 (Whatsapp)
-                    </span>
-                    <span style="display: flex; align-items: center;">
-                        <span class="icon">✉️</span> **klmzr230@gmail.com**
-                    </span>
-                </div>
+                <!-- CAMBIO: Bloque de contacto del Hero Section ELIMINADO -->
+                
             </div>
 
             <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
@@ -316,6 +309,10 @@
                         <p id="editorMessage">Cargando editor...</p>
                     </ul>
                     <button id="saveServiceChanges">Guardar Cambios y Sincronizar (Supabase)</button>
+                    <!-- NUEVO BOTÓN PARA ELIMINAR TODOS LOS SERVICIOS -->
+                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
+                        🚨 Eliminar TODOS los Servicios
+                    </button>
                 </div>
             </div>
             
@@ -341,43 +338,14 @@
     </main>
     
     <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-col">
-                <h3>KLMZ UNLOCKER</h3>
-                <div class="social-icons">
-                    <a href="#">f</a> 
-                    <a href="#">📸</a> 
-                    <a href="#">▶</a> 
-                </div>
-            </div>
-            <div class="footer-col">
-                <h3>Enlaces útiles</h3>
-                <ul>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h3>Suscribir</h3>
-                <p class="subscribe-text">
-                    ¡No te pierdas nuestras futuras actualizaciones! Suscríbete ahora!
-                </p>
-                <a href="#" class="subscribe-button">Hoja informativa</a>
-            </div>
-            <div class="footer-col">
-                <h3>Conéctate con nosotros</h3>
-                <div class="contact-footer-info">
-                    +503 68957466 (Whatsapp)<br>
-                    **klmzr230@gmail.com**
-                </div>
-            </div>
-        </div>
+        <!-- CAMBIO: Se eliminó el div.footer-content, solo queda el footer-bottom -->
         <div class="footer-bottom">
             &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
         </div>
     </footer>
     
     <div class="chat-buttons">
-        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 68957466">
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 689957466">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Icon">
         </a>
     </div>
@@ -798,7 +766,12 @@
                 // Mensaje de error detallado
                 container.innerHTML = `<p style="color:red;">
                     ❌ Error al cargar pedidos del Admin: ${error.message}. 
-                    <br>Verifique que la política RLS de SELECT en la tabla 'orders' esté configurada correctamente para el administrador.
+                    <br>
+                    **¡IMPORTANTE!** Si los pedidos de otros usuarios no aparecen, debe 
+                    **verificar la política RLS (Row Level Security)** en la tabla 'orders' en Supabase. 
+                    Asegúrese de que su usuario administrador ('${ADMIN_EMAIL}') tenga permisos 
+                    de SELECT en **TODOS** los pedidos (por ejemplo: usando una política 
+                    que permita SELECT si \`auth.email() = '${ADMIN_EMAIL}'\`).
                 </p>`;
                 console.error("RLS/API Error al cargar pedidos del Admin:", error);
                 return;
@@ -840,6 +813,8 @@
         }
 
         async function updateOrderStatus(orderId, newStatus) {
+            // Nota: Se reemplazó window.confirm con una implementación de alert/confirm simple 
+            // ya que no hay un modal de confirmación personalizado en este código.
             if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
 
             const { error } = await supabase
@@ -1049,6 +1024,28 @@
                  imeiServicesData = imeiServicesData.filter(s => s.id !== id);
                  renderServiceEditor(); 
              }
+        }
+
+        // NUEVA FUNCIÓN: Eliminar todos los servicios
+        async function clearAllServices() {
+            if (!confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR TODOS los servicios IMEI? Esta acción es irreversible.')) {
+                return;
+            }
+            const editorMessageElement = document.getElementById('editorMessage');
+            editorMessageElement.style.color = 'yellow';
+            editorMessageElement.textContent = 'Eliminando todos los servicios...';
+            
+            imeiServicesData = []; // Clear local data
+            
+            const success = await updateServiceInSupabase([]);
+            
+            if (success) {
+                editorMessageElement.style.color = '#25d366';
+                editorMessageElement.textContent = '✅ ¡Todos los servicios eliminados y sincronizados con éxito! Ahora puedes agregar tus propios servicios.';
+                renderServiceEditor(); // Refresh editor view (will show empty message)
+            } else {
+                // Error message is already handled in updateServiceInSupabase
+            }
         }
         
         async function saveServiceChanges() {
@@ -1339,6 +1336,9 @@
             
             // Listeners de Navegación y Admin
             document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
+            // Listener para el nuevo botón de eliminar
+            document.getElementById('clearAllServicesButton').addEventListener('click', clearAllServices);
+            
             document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
             navAreaCliente.addEventListener('click', handleNavigationClick);
             navPongaOrden.addEventListener('click', handleNavigationClick);
