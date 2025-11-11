@@ -468,7 +468,7 @@
     <script>
         // 🔑 TUS CLAVES SUPABASE 
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU1Nn0.V8i729W38-Qo-F7sV0u8F-m-O-1p5P7J-J8-1n3t-1Y';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
         
         // DECLARACIONES GLOBALES
@@ -485,7 +485,7 @@
         const BACKGROUND_FILE_PATH = 'hero_background.jpg';
         const DEVICES_FILE_PATH = 'main_devices.png';
         
-        // NUEVAS CONSTANTES: IDs para las 3 categorías de servicio en la tabla 'store_services'
+        // IDs para las 3 categorías de servicio en la tabla 'store_services'
         const SERVICE_TYPES = {
             'imei': { id: 1, title: 'IMEI Service' },
             'box-dongle': { id: 2, title: 'Box/Dongle/Tool/Credit - Activation' },
@@ -586,8 +586,74 @@
         }
         
         // Funciones de subir y limpiar imagen (no se modifican)
-        async function uploadImage(fileInputId, bucketName, filePath, responseElementId) { /* ... código omitido para brevedad ... */ }
-        async function clearImage(bucketName, filePath, responseElementId, isBackground = false) { /* ... código omitido para brevedad ... */ }
+        async function uploadImage(fileInputId, bucketName, filePath, responseElementId) { 
+            const fileInput = document.getElementById(fileInputId);
+            const messageElement = document.getElementById(responseElementId);
+
+            if (!messageElement) { return; } 
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+                messageElement.style.color = 'var(--red-error)';
+                messageElement.textContent = 'Seleccione un archivo primero.';
+                return;
+            }
+
+            messageElement.style.color = 'yellow';
+            messageElement.textContent = 'Subiendo imagen...';
+
+            const { error: uploadError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true 
+                });
+
+            if (uploadError) {
+                messageElement.style.color = 'var(--red-error)';
+                if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
+                } else {
+                    messageElement.textContent = `Error al subir: ${uploadError.message}`;
+                }
+                console.error('Error al subir imagen:', uploadError);
+                return;
+            }
+
+            messageElement.style.color = 'var(--whatsapp-green)';
+            messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
+            await loadImages();
+        }
+        async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
+             const messageElement = document.getElementById(responseElementId);
+            
+            if (!messageElement) { return; } 
+            
+            messageElement.style.color = 'yellow';
+            messageElement.textContent = 'Eliminando imagen...';
+
+            const { error: deleteError } = await supabase.storage
+                .from(bucketName)
+                .remove([filePath]);
+
+            if (deleteError && deleteError.statusCode !== '404') {
+                messageElement.style.color = 'var(--red-error)';
+                if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
+                } else {
+                    messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
+                }
+                console.error('Error al eliminar imagen:', deleteError);
+                return;
+            }
+            
+            messageElement.style.color = 'var(--whatsapp-green)';
+            messageElement.textContent = isBackground 
+                ? 'Fondo de imagen eliminado y restaurado.' 
+                : 'Imagen de dispositivos restaurada por defecto.';
+            await loadImages();
+        }
         async function handleUploadBackground() { await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage'); }
         async function handleClearBackground() { await clearImage(BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true); }
         async function handleUploadDevices() { await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage'); }
@@ -727,6 +793,7 @@
          */
         function renderServices(categoryKey) {
             const data = serviceDataStore[categoryKey] || [];
+            // Las IDs de los contenedores son diferentes
             const containerId = `${categoryKey.replace(/-/g, '')}ServiceGridContainer`;
             const sectionId = `${categoryKey.replace(/-/g, '')}ServiceSection`;
 
@@ -766,7 +833,10 @@
                 });
             }
             
+            // Asegurar que solo los cards de esta sección tengan el listener
             document.querySelectorAll(`#${containerId} .service-card`).forEach(card => {
+                // Eliminar cualquier listener previo para evitar duplicados
+                card.removeEventListener('click', openOrderModal); 
                 card.addEventListener('click', openOrderModal);
             });
 
@@ -777,7 +847,7 @@
 
 
         function displayOrders(containerElement, orders, isAdminView = false) {
-            containerElement.innerHTML = '';
+             containerElement.innerHTML = '';
 
             if (orders.length === 0) {
                 containerElement.innerHTML = '<p>No hay pedidos registrados en su historial.</p>';
@@ -825,12 +895,121 @@
             });
         }
 
-        // Funciones de historial (no se modifican)
-        async function fetchAdminOrdersHistory() { /* ... código omitido ... */ }
-        async function fetchClientOrdersHistory() { /* ... código omitido ... */ }
-        window.updateOrderStatus = async function(orderId, newStatus) { /* ... código omitido ... */ }
-        window.executeDeleteOrder = async function(orderId) { /* ... código omitido ... */ }
-        window.deleteOrder = function(orderId) { /* ... código omitido ... */ }
+        // Funciones de historial (se dejan en el script para completar)
+        async function fetchAdminOrdersHistory() {
+             const container = document.getElementById('adminOrderHistory');
+            if (!container) return;
+            
+            displayAdminMessage('Cargando historial de todos los pedidos...', 'yellow', false);
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                displayAdminMessage(`❌ Error al cargar pedidos del Admin: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado para ver todos los pedidos (auth.email() = '${ADMIN_EMAIL}').`, 'var(--red-error)', true);
+                console.error("RLS/API Error al cargar pedidos del Admin:", error);
+                container.innerHTML = '<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error de RLS arriba.</p>';
+                return;
+            }
+            displayAdminMessage(`✅ ${orders.length} pedidos cargados.`, 'var(--whatsapp-green)', false);
+            displayOrders(container, orders, true);
+        }
+        async function fetchClientOrdersHistory() {
+             const container = document.getElementById('clientOrderHistoryContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
+
+            if (!currentUser) {
+                container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
+                return;
+            }
+            const userId = currentUser.id;
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('user_id', userId) 
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error al cargar su historial: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado en 'orders' permitiendo ver solo sus propios pedidos (user_id = auth.uid()).</p>`;
+                return;
+            }
+
+            displayOrders(container, orders, false);
+
+            hideAllSections();
+            if (clientOrderHistorySection) clientOrderHistorySection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.updateOrderStatus = async function(orderId, newStatus) {
+             displayAdminMessage(`Actualizando pedido #${orderId} a ${newStatus}...`, 'yellow', false);
+
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (error) {
+                displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
+            } else {
+                displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
+                fetchAdminOrdersHistory(); 
+            }
+        }
+        window.executeDeleteOrder = async function(orderId) {
+             displayAdminMessage(`Eliminando pedido #${orderId} permanentemente...`, 'yellow', false);
+            
+            const msgEl = document.getElementById('adminOrderHistoryMessage');
+            if (msgEl) {
+                msgEl.onclick = null; 
+                msgEl.style.cursor = 'default';
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .delete()
+                    .eq('id', orderId);
+
+                if (error) {
+                    displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders' para el ADMIN.`, 'var(--red-error)', true);
+                    console.error("Error al eliminar pedido (RLS o API):", error);
+                } else {
+                    displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
+                    fetchAdminOrdersHistory(); 
+                }
+            } catch (e) {
+                const genericErrorMessage = `Error de red/seguridad: ${e.message}. Esto a menudo indica que RLS está bloqueando la solicitud o un problema de red. Por favor, asegúrese de que la política RLS de DELETE está habilitada para el Administrador.`;
+                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${genericErrorMessage}`, 'var(--red-error)', true);
+                console.error("Error de red/fetch al eliminar pedido:", e);
+            }
+        }
+        window.deleteOrder = function(orderId) {
+             const container = document.getElementById('adminOrderHistoryMessage');
+            if (!container) return;
+
+            const confirmationHTML = `
+                <p style="margin-bottom: 10px; color: var(--orange-pending);">
+                    ⚠️ **CONFIRME**: ¿Está seguro de eliminar el Pedido #${orderId}? ¡Esta acción es irreversible!
+                </p>
+                <button onclick="window.executeDeleteOrder(${orderId});" 
+                        style="background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">
+                    Confirmar Eliminación
+                </button>
+                <button onclick="document.getElementById('adminOrderHistoryMessage').innerHTML='';"
+                        style="background-color: var(--button-bg); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Cancelar
+                </button>
+            `;
+            
+            container.style.color = 'var(--text-light)';
+            container.style.borderColor = 'var(--red-error)';
+            container.innerHTML = confirmationHTML;
+        }
         
 
         // --- LÓGICA DEL MODAL DE PEDIDO (ACTUALIZADA) ---
@@ -1287,9 +1466,81 @@
         }
         
         // Funciones de Auth (no se modifican)
-        async function signInWithEmail() { /* ... código omitido ... */ }
-        async function signUpWithEmail() { /* ... código omitido ... */ }
-        async function signOut() { /* ... código omitido ... */ }
+        async function signInWithEmail() { 
+             const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (loginMessage) {
+                loginMessage.style.color = 'yellow';
+                loginMessage.textContent = 'Iniciando sesión...';
+            }
+
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Error de inicialización de la API.'; } return; }
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                console.error('Error al hacer login:', error);
+                if (loginMessage) loginMessage.style.color = 'var(--red-error)';
+                let msg = error.message;
+                
+                if (error.status === 429) {
+                    msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
+                } 
+                else if (error.message.includes('Invalid login credentials')) { 
+                    msg = '❌ Credenciales de inicio de sesión inválidas. Comprueba el correo y la contraseña.'; 
+                } 
+                else if (error.message.includes('Email not confirmed')) { 
+                    msg = '📧 Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
+                }
+                
+                if (loginMessage) loginMessage.textContent = `Error de inicio: ${msg}`;
+            } else if (data.user) {
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--whatsapp-green)';
+                    loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                }
+            } else {
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--red-error)';
+                    loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
+                }
+            }
+        }
+        async function signUpWithEmail() { 
+             const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (loginMessage) {
+                loginMessage.style.color = 'yellow';
+                loginMessage.textContent = 'Registrando usuario...';
+            }
+            
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Erro de inicialización de la API.'; } return; }
+            
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                console.error('Error al registrar:', error);
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--red-error)';
+                    loginMessage.textContent = `Error: ${error.message}`;
+                }
+            } else {
+                if (loginMessage) {
+                    loginMessage.style.color = '#4dc2f2'; 
+                    loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
+                }
+            }
+        }
+        async function signOut() { 
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error al hacer logout:', error);
+            } else {
+                if (loginMessage) loginMessage.textContent = '';
+            }
+        }
 
         // --- Inicialización (IIFE para evitar Race Condition) ---
         (async function initApp() {
@@ -1310,12 +1561,13 @@
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
             adminSection = document.getElementById('adminSection');
+            // Mapeo de las 3 secciones
             imeiServiceSection = document.getElementById('imeiServiceSection'); 
-            boxDongleServiceSection = document.getElementById('boxDongleServiceSection'); // Nuevo
-            digitalRentServiceSection = document.getElementById('digitalRentServiceSection'); // Nuevo
+            boxDongleServiceSection = document.getElementById('boxDongleServiceSection'); 
+            digitalRentServiceSection = document.getElementById('digitalRentServiceSection'); 
             clientOrderHistorySection = document.getElementById('clientOrderHistorySection');
             
-            loadingMessage = document.getElementById('loadingMessageIMEI'); // Usamos el IMEI como fallback de carga
+            loadingMessage = document.getElementById('loadingMessageIMEI'); 
             editorMessage = document.getElementById('editorMessage'); 
             adminOrderHistory = document.getElementById('adminOrderHistory'); 
             clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
@@ -1374,7 +1626,7 @@
                 });
             }
 
-            // Listener para los enlaces dentro del menú de Poner Orden
+            // Listener para los enlaces dentro del menú de Poner Orden (CORRECCIÓN CLAVE)
             document.querySelectorAll('.order-type-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1391,7 +1643,7 @@
                         return;
                     }
                     
-                    // Renderizar la lista de servicios de la categoría seleccionada
+                    // CORRECCIÓN: Llamar a la función genérica de renderizado
                     renderServices(serviceType); 
                 });
             });
