@@ -1123,7 +1123,7 @@
                 displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
             } else {
                 // Al actualizar exitosamente, forzamos la recarga del admin.
-                // Esta recarga dispara el evento Realtime que actualiza al cliente.
+                // Esto dispara el evento Realtime que actualiza al cliente.
                 displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
                 fetchAdminOrdersHistory(); 
             }
@@ -1747,17 +1747,18 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
                     console.log('Cambio en pedidos detectado:', payload.eventType, payload.new?.status);
                     
-                    // Recarga la vista de historial de pedidos del usuario o del administrador
-                    const currentSection = document.querySelector('section:not(.hidden)');
+                    const currentSectionId = document.querySelector('section:not(.hidden)')?.id;
                     
                     if (currentUser) {
                         const isAdmin = currentUser.email === ADMIN_EMAIL;
 
-                        if (isAdmin && (currentSection.id === 'adminSection')) {
-                            // Si es admin y está viendo historiales, recargar el historial de admin
+                        // Si el cambio proviene del admin (o cualquier lado) y el admin tiene abierta su vista
+                        if (isAdmin && currentSectionId === 'adminSection') {
                             fetchAdminOrdersHistory();
-                        } else if (currentSection.id === 'clientOrderHistorySection') {
-                            // Si es un cliente viendo su historial, recargar el historial del cliente
+                        } 
+                        // Si es cualquier usuario (incluyendo el admin) y tiene abierta la vista de historial de cliente
+                        if (currentSectionId === 'clientOrderHistorySection') {
+                            // ESTA ES LA RECARGA CRÍTICA PARA EL CLIENTE
                             fetchClientOrdersHistory();
                         }
                     }
