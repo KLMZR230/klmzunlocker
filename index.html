@@ -40,13 +40,15 @@
             justify-content: space-between; 
             align-items: flex-end; 
             padding: 60px 50px 0px 50px; 
-            /* ARREGLO: Usamos altura fija + mínimo para asegurar visibilidad */
             min-height: 500px; 
-            height: 70vh; /* Asegura que ocupe una buena parte de la ventana */
+            height: 70vh; 
             position: relative; 
             overflow: hidden; 
             background-size: cover; 
             background-position: center bottom; 
+            /* Fix para asegurar color de fallback si no hay imagen */
+            background-color: var(--dark-bg);
+            background-image: none; /* Asegura que se respete el background-color por defecto */
         }
         .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
         .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
@@ -274,7 +276,7 @@
             <div class="admin-options">
                 <h4>Gestión de Órdenes</h4>
                 <div class="form-container">
-                     <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
+                    <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
                     <div id="adminOrderHistory" class="order-history-grid">
                         <p>Cargando pedidos...</p>
                     </div>
@@ -326,7 +328,7 @@
                     <p id="backgroundResponseMessage" class="form-message"></p>
                     <button id="clearBackgroundButton" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
                 </div>
-                   <div class="form-container" style="margin-top: 20px;">
+                    <div class="form-container" style="margin-top: 20px;">
                     <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
                     <input type="file" id="devicesImageFile" accept="image/*">
                     <button id="uploadDevicesButton">Subir Imagen de Dispositivos</button>
@@ -409,88 +411,82 @@
         // Función de parseo (mantenida por si acaso)
         function parseAndNormalizeServices(rawText) {
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            const services = [];
-            let currentCategory = 'Todo Grupo';
-            let nextId = 1;
+             const services = [];
+             let currentCategory = 'Todo Grupo';
+             let nextId = 1;
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                
-                if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
-                    if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
-                       currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
-                    }
-                }
-                
-                const priceTimeMatch = line.match(/(\$[0-9,.]+)[\s\u00A0]+([0-9-.\s\u00A0A-Za-z]+)$/);
-                
-                if (priceTimeMatch) {
-                    const price = priceTimeMatch[1];
-                    const time = priceTimeMatch[2].trim().replace(/\u00A0/g, ' '); 
-                    
-                    let name = '';
-                    let k = i - 1;
-                    
-                    while (k >= 0 && !lines[k].startsWith('$') && lines[k].length > 3) {
-                         name = lines[k] + ' ' + name;
-                         k--;
-                         if (k < 0) break;
-                    }
-                    
-                    if (name.trim() === '') {
-                         name = line.replace(priceTimeMatch[0], '').trim();
-                    } else {
-                         name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
-                         name = name.replace(/\s+/g, ' ').trim(); 
-                    }
+             for (let i = 0; i < lines.length; i++) {
+                 const line = lines[i];
+                 
+                 if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
+                     if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
+                        currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
+                     }
+                 }
+                 
+                 const priceTimeMatch = line.match(/(\$[0-9,.]+)[\s\u00A0]+([0-9-.\s\u00A0A-Za-z]+)$/);
+                 
+                 if (priceTimeMatch) {
+                     const price = priceTimeMatch[1];
+                     const time = priceTimeMatch[2].trim().replace(/\u00A0/g, ' '); 
+                     
+                     let name = '';
+                     let k = i - 1;
+                     
+                     while (k >= 0 && !lines[k].startsWith('$') && lines[k].length > 3) {
+                          name = lines[k] + ' ' + name;
+                          k--;
+                          if (k < 0) break;
+                     }
+                     
+                     if (name.trim() === '') {
+                          name = line.replace(priceTimeMatch[0], '').trim();
+                     } else {
+                          name = name.trim().replace(/^(He|F|Mr|FR|HF|iR|iA|SA|Ne|OP|HO|Ve|US|T|LP|iH|iB|Ap|By|No|Sa|Xf|AT|EM|M|Ro|R-|Re|IM|So|XI|Xi|Eu|Me|LG|Le|i|Fr|Cr|me|Mo|NO|ZT|UK|Sw|BL|Sp|Ro|JA|Ma|Ca|Po|Ph|No|Au|Cr|iR|i|Mr|He|F)\s/g, '').trim();
+                          name = name.replace(/\s+/g, ' ').trim(); 
+                     }
 
-                    if (name.length > 5 && !name.includes('Discounted')) {
-                        services.push({
-                            id: nextId++,
-                            name: name.substring(0, 100).trim(), 
-                            price: price,
-                            time: time,
-                            category: currentCategory.substring(0, 50).trim(),
-                        });
-                    }
-                }
-            }
-            return services;
+                     if (name.length > 5 && !name.includes('Discounted')) {
+                         services.push({
+                             id: nextId++,
+                             name: name.substring(0, 100).trim(), 
+                             price: price,
+                             time: time,
+                             category: currentCategory.substring(0, 50).trim(),
+                         });
+                     }
+                 }
+             }
+             return services;
         }
 
         // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
         
+        // FIX: Se eliminó la lógica de detección de URL complicada y se garantizó el cache-buster.
         async function getPublicUrl(bucketName, filePath, fallbackUrl) {
             if (!supabase) return fallbackUrl;
 
             // 1. Obtener la URL pública de Supabase
             const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-            
             let url = data?.publicUrl;
             
-            // 2. Verificación de URL base
-            if (!url || url.includes('not-found') || (url.endsWith(filePath) && url.length > SUPABASE_URL.length + bucketName.length + filePath.length)) {
-                return fallbackUrl;
-            }
-            
-            // 3. ARREGLO FINAL PARA FORZAR LA RECARGA (CACHE-BUSTER)
+            if (!url) return fallbackUrl;
+
+            // 2. Add Cache-Buster to force browser to load new version after upsert/update
             try {
-                // Asegurar que la URL sea codificada correctamente y usar URL API
                 const parsedUrl = new URL(url);
                 const cacheBuster = Date.now();
-                
-                // Agregar el parámetro de caché a la URL
                 parsedUrl.searchParams.set('v', cacheBuster);
                 url = parsedUrl.toString();
 
             } catch (e) {
-                // Si falla la construcción con URL, simplemente se añade el cache-buster a la fuerza
+                // Fallback if URL constructor fails
                 const cacheBuster = Date.now();
                 const separator = url.includes('?') ? '&' : '?';
                 url = `${url}${separator}v=${cacheBuster}`;
             }
 
-            return url || fallbackUrl;
+            return url;
         }
 
         async function loadImages() {
@@ -505,14 +501,14 @@
             if (bgUrl && heroSection) {
                 // Forzar la imagen de fondo con alta prioridad
                 heroSection.style.backgroundImage = `url('${bgUrl}')`;
-                heroSection.style.backgroundColor = 'transparent'; // Asegura que el fondo CSS no bloquee la imagen
+                heroSection.style.backgroundColor = 'transparent'; 
                 heroSection.style.backgroundSize = 'cover';
                 heroSection.style.backgroundPosition = 'center bottom';
 
             } else if (heroSection) {
-                // Si no hay URL, restaurar el fondo al color sólido
+                // Si no hay URL (se eliminó o nunca se subió), restaurar el fondo al color sólido
                 heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = '#161a20'; // Color definido en CSS :root
+                heroSection.style.backgroundColor = 'var(--dark-bg)'; // Color definido en CSS :root
             }
 
             // 3. Cargar Imagen de Dispositivos (Se aplica al <img> src)
@@ -583,25 +579,20 @@
                 messageElement.style.color = 'red';
                 // MANEJO MEJORADO DE RLS PARA EVITAR EL CIERRE DEL PANEL
                 if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
-                     messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
                 } else {
-                     messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
+                    messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
                 }
                 console.error('Error al eliminar imagen:', deleteError);
                 return;
             }
             
-            if (!isBackground) {
-                mainDevicesImage.src = DEFAULT_DEVICES_IMAGE_URL;
-                messageElement.textContent = 'Imagen de dispositivos restaurada por defecto.';
-            } else {
-                heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = '#161a20';
-                messageElement.textContent = 'Fondo de imagen eliminado.';
-            }
-
+            // FIX: Llamar a loadImages para forzar la actualización del estado y el restablecimiento al color/default URL.
             messageElement.style.color = '#25d366';
-            
+            messageElement.textContent = isBackground 
+                ? 'Fondo de imagen eliminado y restaurado.' 
+                : 'Imagen de dispositivos restaurada por defecto.';
+            await loadImages();
         }
         
         async function handleUploadBackground() {
@@ -1238,7 +1229,7 @@
                 
                 // Manejo de Error 429 (Rate Limit)
                 if (error.status === 429) {
-                     msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
+                    msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
                 } 
                 // Manejo de Error 400 (Credenciales)
                 else if (error.message.includes('Invalid login credentials')) { 
@@ -1373,6 +1364,7 @@
                         hideAllSections();
                         heroSection.classList.remove('hidden');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                        // Reemplazar alert() con un mensaje en la UI si fuera una app de producción
                         alert(`Función para ${this.textContent} aún no implementada.`);
                     }
                 });
