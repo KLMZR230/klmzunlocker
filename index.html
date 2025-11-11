@@ -466,7 +466,7 @@
     </div>
 
     <script>
-        // 🔑 TUS CLAVES SUPABASE 
+        // 🔑 TUS CLAVES SUPABASE (INSERTADAS)
         const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
         const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
@@ -800,7 +800,10 @@
             const container = document.getElementById(containerId);
             const section = document.getElementById(sectionId);
             
-            if (!container || !section) return;
+            if (!container || !section) {
+                 console.error(`Error al renderizar: Contenedor (${containerId}) o Sección (${sectionId}) no encontrados.`);
+                 return;
+            }
 
             container.innerHTML = ''; 
             
@@ -1366,6 +1369,7 @@
                     if (adminNameDisplay) adminNameDisplay.textContent = `(${user.email})`;
                 }
                 
+                // Mostrar la sección Hero por defecto, a menos que ya se esté mostrando una sección de servicio.
                 if (heroSection) heroSection.classList.remove('hidden');
             } else {
                 if (heroSection) heroSection.classList.remove('hidden'); 
@@ -1379,7 +1383,7 @@
                 }
             }
             
-            // Si no hay ninguna sección activa, mostrar Hero
+            // Si no hay ninguna sección activa, mostrar Hero (lógica redundante, pero segura)
             if (document.querySelectorAll('section:not(.hidden)').length === 0) {
                  if (heroSection) heroSection.classList.remove('hidden');
             }
@@ -1660,6 +1664,10 @@
 
             supabase.auth.onAuthStateChange((event, session) => {
                 checkUser(session);
+                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección IMEI por defecto
+                if (session && event === 'SIGNED_IN') {
+                    renderServices('imei');
+                }
             });
         })();
     </script>
