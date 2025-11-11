@@ -60,7 +60,6 @@
         .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
         .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
         .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
-        .contact-info-hero { margin-top: 40px; line-height: 1.8; font-size: 16px; }
         .contact-info-hero .icon { color: var(--accent-pink); margin-right: 5px; }
         #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
         .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
@@ -168,10 +167,83 @@
 
         /* Modal Styles */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background-color: #22252a; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%; text-align: center; }
-        .modal-content h3 { color: var(--accent-pink); margin-bottom: 20px; }
-        .modal-content input { margin-bottom: 15px; }
-        .modal-content button { margin: 10px; }
+        .modal-content { 
+            background-color: #22252a; 
+            padding: 30px; 
+            border-radius: 8px; 
+            max-width: 400px; 
+            width: 90%; 
+            text-align: center; 
+        }
+
+        /* --- ESTILOS DE MODAL DE PEDIDO (MEJORADO) --- */
+        
+        /* Contenedor del Título del Servicio */
+        #modalServiceName {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-light);
+            background-color: #2b2f36; /* Darker background for service info */
+            padding: 15px;
+            margin-top: -30px; /* Pull it slightly above the modal top margin */
+            margin-left: -30px;
+            margin-right: -30px;
+            margin-bottom: 25px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 4px solid var(--accent-pink);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Estilos para el campo de entrada */
+        .modal-input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .modal-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--accent-pink); /* Highlight label */
+            font-weight: bold;
+        }
+        .modal-input-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            font-size: 16px;
+        }
+        
+        /* Estilos de botones del modal (Sobrescribe estilos genéricos) */
+        .modal-content button {
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 16px;
+            padding: 12px 25px; /* Larger click target */
+            border-radius: 6px;
+            width: 100%; /* Make them full width of modal content */
+            margin-left: 0; /* Clear margin from general button style */
+            margin-right: 0;
+            margin-top: 10px;
+        }
+        #submitModalOrder {
+            background-color: var(--accent-pink); /* Pink for Confirm */
+            margin-bottom: 5px; 
+        }
+        #submitModalOrder:hover {
+            background-color: #f069bb; /* Lighter pink */
+            transform: translateY(-1px);
+        }
+        #closeModal {
+            background-color: #4a4a58 !important; /* Muted color for Cancel */
+        }
+        #closeModal:hover {
+            background-color: #6a6a78 !important;
+            transform: translateY(-1px);
+        }
         
         /* Estilo para el nuevo formulario de añadir servicio */
         #newServiceForm {
@@ -240,13 +312,29 @@
     <main>
         <div class="modal hidden" id="orderModal">
             <div class="modal-content">
-                <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
-                <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)">
-                <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
+                
+                <!-- Título del Servicio Prominente (Contenido se llena con JS) -->
+                <h3 id="modalServiceName"></h3>
+                
+                <h4 style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+                    Confirme el número de serie (SN/IMEI) para continuar:
+                </h4>
+
+                <div class="modal-input-group">
+                    <label for="modalSerial">Número de Serie (SN/IMEI):</label>
+                    <input type="text" id="modalSerial" placeholder="Ingresa SN/IMEI" required>
+                </div>
+                
+                <div class="modal-input-group">
+                    <label for="modalEmail">Correo de Contacto (Usuario Actual):</label>
+                    <!-- El valor de este input se llena automáticamente al abrir el modal -->
+                    <input type="email" id="modalEmail" placeholder="Tu correo (no editable)" readonly>
+                </div>
+
                 <input type="hidden" id="modalServiceId">
 
                 <button id="submitModalOrder">Confirmar Pedido</button>
-                <button id="closeModal" style="background-color: #666; margin-top: 10px;">Cancelar</button>
+                <button id="closeModal">Cancelar</button>
                 <p id="modalMessage" class="form-message"></p>
             </div>
         </div>
