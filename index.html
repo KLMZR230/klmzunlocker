@@ -147,7 +147,8 @@
         .order-details p { margin: 2px 0; }
         .order-actions { text-align: right; }
         .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
-        .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+        .order-actions .admin-order-buttons { display: flex; flex-direction: column; align-items: flex-end; }
+        .order-actions .admin-order-buttons button { margin-top: 5px; background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
 
         /* Estilo del Badge de Estado */
         .status-badge {
@@ -466,14 +467,20 @@
 
         // --- FUNCIONES DE MENSAJERÍA ---
 
-        function displayAdminMessage(message, color = 'red', isError = true) {
+        function displayAdminMessage(message, color = 'var(--red-error)', isError = true) {
             const container = document.getElementById('adminOrderHistoryMessage');
             if (container) {
                 container.style.color = color;
                 container.style.borderColor = color;
                 container.innerHTML = `<p>${isError ? '❌ ERROR RLS/API: ' : '✅ INFORMACIÓN: '}${message}</p>`;
                 if (!isError) {
-                    setTimeout(() => container.innerHTML = '', 5000);
+                    // Mantener mensajes informativos (no error) visibles por 5 segundos
+                    setTimeout(() => {
+                        if (container.innerHTML.includes(message)) {
+                             container.innerHTML = '';
+                             container.style.borderColor = 'var(--accent-pink)';
+                        }
+                    }, 5000);
                 }
             } else {
                 console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
@@ -771,7 +778,9 @@
                         <select onchange="updateOrderStatus(${order.id}, this.value)">
                             ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
                         </select>
-                        <button onclick="window.deleteOrder(${order.id})" style="background-color: var(--red-error);">Eliminar</button>
+                        <div class="admin-order-buttons">
+                            <button onclick="window.deleteOrder(${order.id})">Eliminar</button>
+                        </div>
                     `;
                 } else {
                     orderActionsHtml = `<span class="status-badge ${order.status.replace(/[^a-zA-Z0-9]/g, '')}">${order.status}</span>`;
@@ -871,7 +880,7 @@
                 .eq('id', orderId);
 
             if (error) {
-                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. Revise los permisos RLS de DELETE.`, 'var(--red-error)', true);
+                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders'.`, 'var(--red-error)', true);
                 console.error("Error al eliminar pedido:", error);
             } else {
                 displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
