@@ -51,7 +51,7 @@
             max-height: 90px; 
             border-radius: 50%; /* ¡Hace el logo redondo! */
             object-fit: cover; 
-            border: none;     /* Elimina bordes feos */
+            border: none;      /* Elimina bordes feos */
             vertical-align: middle; 
         }
         
@@ -557,7 +557,7 @@
                     <p id="devicesImageResponseMessage" class="form-message"></p>
                     <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
                 </div>
-                 <div class="form-container" style="margin-top: 20px;">
+                   <div class="form-container" style="margin-top: 20px;">
                     <h3>✨ Logo del Sitio (Header)</h3>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Sube un archivo PNG para el logo. Se recomienda una imagen con fondo transparente.</p>
                     <input type="file" id="logoImageFile" accept="image/*">
@@ -935,9 +935,9 @@
         }
 
         /**
-         * Función genérica para renderizar servicios en una sección específica.
-         * @param {string} categoryKey - 'imei', 'box-dongle', o 'digital-rent'.
-         */
+          * Función genérica para renderizar servicios en una sección específica.
+          * @param {string} categoryKey - 'imei', 'box-dongle', o 'digital-rent'.
+          */
         function renderServices(categoryKey) {
             const data = serviceDataStore[categoryKey] || [];
             
@@ -1123,9 +1123,12 @@
                 displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
             } else {
                 // Al actualizar exitosamente, forzamos la recarga del admin.
-                // Esta recarga dispara el evento Realtime que actualiza al cliente.
+                // Esta recarga disparará el evento Realtime que actualiza al cliente.
                 displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
-                fetchAdminOrdersHistory(); 
+                // Si la sección del admin está abierta, recargar la vista
+                if (document.getElementById('adminSection').classList.contains('hidden') === false) {
+                     fetchAdminOrdersHistory(); 
+                }
             }
         }
         // --- FIN FUNCIÓN CORREGIDA ---
@@ -1150,7 +1153,10 @@
                     console.error("Error al eliminar pedido (RLS o API):", error);
                 } else {
                     displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
-                    fetchAdminOrdersHistory(); 
+                    // Si la sección del admin está abierta, recargar la vista
+                    if (document.getElementById('adminSection').classList.contains('hidden') === false) {
+                        fetchAdminOrdersHistory(); 
+                    }
                 }
             } catch (e) {
                 const genericErrorMessage = `Error de red/seguridad: ${e.message}. Esto a menudo indica que RLS está bloqueando la solicitud o un problema de red. Por favor, asegúrese de que la política RLS de DELETE está habilitada para el Administrador.`;
@@ -1732,7 +1738,7 @@
             }
         }
 
-        // --- Suscripción a Realtime para Actualizaciones de Pedidos (NUEVO) ---
+        // --- Suscripción a Realtime para Actualizaciones de Pedidos (CORREGIDO) ---
         function subscribeToOrders() {
             if (!supabase) {
                 console.error("Supabase no inicializado, no se puede suscribir a Realtime.");
@@ -1749,17 +1755,18 @@
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
                     console.log('Cambio en pedidos detectado:', payload.eventType, payload.new?.status);
                     
+                    // Determinar la sección actualmente visible
                     const currentSection = document.querySelector('section:not(.hidden)');
                     const currentSectionId = currentSection?.id;
                     
                     if (currentUser) {
                         const isAdmin = currentUser.email === ADMIN_EMAIL;
 
-                        // Si el cambio ocurre y estamos en la vista de Admin, recargar
+                        // 1. Recarga para el ADMIN si está viendo el panel de gestión
                         if (isAdmin && currentSectionId === 'adminSection') {
                             fetchAdminOrdersHistory();
                         } 
-                        // Si es cualquier usuario (incluyendo el admin) y tiene abierta la vista de historial de cliente
+                        // 2. Recarga para el CLIENTE (incluido el admin viendo su propio historial) si está en su historial
                         if (currentSectionId === 'clientOrderHistorySection') {
                             fetchClientOrdersHistory();
                         }
