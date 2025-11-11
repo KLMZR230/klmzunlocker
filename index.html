@@ -36,7 +36,7 @@
         .logo { 
             display: flex; 
             align-items: center; 
-            height: 100px; /* Tamaño del contenedor ajustado a 100px */
+            height: 100px; 
             font-size: 24px; 
             font-weight: bold;
             color: var(--text-light);
@@ -45,13 +45,13 @@
         
         /* Estilos para la imagen del logo - ¡REDONDO Y MÁS GRANDE! */
         .logo #siteLogo {
-            height: 90px; /* Altura fija para un círculo perfecto */
-            width: 90px;  /* Ancho fijo para un círculo perfecto */
+            height: 90px; 
+            width: 90px;  
             min-height: 90px; 
             max-height: 90px; 
-            border-radius: 50%; /* ¡Hace el logo redondo! */
+            border-radius: 50%; 
             object-fit: cover; 
-            border: none;     /* Elimina bordes feos */
+            border: none;     
             vertical-align: middle; 
         }
         
@@ -291,6 +291,85 @@
             border-left: 3px solid var(--accent-pink);
             margin-bottom: 20px;
             border-radius: 4px;
+        }
+
+        /* --- MEDIA QUERIES (ADAPTABILIDAD MÓVIL) --- */
+        @media (max-width: 768px) {
+            .main-nav { 
+                flex-direction: column; 
+                align-items: flex-start;
+                padding: 10px 20px;
+                height: auto; /* Permite que la nav crezca */
+            }
+            .logo { 
+                height: 70px; /* Reducido un poco para móvil */
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 5px;
+            }
+            .logo #siteLogo {
+                height: 65px; /* Tamaño del logo en móvil */
+                width: 65px;
+                min-height: 65px;
+                max-height: 65px;
+            }
+            .logo .logo-text {
+                font-size: 22px;
+            }
+            .nav-links {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                border-top: 1px solid #292d34;
+                padding-top: 10px;
+            }
+            .nav-links > a, .nav-item {
+                margin: 5px 10px;
+                font-size: 12px;
+                padding: 5px 0;
+            }
+            #loginLogoutBtn {
+                margin: 5px 0 5px 10px;
+            }
+            .hero-section {
+                padding: 30px 20px 0 20px;
+                height: 50vh;
+                min-height: 350px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .services-content {
+                flex-basis: auto;
+                width: 100%;
+                padding-bottom: 20px;
+            }
+            .services-box {
+                width: 100%;
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+            #mainDevicesImage {
+                display: none; /* Ocultar imagen de fondo en móviles para ahorrar espacio */
+            }
+            .service-grid {
+                grid-template-columns: 1fr; /* Una columna para las tarjetas de servicio */
+            }
+            .order-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .order-actions {
+                width: 100%;
+                text-align: left;
+                margin-top: 10px;
+                border-top: 1px solid #333;
+                padding-top: 10px;
+            }
+            .order-actions .admin-order-buttons {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -1647,6 +1726,40 @@
             }
         }
 
+        // --- Suscripción a Realtime para Actualizaciones de Pedidos (NUEVO) ---
+        function subscribeToOrders() {
+            if (!supabase) {
+                console.error("Supabase no inicializado, no se puede suscribir a Realtime.");
+                return;
+            }
+
+            // Cancela cualquier suscripción anterior para evitar duplicados
+            supabase.removeAllChannels();
+
+            // Suscribirse a los cambios en la tabla 'orders'
+            supabase.channel('orders_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+                    console.log('Cambio en pedidos detectado:', payload.eventType, payload.new?.status);
+                    
+                    // Recarga la vista de historial de pedidos del usuario o del administrador
+                    const currentSection = document.querySelector('section:not(.hidden)');
+                    
+                    if (currentUser) {
+                        const isAdmin = currentUser.email === ADMIN_EMAIL;
+
+                        if (isAdmin && (currentSection.id === 'adminSection' || currentSection.id === 'clientOrderHistorySection')) {
+                            // Si es admin y está viendo historiales, recargar el historial de admin
+                            fetchAdminOrdersHistory();
+                        } else if (currentSection.id === 'clientOrderHistorySection') {
+                            // Si es un cliente viendo su historial, recargar el historial del cliente
+                            fetchClientOrdersHistory();
+                        }
+                    }
+                })
+                .subscribe();
+        }
+
+
         // --- Inicialización de la Aplicación (IIFE) ---
         (async function initApp() {
             
@@ -1701,6 +1814,9 @@
             // --- CARGA DE DATOS ---
             await fetchServices(); 
             
+            // --- SUSCRIPCIÓN EN TIEMPO REAL ---
+            subscribeToOrders();
+
             // Listeners de Autenticación y Modal
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
             document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
