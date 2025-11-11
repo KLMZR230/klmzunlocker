@@ -18,6 +18,11 @@
             --card-border: #292d34;
             --card-inner-bg: #1a1e25; 
             --green-check: #00ff00; 
+
+            /* Colores para Estados */
+            --status-success: var(--whatsapp-green);
+            --status-pending: #ff9800; /* Naranja/Ámbar */
+            --status-rejected: #ff5555; /* Rojo vibrante */
         }
 
         /* Estilos Globales */
@@ -125,12 +130,38 @@
         .service-editor-list li .full-name-input { width: 95%; } 
         .service-editor-list li .service-editor-actions { margin-left: auto; }
         
-        /* Estilos para el Historial de Pedidos */
+        /* Estilos para el Historial de Pedidos (MEJORADO) */
         .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
-        .order-card { background-color: #1a1e25; padding: 15px; border-left: 5px solid gray; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .order-card.Exitoso { border-left-color: var(--whatsapp-green); }
-        .order-card.Pendiente { border-left-color: yellow; }
-        .order-card.Rechazado { border-left-color: red; }
+        .order-card { 
+            background-color: #1a1e25; 
+            padding: 15px; 
+            border-left: 5px solid gray; 
+            border-radius: 8px; /* Ligeramente más redondeado */
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.2s;
+            border: 1px solid var(--card-border);
+        }
+        /* ESTILOS VISUALMENTE ATRACTIVOS POR ESTADO */
+        .order-card.Exitoso { 
+            border-left-color: var(--status-success); 
+            box-shadow: 0 0 12px rgba(37, 211, 102, 0.3); /* Sombra verde */
+            background-color: #16241a; /* Tinte verde oscuro */
+            border-color: #16241a;
+        }
+        .order-card.Pendiente { 
+            border-left-color: var(--status-pending); 
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.3); /* Sombra naranja */
+            background-color: #262416; /* Tinte naranja oscuro */
+            border-color: #262416;
+        }
+        .order-card.Rechazado { 
+            border-left-color: var(--status-rejected); 
+            box-shadow: 0 0 12px rgba(255, 85, 85, 0.3); /* Sombra roja */
+            background-color: #241616; /* Tinte rojo oscuro */
+            border-color: #241616;
+        }
         .order-details p { margin: 2px 0; }
         .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; }
         .order-actions button { margin-top: 5px; background-color: #4c4e97; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
@@ -173,7 +204,6 @@
 </head>
 <body>
 
-    <!-- CAMBIO: Barra superior de información vacía -->
     <div class="top-info-bar">
         <div class="info-group">
             </div>
@@ -246,8 +276,6 @@
                     <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
                 </div>
                 
-                <!-- CAMBIO: Bloque de contacto del Hero Section ELIMINADO -->
-                
             </div>
 
             <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
@@ -270,6 +298,8 @@
                 <h4>Gestión de Órdenes</h4>
                 <div class="form-container">
                     <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
+                    <!-- NUEVO ELEMENTO DE MENSAJE PARA EL ADMIN ORDER HISTORY -->
+                    <p id="adminOrderHistoryMessage" class="form-message"></p>
                     <div id="adminOrderHistory" class="order-history-grid">
                         <p>Cargando pedidos...</p>
                     </div>
@@ -305,13 +335,15 @@
             <div class="admin-options" style="margin-top: 30px;">
                 <h4>⚙️ Editar Tarjetas de Servicios IMEI</h4>
                 <div class="form-container">
+                    <!-- MENSAJE DE ESTADO DEL EDITOR, FUERA DE UL -->
+                    <p id="editorMessage">Cargando editor...</p>
                     <ul id="serviceEditorList" class="service-editor-list">
-                        <p id="editorMessage">Cargando editor...</p>
+                        <!-- Los elementos <li> se renderizarán aquí -->
                     </ul>
                     <button id="saveServiceChanges">Guardar Cambios y Sincronizar (Supabase)</button>
                     <!-- NUEVO BOTÓN PARA ELIMINAR TODOS LOS SERVICIOS -->
-                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
-                        🚨 Eliminar TODOS los Servicios
+                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;" onclick="clearAllServices()">
+                        🚨 Eliminar TODOS los Servicios (Irreversible en Supabase)
                     </button>
                 </div>
             </div>
@@ -338,7 +370,6 @@
     </main>
     
     <footer class="site-footer">
-        <!-- CAMBIO: Se eliminó el div.footer-content, solo queda el footer-bottom -->
         <div class="footer-bottom">
             &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
         </div>
@@ -361,7 +392,7 @@
         let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, clientOrderHistorySection; 
         let loginLogoutBtn;
         let loggedInUserName, adminNameDisplay;
-        let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage;
+        let orderResponseMessage, backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
         let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
 
         const BACKGROUND_BUCKET_NAME = 'background-images'; 
@@ -370,12 +401,28 @@
         const BACKGROUND_FILE_PATH = 'hero_background.jpg';
         const DEVICES_FILE_PATH = 'main_devices.png';
         
+        // CORRECCIÓN CLAVE: Inicializar con una lista vacía para borrar los servicios inmediatamente.
         let imeiServicesData = []; 
         const SERVICES_RECORD_ID = 1; 
 
         // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
         let currentUser = null; 
 
+        // --- UTILIDAD DE MENSAJERÍA ADMIN (NUEVA) ---
+        function displayAdminMessage(message, color = 'red', targetId) {
+            const el = document.getElementById(targetId);
+            if (el) {
+                el.style.color = color;
+                el.textContent = message;
+                // Borrar el mensaje después de 8 segundos, pero solo si no ha sido reemplazado por otro
+                setTimeout(() => {
+                    if (el.textContent === message) el.textContent = '';
+                }, 8000);
+            } else {
+                console.warn(`Admin Message (${targetId}): ${message}`);
+            }
+        }
+        
         // Función de parseo (mantenida por si acaso)
         function parseAndNormalizeServices(rawText) {
              const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
@@ -388,7 +435,7 @@
                  
                  if (line.endsWith('✅') && lines.length > i + 1 && !lines[i+1].startsWith('$') && lines[i+1].length > 0) {
                      if (!lines[i+1].includes('Miniutes') && !lines[i+1].includes('Hours') && !lines[i+1].startsWith('$')) {
-                        currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
+                         currentCategory = line.replace(/✅|[\s\u00A0]+$/g, '').trim();
                      }
                  }
                  
@@ -430,7 +477,6 @@
 
         // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
         
-        // FIX: Se eliminó la lógica de detección de URL complicada y se garantizó el cache-buster.
         async function getPublicUrl(bucketName, filePath, fallbackUrl) {
             if (!supabase) return fallbackUrl;
 
@@ -610,12 +656,13 @@
             }
             
             if (data && data.service_data && data.service_data.length > 0) {
-                imeiServicesData = data.service_data;
+                // Solo cargamos si hay datos; de lo contrario, mantenemos imeiServicesData = []
+                imeiServicesData = data.service_data; 
                 if (msgEl) msgEl.textContent = `✅ ${imeiServicesData.length} servicios cargados correctamente.`;
                 return true;
             } else {
                 if (msgEl) msgEl.textContent = 'No se encontró registro. Inicializando con lista vacía...';
-                
+                // Si no hay datos, forzamos un upsert con lista vacía para establecer el registro
                 const initialData = []; 
                 const success = await updateServiceInSupabase(initialData); 
                 
@@ -676,11 +723,7 @@
                  // FIX: La etiqueta p con id=loadingMessage se recrea aquí
                  container.innerHTML = `<p id="loadingMessage" style="color:orange;">No hay servicios cargados. Si eres administrador, usa el Panel de Administración para agregar tarjetas.</p>`;
                  loadingMessage = document.getElementById('loadingMessage'); // Re-map global variable
-                 if (!loadingMessage || loadingMessage.textContent.includes('Cargando')) {
-                     fetchServices().then(() => {
-                         if (imeiServicesData.length > 0) renderImeiServices();
-                     });
-                 }
+                 // No intentamos re-fetch, asumimos que fetchServices ya se llamó en init
                  hideAllSections();
                  if (imeiServiceSection) imeiServiceSection.classList.remove('hidden');
                  return;
@@ -732,20 +775,35 @@
 
             orders.forEach(order => {
                 const card = document.createElement('div');
+                // Usamos el estado normalizado para la clase CSS
                 card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
                 card.dataset.orderId = order.id;
 
-                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
-                
+                // Determinar el color para el texto de la etiqueta (badge)
+                let statusTextColor = 'var(--text-light)';
+                let statusBadgeBg = 'var(--button-bg)';
+                let statusText = order.status;
+
+                if (order.status === 'Exitoso') {
+                    statusTextColor = 'var(--status-success)';
+                    statusBadgeBg = 'rgba(37, 211, 102, 0.1)';
+                } else if (order.status === 'Pendiente') {
+                    statusTextColor = 'var(--status-pending)';
+                    statusBadgeBg = 'rgba(255, 152, 0, 0.1)';
+                } else if (order.status === 'Rechazado') {
+                    statusTextColor = 'var(--status-rejected)';
+                    statusBadgeBg = 'rgba(255, 85, 85, 0.1)';
+                }
+
+                // Generar las opciones de acción (select para admin, nada para cliente)
                 let orderActionsHtml = '';
                 if (isAdminView) {
+                    const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
                     orderActionsHtml = `
                         <select onchange="updateOrderStatus(${order.id}, this.value)">
                             ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
                         </select>
                     `;
-                } else {
-                    orderActionsHtml = `<p><strong>Estado:</strong> ${order.status}</p>`;
                 }
 
                 card.innerHTML = `
@@ -753,6 +811,15 @@
                         <p><strong>Servicio:</strong> ${order.service_name}</p>
                         <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
                         ${isAdminView ? `<p><strong>Contacto:</strong> ${order.contact_email}</p>` : ''}
+                        
+                        <!-- ESTADO CON ETIQUETA DE COLOR -->
+                        <p style="margin: 5px 0;">
+                            <strong>Estado:</strong> 
+                            <span style="color: ${statusTextColor}; background-color: ${statusBadgeBg}; font-weight: bold; padding: 4px 10px; border-radius: 9999px; font-size: 13px;">
+                                ${statusText}
+                            </span>
+                        </p>
+                        
                         <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
                     </div>
                     <div class="order-actions">
@@ -767,9 +834,11 @@
         // MEJORA: Función para cargar historial de TODOS (Admin)
         async function fetchAdminOrdersHistory() {
             const container = document.getElementById('adminOrderHistory');
-            if (!container) return;
+            const messageEl = document.getElementById('adminOrderHistoryMessage');
+            if (!container || !messageEl) return;
             
             container.innerHTML = '<p>Cargando historial de todos los pedidos...</p>';
+            messageEl.textContent = ''; // Limpiar mensaje anterior
 
             const { data: orders, error } = await supabase
                 .from('orders')
@@ -778,15 +847,13 @@
 
             if (error) {
                 // Mensaje de error detallado
-                container.innerHTML = `<p style="color:red;">
+                messageEl.style.color = 'red';
+                messageEl.innerHTML = `
                     ❌ Error al cargar pedidos del Admin: ${error.message}. 
                     <br>
-                    **¡IMPORTANTE!** Si los pedidos de otros usuarios no aparecen, debe 
-                    **verificar la política RLS (Row Level Security)** en la tabla 'orders' en Supabase. 
-                    Asegúrese de que su usuario administrador ('${ADMIN_EMAIL}') tenga permisos 
-                    de SELECT en **TODOS** los pedidos (por ejemplo: usando una política 
-                    que permita SELECT si \`auth.email() = '${ADMIN_EMAIL}'\`).
-                </p>`;
+                    **¡IMPORTANTE!** Verifique la política RLS (SELECT) en la tabla 'orders' para su administrador ('${ADMIN_EMAIL}').
+                `;
+                container.innerHTML = `<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error anterior.</p>`;
                 console.error("RLS/API Error al cargar pedidos del Admin:", error);
                 return;
             }
@@ -826,33 +893,31 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        async function updateOrderStatus(orderId, newStatus) {
-            // Nota: Se reemplazó window.confirm con una implementación de alert/confirm simple 
-            // ya que no hay un modal de confirmación personalizado en este código.
-            if (!confirm(`¿Seguro que quieres cambiar el estado del pedido #${orderId} a ${newStatus}?`)) return;
+        // FUNCIÓN GLOBAL PARA INLINE HTML (ACTUALIZACIÓN DE ESTADO DE ORDEN)
+        window.updateOrderStatus = async function (orderId, newStatus) {
+            displayAdminMessage(`Cambiando estado del pedido #${orderId} a ${newStatus}...`, 'yellow', 'adminOrderHistoryMessage');
 
+            // 1. Ejecución sin confirmación de diálogo (por restricción de la plataforma)
             const { error } = await supabase
                 .from('orders')
                 .update({ status: newStatus })
                 .eq('id', orderId);
 
             if (error) {
-                alert(`Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`);
+                displayAdminMessage(`❌ Error al actualizar: ${error.message}. Revise los permisos RLS de UPDATE.`, 'red', 'adminOrderHistoryMessage');
             } else {
+                displayAdminMessage(`✅ Estado del pedido #${orderId} cambiado a ${newStatus}.`, 'var(--status-success)', 'adminOrderHistoryMessage');
                 fetchAdminOrdersHistory(); 
             }
         }
 
-        // FUNCIÓN CORREGIDA PARA USAR LA VARIABLE GLOBAL currentUser
+        // FUNCIÓN CORREGIDA PARA USAR LA VARIABLE GLOBAL currentUser (Removido Alert)
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
-            // 1. VERIFICACIÓN CRÍTICA: Usar la variable global INSTANTÁNEA
+            // 1. VERIFICACIÓN CRÍTICA: Redirección silenciosa sin alert()
             if (!currentUser) {
-                alert('Debe iniciar sesión para realizar un pedido.');
-                
-                // Si la variable global es nula, mostramos la pantalla de login.
                 hideAllSections();
                 if (loginSection) loginSection.classList.remove('hidden');
                 if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
@@ -938,7 +1003,7 @@
                 console.error(error);
             } else {
                 if (modalMessage) {
-                    modalMessage.style.color = '#25d366';
+                    modalMessage.style.color = 'var(--status-success)';
                     modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
                 }
                 
@@ -989,7 +1054,7 @@
 
             if (success) {
                 if (addServiceMessage) {
-                    addServiceMessage.style.color = '#25d366';
+                    addServiceMessage.style.color = 'var(--status-success)';
                     addServiceMessage.textContent = `✅ Servicio "${newService.name.substring(0, 30)}..." añadido y guardado con éxito!`;
                 }
                 
@@ -1003,76 +1068,72 @@
         }
 
 
+        // FUNCIÓN CORREGIDA: Ahora solo renderiza el estado actual, sin llamadas asíncronas anidadas.
         function renderServiceEditor() {
             const editorList = document.getElementById('serviceEditorList');
             if (!editorList) return;
 
-            fetchServices().then(() => {
-                editorList.innerHTML = '';
-                
-                // FIX: Re-map global variable in case it was overwritten or needs to be refreshed
-                editorMessage = document.getElementById('editorMessage');
-                if (!editorMessage) return;
+            editorList.innerHTML = '';
+            
+            // Re-mapear el elemento de mensaje global por si fue reemplazado dinámicamente
+            editorMessage = document.getElementById('editorMessage');
+            if (!editorMessage) return;
 
-                editorMessage.textContent = ''; // Limpiar mensaje anterior
-                
-                if (imeiServicesData.length === 0) {
-                    editorList.innerHTML = `<p id="editorMessage" style="color:orange;">No hay servicios para editar. Intente reiniciar los datos.</p>`;
-                    editorMessage = document.getElementById('editorMessage'); // Re-map global variable
-                    return;
-                }
-
-                imeiServicesData.forEach((service) => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        <div style="flex-grow: 1; margin-right: 15px;">
-                            <div class="input-group">
-                                <p>Nombre Completo (ID: ${service.id}):</p>
-                                <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
-                            </div>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <div class="input-group">
-                                    <p>Precio:</p>
-                                    <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
-                                </div>
-                                <div class="input-group">
-                                    <p>Tiempo:</p>
-                                    <input type="text" id="time-${service.id}" value="${service.time}" data-field="time" data-id="${service.id}" style="width: 100px;" />
-                                </div>
-                                <div class="input-group">
-                                    <p>Categoría:</p>
-                                    <input type="text" id="category-${service.id}" value="${service.category}" data-field="category" data-id="${service.id}" style="width: 120px;" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-editor-actions">
-                            <button onclick="deleteService(${service.id})">Eliminar</button>
-                        </div>
-                    `;
-                    editorList.appendChild(listItem);
-                });
-                
-                hideAllSections();
-                if (adminSection) adminSection.classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                if (editorMessage) editorMessage.textContent = `${imeiServicesData.length} servicios listados y listos para editar.`;
-            });
-        }
-        
-        function deleteService(id) {
-             // Nota: Se reemplazó window.confirm con una implementación de alert/confirm simple 
-             if (confirm(`¿Seguro que quieres eliminar el servicio ID ${id}? (Recuerda guardar los cambios)`)) {
-                 imeiServicesData = imeiServicesData.filter(s => s.id !== id);
-                 renderServiceEditor(); 
-             }
-        }
-
-        // FUNCIÓN CORREGIDA
-        async function clearAllServices() {
-            // Nota: Se reemplazó window.confirm con una implementación de alert/confirm simple 
-            if (!confirm('¡ADVERTENCIA! ¿Está seguro de que desea ELIMINAR TODOS los servicios IMEI? Esta acción es irreversible.')) {
+            editorMessage.textContent = ''; // Limpiar mensaje anterior
+            
+            if (imeiServicesData.length === 0) {
+                editorMessage.style.color = 'orange';
+                editorMessage.textContent = 'No hay servicios para editar. Intente usar el formulario superior para agregar uno.';
                 return;
             }
+
+            imeiServicesData.forEach((service) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <div style="flex-grow: 1; margin-right: 15px;">
+                        <div class="input-group">
+                            <p>Nombre Completo (ID: ${service.id}):</p>
+                            <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <div class="input-group">
+                                <p>Precio:</p>
+                                <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
+                            </div>
+                            <div class="input-group">
+                                <p>Tiempo:</p>
+                                <input type="text" id="time-${service.id}" value="${service.time}" data-field="time" data-id="${service.id}" style="width: 100px;" />
+                            </div>
+                            <div class="input-group">
+                                <p>Categoría:</p>
+                                <input type="text" id="category-${service.id}" value="${service.category}" data-field="category" data-id="${service.id}" style="width: 120px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="service-editor-actions">
+                        <button onclick="deleteService(${service.id})" style="background-color: #f44336;">Eliminar</button>
+                    </div>
+                `;
+                editorList.appendChild(listItem);
+            });
+            
+            if (editorMessage) editorMessage.textContent = `${imeiServicesData.length} servicios listados y listos para editar.`;
+        }
+        
+        // FUNCIÓN GLOBAL (REEMPLAZANDO CONFIRM)
+        window.deleteService = function (id) {
+             // 1. Reemplazando confirm() con ejecución directa y mensaje
+             displayAdminMessage(`⚠️ Servicio ID ${id} ELIMINADO LOCALMENTE. Presiona "Guardar Cambios" para sincronizar.`, 'var(--status-pending)', 'editorMessage');
+
+             imeiServicesData = imeiServicesData.filter(s => s.id !== id);
+             renderServiceEditor(); 
+        }
+
+        // FUNCIÓN CORREGIDA (REEMPLAZANDO CONFIRM)
+        async function clearAllServices() {
+            // 1. Reemplazando confirm() con ejecución directa y mensaje
+            displayAdminMessage('🚨 Eliminando TODOS los servicios... El botón de "Guardar Cambios" realizará la eliminación total en Supabase.', 'red', 'editorMessage');
+            
             const editorMessageElement = document.getElementById('editorMessage');
             
             // FIX: Agregar null check para prevenir el crash
@@ -1081,20 +1142,13 @@
                 return;
             }
 
-            editorMessageElement.style.color = 'yellow';
-            editorMessageElement.textContent = 'Eliminando todos los servicios...';
-            
             imeiServicesData = []; // Clear local data
             
-            const success = await updateServiceInSupabase([]);
-            
-            if (success) {
-                editorMessageElement.style.color = '#25d366';
-                editorMessageElement.textContent = '✅ ¡Todos los servicios eliminados y sincronizados con éxito! Ahora puedes agregar tus propios servicios.';
-                renderServiceEditor(); // Refresh editor view (will show empty message)
-            } else {
-                // Error message is already handled in updateServiceInSupabase
-            }
+            // FIX: Antes se hacía upsert aquí, pero lo he movido para que el usuario confirme con 'Guardar Cambios'
+            // Ya que si elimina accidentalmente, puede recargar antes de guardar.
+            editorMessageElement.style.color = 'red';
+            editorMessageElement.textContent = '✅ Lista local vaciada. Pulsa "Guardar Cambios y Sincronizar" para hacer la eliminación total permanente.';
+            renderServiceEditor(); 
         }
         
         // FUNCIÓN CORREGIDA
@@ -1135,9 +1189,10 @@
 
             if (success) {
                 imeiServicesData = updatedData; 
-                editorMessageElement.style.color = '#25d366';
-                editorMessageElement.textContent = '✅ ¡Cambios guardados y sincronizados con éxito!';
+                editorMessageElement.style.color = 'var(--status-success)';
+                editorMessageElement.textContent = `✅ ¡Cambios guardados y sincronizados con éxito! Total: ${imeiServicesData.length} servicios.`;
                 renderServiceEditor(); 
+                renderImeiServices(); // Sincroniza la vista de cliente para reflejar los cambios
             } else {
                 editorMessageElement.style.color = 'red';
             }
@@ -1184,6 +1239,7 @@
                 }
             }
             
+            // Si no hay ninguna sección visible, mostramos el home
             if (document.getElementById('imeiServiceSection')?.classList.contains('hidden') && 
                 document.getElementById('loginSection')?.classList.contains('hidden') &&
                 document.getElementById('adminSection')?.classList.contains('hidden') &&
@@ -1226,16 +1282,20 @@
                         if (loginSection) loginSection.classList.remove('hidden');
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                         if (loginMessage) {
-                            loginMessage.style.color = 'orange';
+                            loginMessage.style.color = 'var(--status-pending)';
                             loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
                         }
                     }
                     break;
                 case 'navAdminPanel':
                     if (isAdmin) {
+                        // Asegura que los servicios estén cargados antes de renderizar el editor.
                         await fetchServices();
-                        fetchAdminOrdersHistory(); // CAMBIO: Llama a cargar las órdenes al abrir el panel.
+                        
+                        // Carga de las órdenes y renderizado del editor
+                        fetchAdminOrdersHistory(); 
                         renderServiceEditor(); 
+                        if (adminSection) adminSection.classList.remove('hidden');
                     } else if (isLoggedIn) {
                          if (heroSection) heroSection.classList.remove('hidden'); 
                     } else {
@@ -1257,7 +1317,7 @@
                         if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
                         if (loginMessage) {
                             loginMessage.textContent = 'Inicia sesión para ver tu historial de pedidos.';
-                            loginMessage.style.color = 'orange';
+                            loginMessage.style.color = 'var(--status-pending)';
                         }
                     }
                     break;
@@ -1310,7 +1370,7 @@
                 if (loginMessage) loginMessage.textContent = `Error de inicio: ${msg}`;
             } else if (data.user) {
                 if (loginMessage) {
-                    loginMessage.style.color = '#25d366';
+                    loginMessage.style.color = 'var(--status-success)';
                     loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
                 }
                 
@@ -1361,8 +1421,8 @@
         }
 
         // --- Inicialización ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            
+        (async () => { // <--- CAMBIO CLAVE: Usando una IIFE asíncrona para iniciar inmediatamente
+
             // Arreglo para que el navegador recuerde la posición al recargar
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual'; 
@@ -1376,7 +1436,7 @@
                  return; 
             }
 
-            // Mapeo de Elementos DOM (Mantenido por brevedad)
+            // Mapeo de Elementos DOM 
             heroSection = document.getElementById('heroSection');
             mainDevicesImage = document.getElementById('mainDevicesImage');
             loginSection = document.getElementById('loginSection');
@@ -1389,6 +1449,7 @@
             adminOrderHistory = document.getElementById('adminOrderHistory'); 
             clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
             addServiceMessage = document.getElementById('addServiceMessage');
+            adminOrderHistoryMessage = document.getElementById('adminOrderHistoryMessage'); // Nuevo mensaje
 
             loginLogoutBtn = document.getElementById('loginLogoutBtn');
             loggedInUserName = document.getElementById('loggedInUserName');
@@ -1448,8 +1509,7 @@
                         hideAllSections();
                         if (heroSection) heroSection.classList.remove('hidden');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                        // Reemplazar alert() con un mensaje en la UI si fuera una app de producción
-                        alert(`Función para ${this.textContent} aún no implementada.`);
+                        displayAdminMessage(`La función para ${this.textContent} aún no está implementada.`, 'var(--status-pending)', 'loginMessage');
                     }
                 });
             });
@@ -1462,7 +1522,7 @@
                  // El listener llama a checkUser para actualizar la UI y la variable global
                  checkUser(session);
             });
-        });
+        })(); // <--- CIERRE DE LA IIFE
     </script>
 </body>
 </html>
