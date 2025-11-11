@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
-    <!-- Cargamos la librería Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -199,6 +198,11 @@
             color: white;
             font-size: 14px;
         }
+        /* Estilos específicos para los nuevos campos */
+        .modal-content input.required-field {
+            border: 1px solid #555;
+        }
+
         .modal-content button { 
             padding: 10px 20px;
             border: none;
@@ -262,7 +266,6 @@
 </head>
 <body>
 
-    <!-- CAMBIO: Barra superior de información vacía -->
     <div class="top-info-bar">
         <div class="info-group">
             </div>
@@ -301,9 +304,12 @@
             <div class="modal-content">
                 <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
                 
+                <input type="text" id="modalClientName" placeholder="Tu Nombre Completo" class="required-field" required>
+                <input type="text" id="modalWhatsapp" placeholder="Número de WhatsApp (Ej: +50377778888)" class="required-field" required>
+
                 <div class="modal-serial-input">
                     <p>Ingrese el SN/IMEI para este servicio:</p>
-                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" required>
+                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" class="required-field" required>
                 </div>
                 
                 <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
@@ -788,12 +794,17 @@
                 } else {
                     orderActionsHtml = `<span class="status-badge ${order.status.replace(/[^a-zA-Z0-9]/g, '')}">${order.status}</span>`;
                 }
+                
+                // Muestra Nombre de Cliente y WhatsApp en la vista de Admin (o para el cliente si se desea, lo dejé en solo Admin por defecto)
+                let extraDetails = isAdminView ? `<p><strong>Cliente:</strong> ${order.client_name || 'N/A'}</p><p><strong>WhatsApp:</strong> ${order.whatsapp || 'N/A'}</p>` : '';
+
 
                 card.innerHTML = `
                     <div class="order-details">
                         <p><strong>Servicio:</strong> ${order.service_name}</p>
                         <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
-                        ${isAdminView ? `<p><strong>Contacto:</strong> ${order.contact_email}</p>` : ''}
+                        ${extraDetails}
+                        ${isAdminView ? `<p><strong>Contacto Email:</strong> ${order.contact_email}</p>` : ''}
                         <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
                     </div>
                     <div class="order-actions">
@@ -962,6 +973,10 @@
             document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
             document.getElementById('modalEmail').value = user.email || '';
             document.getElementById('modalSerial').value = ''; 
+            // NUEVO: Limpiar campos de Nombre y WhatsApp
+            document.getElementById('modalClientName').value = '';
+            document.getElementById('modalWhatsapp').value = '';
+            
             document.getElementById('modalServiceId').value = service.id;
             if (document.getElementById('modalMessage')) document.getElementById('modalMessage').textContent = '';
             if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.remove('hidden');
@@ -970,6 +985,10 @@
         async function submitBypassOrder() {
             const sn = document.getElementById('modalSerial').value.trim();
             const email = document.getElementById('modalEmail').value.trim();
+            // NUEVO: Obtener Nombre y WhatsApp
+            const clientName = document.getElementById('modalClientName').value.trim();
+            const whatsapp = document.getElementById('modalWhatsapp').value.trim();
+            
             const serviceId = document.getElementById('modalServiceId').value;
             const service = imeiServicesData.find(s => s.id == serviceId);
             
@@ -985,10 +1004,11 @@
                 return;
             }
 
-            if (!sn || !email) {
+            // NUEVO: Validar todos los campos requeridos
+            if (!sn || !email || !clientName || !whatsapp) {
                 if (modalMessage) {
                     modalMessage.style.color = 'var(--red-error)';
-                    modalMessage.textContent = 'Complete el SN/IMEI y el Correo Electrónico.';
+                    modalMessage.textContent = 'Complete todos los campos (Nombre, WhatsApp, SN/IMEI, Email).';
                 }
                 return;
             }
@@ -1014,6 +1034,10 @@
                     device_name: sn, 
                     imei: sn, 
                     contact_email: email,
+                    // NUEVO: Insertar Nombre y WhatsApp
+                    client_name: clientName, 
+                    whatsapp: whatsapp,
+                    
                     status: 'Pendiente', 
                 }]);
 
