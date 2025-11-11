@@ -1,1695 +1,1675 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --dark-bg: #161a20; 
-            --header-bg: #11141a; 
-            --text-light: #ffffff;
-            --text-muted: #aaaaaa;
-            --accent-pink: #d9429c; 
-            --service-box-bg: #1c2025; 
-            --button-bg: #4a4a58; 
-            --whatsapp-green: #25d366; 
-            --card-border: #292d34;
-            --card-inner-bg: #1a1e25; 
-            --green-check: #00ff00; 
-            --red-error: #f44336;
-            --orange-pending: #ff9800;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --dark-bg: #161a20; 
+            --header-bg: #11141a; 
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --accent-pink: #d9429c; 
+            --service-box-bg: #1c2025; 
+            --button-bg: #4a4a58; 
+            --whatsapp-green: #25d366; 
+            --card-border: #292d34;
+            --card-inner-bg: #1a1e25; 
+            --green-check: #00ff00; 
+            --red-error: #f44336;
+            --orange-pending: #ff9800;
+        }
 
-        /* Estilos Globales */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
-        body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
-        a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
-        a:hover { color: var(--accent-pink); }
-        .top-info-bar { background-color: var(--header-bg); display: flex; justify-content: flex-end; align-items: center; padding: 8px 30px; font-size: 12px; border-bottom: 1px solid #292d34; }
-        .top-info-bar .info-group a { margin-left: 20px; padding: 5px 10px; border-radius: 3px; background-color: var(--button-bg); color: white; font-weight: bold; text-transform: uppercase; }
-        .top-info-bar .contact-info { color: var(--text-muted); margin-right: 20px; }
-        .main-nav { background-color: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; }
-        .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
-        .logo .klmz { color: #4dc2f2; }
-        .nav-links { display: flex; align-items: center; }
-        .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
-        .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
-        #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
-        .hero-section { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-end; 
-            padding: 60px 50px 0px 50px; 
-            min-height: 500px; 
-            height: 70vh; 
-            position: relative; 
-            overflow: hidden; 
-            background-size: cover; 
-            background-position: center bottom; 
-            background-color: var(--dark-bg);
-            background-image: none;
-        }
-        .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
-        .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
-        .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
-        .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
-        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
-        #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
-        .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
-        .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
-        .chat-buttons { position: fixed; bottom: 20px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
-        .chat-button { 
-            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
-        }
-        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
-        .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+        /* Estilos Globales */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+        body { background-color: var(--dark-bg); color: var(--text-light); font-size: 14px; }
+        a { color: var(--text-light); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-pink); }
+        .top-info-bar { background-color: var(--header-bg); display: flex; justify-content: flex-end; align-items: center; padding: 8px 30px; font-size: 12px; border-bottom: 1px solid #292d34; }
+        .top-info-bar .info-group a { margin-left: 20px; padding: 5px 10px; border-radius: 3px; background-color: var(--button-bg); color: white; font-weight: bold; text-transform: uppercase; }
+        .top-info-bar .contact-info { color: var(--text-muted); margin-right: 20px; }
+        .main-nav { background-color: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--text-light); }
+        .logo .klmz { color: #4dc2f2; }
+        .nav-links { display: flex; align-items: center; }
+        .nav-links > a, .nav-item { margin-left: 25px; font-weight: 500; padding: 10px 0; text-transform: uppercase; cursor: pointer; position: relative; } 
+        .nav-item::after { content: ' ▼'; font-size: 8px; margin-left: 5px; }
+        #loginLogoutBtn { background-color: #3b3b3b; padding: 5px 15px; border-radius: 5px; margin-left: 30px; border: 1px solid #454545; cursor: pointer; }
+        .hero-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            padding: 60px 50px 0px 50px; 
+            min-height: 500px; 
+            height: 70vh; 
+            position: relative; 
+            overflow: hidden; 
+            background-size: cover; 
+            background-position: center bottom; 
+            background-color: var(--dark-bg);
+            background-image: none;
+        }
+        .services-content { flex-basis: 40%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 80px; z-index: 10; }
+        .services-box { background-color: var(--service-box-bg); border-radius: 10px; padding: 25px 30px; margin-bottom: 30px; width: 90%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); border: 3px solid var(--accent-pink); border-radius: 50px / 10px; display: flex; flex-direction: column; align-items: flex-start; }
+        .services-title { background-color: #000; color: var(--text-light); font-size: 20px; font-weight: bold; padding: 10px 20px; margin-top: -45px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-left: -10px; border: 2px solid var(--accent-pink); }
+        .service-item { display: flex; align-items: center; margin-top: 20px; font-size: 16px; font-weight: bold; letter-spacing: 0.5px; }
+        .service-item::before { content: ''; font-size: 18px; color: var(--accent-pink); margin-right: 5px; }
+        #mainDevicesImage { position: absolute; bottom: 0; right: 0; width: 60%; max-width: 900px; height: auto; object-fit: contain; z-index: 1; }
+        .site-footer { background-color: #1a1e25; padding: 50px 30px 20px 30px; display: flex; flex-direction: column; border-top: 1px solid #292d34; }
+        .footer-bottom { border-top: 1px solid #292d34; padding-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
+        .chat-buttons { position: fixed; bottom: 20px; right: 20px; z-index: 101; display: flex; flex-direction: column; gap: 15px; }
+        .chat-button { 
+            width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); cursor: pointer; overflow: hidden; 
+        }
+        .chat-button.whatsapp { background-color: var(--whatsapp-green); text-decoration: none; border: none; }
+        .chat-button.whatsapp img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        .admin-section { max-width: 1000px; }
-        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
-        .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
-        .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
-        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5ps; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
-        .admin-options { text-align: left; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
-        .admin-options h4 { font-size: 20px; margin-bottom: 15px; color: var(--text-light); }
-        .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
-        .admin-options .form-container button { background-color: #4c4e97; }
-        .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
-        .hidden { display: none !important; }
+        .admin-section { max-width: 1000px; }
+        .admin-section, .login-section { background-color: #22252a; border-radius: 8px; padding: 30px; margin: 50px auto; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); text-align: center; }
+        .admin-section h3, .login-section h3 { margin-bottom: 25px; color: var(--text-light); font-size: 24px; }
+        .admin-section input, .login-section input { display: block; width: calc(100% - 20px); padding: 12px; margin: 15px auto; border-radius: 5px; border: 1px solid #444; background-color: #333; color: white; font-size: 16px; }
+        .admin-section button, .login-section button { background-color: var(--accent-pink); color: white; padding: 12px 25px; border: none; cursor: pointer; font-weight: bold; border-radius: 5ps; font-size: 16px; transition: background-color 0.2s; margin-top: 15px; }
+        .admin-options { text-align: left; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
+        .admin-options h4 { font-size: 20px; margin-bottom: 15px; color: var(--text-light); }
+        .admin-options .form-container { margin-top: 20px; background-color: #1c2025; padding: 20px; border-radius: 8px; }
+        .admin-options .form-container button { background-color: #4c4e97; }
+        .form-message { margin-top: 15px; font-size: 14px; color: yellow; }
+        .hidden { display: none !important; }
 
-        /* Estilo para el Dropdown de Poner Orden */
-        .dropdown-menu {
-            position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 350px; background-color: var(--header-bg); border: 1px solid #333; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); z-index: 20; padding: 10px 0; list-style: none; text-align: left; text-transform: none; 
-        }
-        .dropdown-menu li a { display: block; padding: 8px 15px; color: var(--text-light); font-weight: normal; }
-        .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
+        /* Estilo para el Dropdown de Poner Orden */
+        .dropdown-menu {
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%); min-width: 350px; background-color: var(--header-bg); border: 1px solid #333; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); z-index: 20; padding: 10px 0; list-style: none; text-align: left; text-transform: none; 
+        }
+        .dropdown-menu li a { display: block; padding: 8px 15px; color: var(--text-light); font-weight: normal; }
+        .dropdown-menu li a:hover { background-color: #22252a; color: var(--accent-pink); }
 
-        /* --- ESTILOS DE SECCIONES INTERNAS --- */
-        #imeiServiceSection, #boxDongleServiceSection, #digitalRentServiceSection, #clientOrderHistorySection { padding: 40px 50px; background-color: var(--dark-bg); }
-        #imeiServiceSection h2, #boxDongleServiceSection h2, #digitalRentServiceSection h2, #clientOrderHistorySection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
-        .service-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
-            gap: 20px; 
-        }
-        .service-card { cursor: pointer; background-color: var(--card-inner-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 5px; line-height: 1.4; display: flex; justify-content: space-between; align-items: flex-start; }
-        .service-card .new-tag { color: var(--accent-pink); font-size: 11px; font-weight: bold; margin-left: 10px; }
-        .card-details { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: none; font-weight: bold; }
-        .card-footer .price { font-size: 14px; color: #ff9800; }
-        .card-footer .time { font-size: 14px; color: #ff9800; }
-        .card-icon-check { color: var(--green-check); font-size: 1.2em; margin-left: 5px; }
+        /* --- ESTILOS DE SECCIONES INTERNAS --- */
+        #imeiServiceSection, #boxDongleServiceSection, #digitalRentServiceSection, #clientOrderHistorySection { padding: 40px 50px; background-color: var(--dark-bg); }
+        #imeiServiceSection h2, #boxDongleServiceSection h2, #digitalRentServiceSection h2, #clientOrderHistorySection h2 { margin-bottom: 30px; color: var(--accent-pink); font-size: 28px; border-bottom: 2px solid var(--card-border); padding-bottom: 10px; }
+        .service-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 20px; 
+        }
+        .service-card { cursor: pointer; background-color: var(--card-inner-bg); border: 1px solid #333; border-radius: 8px; padding: 15px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .service-card h3 { font-size: 16px; color: var(--text-light); margin-bottom: 5px; line-height: 1.4; display: flex; justify-content: space-between; align-items: flex-start; }
+        .service-card .new-tag { color: var(--accent-pink); font-size: 11px; font-weight: bold; margin-left: 10px; }
+        .card-details { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: none; font-weight: bold; }
+        .card-footer .price { font-size: 14px; color: #ff9800; }
+        .card-footer .time { font-size: 14px; color: #ff9800; }
+        .card-icon-check { color: var(--green-check); font-size: 1.2em; margin-left: 5px; }
 
-        /* Estilos del Editor de Servicios */
-        .service-editor-list { list-style: none; padding: 0; }
-        .service-editor-list li { 
-            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; 
-        }
-        .service-editor-list li input { display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; font-size: 12px; }
-        .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; flex-shrink: 0; }
-        .service-editor-list li .input-group p { font-size: 10px; color: #aaa; margin-bottom: 2px; }
-        .service-editor-list li .full-name-input { width: 95%; } 
-        .service-editor-list li .service-editor-actions { margin-left: auto; }
-        .service-editor-list button { background-color: var(--red-error); font-size: 12px; padding: 5px 10px; margin-top: 5px; }
-        
-        /* Estilos para el Historial de Pedidos */
-        .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
-        .order-card { 
-            background-color: #1a1e25; 
-            padding: 15px; 
-            border-left: 5px solid gray; 
-            border-radius: 4px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            transition: all 0.3s ease-in-out;
-        }
+        /* Estilos del Editor de Servicios */
+        .service-editor-list { list-style: none; padding: 0; }
+        .service-editor-list li { 
+            background-color: #1c2025; border: 1px solid #333; margin-bottom: 10px; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; 
+        }
+        .service-editor-list li input { display: block; margin: 5px 0; background-color: #2e353f; border: 1px solid #444; padding: 4px; border-radius: 3px; color: white; font-size: 12px; }
+        .service-editor-list li .input-group { display: flex; flex-direction: column; margin-right: 10px; flex-shrink: 0; }
+        .service-editor-list li .input-group p { font-size: 10px; color: #aaa; margin-bottom: 2px; }
+        .service-editor-list li .full-name-input { width: 95%; } 
+        .service-editor-list li .service-editor-actions { margin-left: auto; }
+        .service-editor-list button { background-color: var(--red-error); font-size: 12px; padding: 5px 10px; margin-top: 5px; }
+        
+        /* Estilos para el Historial de Pedidos */
+        .order-history-grid { display: grid; gap: 15px; grid-template-columns: 1fr; }
+        .order-card { 
+            background-color: #1a1e25; 
+            padding: 15px; 
+            border-left: 5px solid gray; 
+            border-radius: 4px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.3s ease-in-out;
+        }
 
-        /* Colores de Estado de Pedidos */
-        .order-card.Exitoso { 
-            border-left-color: var(--whatsapp-green); 
-            box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); 
-            background-color: #1a251f;
-        }
-        .order-card.Pendiente { 
-            border-left-color: var(--orange-pending); 
-            box-shadow: 0 0 10px rgba(255, 152, 0, 0.2); 
-            background-color: #25231a;
-        }
-        .order-card.Rechazado { 
-            border-left-color: var(--red-error); 
-            box-shadow: 0 0 10px rgba(244, 67, 54, 0.2); 
-            background-color: #251a1a;
-        }
-        
-        .order-details p { margin: 2px 0; }
-        .order-actions { text-align: right; }
-        /* FIX: Asegurar que el select llama a la función global */
-        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
-        .order-actions .admin-order-buttons { display: flex; flex-direction: column; align-items: flex-end; }
-        .order-actions .admin-order-buttons button { margin-top: 5px; background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        /* Colores de Estado de Pedidos */
+        .order-card.Exitoso { 
+            border-left-color: var(--whatsapp-green); 
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); 
+            background-color: #1a251f;
+        }
+        .order-card.Pendiente { 
+            border-left-color: var(--orange-pending); 
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.2); 
+            background-color: #25231a;
+        }
+        .order-card.Rechazado { 
+            border-left-color: var(--red-error); 
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.2); 
+            background-color: #251a1a;
+        }
+        
+        .order-details p { margin: 2px 0; }
+        .order-actions { text-align: right; }
+        /* FIX: Asegurar que el select llama a la función global */
+        .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
+        .order-actions .admin-order-buttons { display: flex; flex-direction: column; align-items: flex-end; }
+        .order-actions .admin-order-buttons button { margin-top: 5px; background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
 
-        /* Estilo del Badge de Estado */
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 5px;
-        }
+        /* Estilo del Badge de Estado */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
 
-        .status-badge.Exitoso { background-color: var(--whatsapp-green); color: black; }
-        .status-badge.Pendiente { background-color: var(--orange-pending); color: black; }
-        .status-badge.Rechazado { background-color: var(--red-error); color: white; }
+        .status-badge.Exitoso { background-color: var(--whatsapp-green); color: black; }
+        .status-badge.Pendiente { background-color: var(--orange-pending); color: black; }
+        .status-badge.Rechazado { background-color: var(--red-error); color: white; }
 
 
-        /* Modal Styles - Mejorado */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { 
-            background: linear-gradient(145deg, #1c2025, #22252a);
-            padding: 40px; 
-            border-radius: 12px; 
-            max-width: 450px; 
-            width: 90%; 
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--card-border);
-        }
-        .modal-content h3 { 
-            color: var(--accent-pink); 
-            margin-bottom: 25px; 
-            font-size: 22px;
-            text-transform: uppercase;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-        }
-        .modal-content input { 
-            margin-bottom: 15px; 
-            width: 100%;
-            background-color: #2e353f;
-            border: 1px solid #444;
-            padding: 10px;
-            border-radius: 6px;
-            color: white;
-            font-size: 14px;
-        }
-        /* Estilos específicos para los campos requeridos en el modal */
-        .modal-content input.required-field {
-            border: 1px solid #555;
-        }
+        /* Modal Styles - Mejorado */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { 
+            background: linear-gradient(145deg, #1c2025, #22252a);
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 450px; 
+            width: 90%; 
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--card-border);
+        }
+        .modal-content h3 { 
+            color: var(--accent-pink); 
+            margin-bottom: 25px; 
+            font-size: 22px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .modal-content input { 
+            margin-bottom: 15px; 
+            width: 100%;
+            background-color: #2e353f;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+        }
+        /* Estilos específicos para los campos requeridos en el modal */
+        .modal-content input.required-field {
+            border: 1px solid #555;
+        }
 
-        .modal-content button { 
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 6px;
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        .modal-content button:active { transform: scale(0.98); }
-        .modal-content #submitModalOrder { background-color: var(--whatsapp-green); color: black; }
-        .modal-content #closeModal { background-color: #4a4a58; color: white; }
-        .modal-footer-actions { margin-top: 20px; display: flex; justify-content: space-around; }
-        .modal-serial-input { 
-            margin-top: 20px;
-            background-color: #161a20;
-            border-radius: 8px;
-            padding: 10px;
-            border: 1px solid #4a4a58;
-        }
-        .modal-serial-input p { font-size: 12px; color: var(--text-muted); margin-bottom: 5px;}
-        
-        /* Estilo para el nuevo formulario de añadir servicio */
-        #newServiceForm {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        #newServiceForm input {
-            width: 100%;
-            margin: 0;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        #newServiceForm label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: left;
-        }
-        #newServiceForm .full-width {
-            grid-column: span 2;
-        }
-        #addServiceButton {
-            grid-column: span 2;
-            background-color: var(--whatsapp-green) !important;
-            color: black !important;
-        }
+        .modal-content button { 
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .modal-content button:active { transform: scale(0.98); }
+        .modal-content #submitModalOrder { background-color: var(--whatsapp-green); color: black; }
+        .modal-content #closeModal { background-color: #4a4a58; color: white; }
+        .modal-footer-actions { margin-top: 20px; display: flex; justify-content: space-around; }
+        .modal-serial-input { 
+            margin-top: 20px;
+            background-color: #161a20;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #4a4a58;
+        }
+        .modal-serial-input p { font-size: 12px; color: var(--text-muted); margin-bottom: 5px;}
+        
+        /* Estilo para el nuevo formulario de añadir servicio */
+        #newServiceForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #newServiceForm input {
+            width: 100%;
+            margin: 0;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        #newServiceForm label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: left;
+        }
+        #newServiceForm .full-width {
+            grid-column: span 2;
+        }
+        #addServiceButton {
+            grid-column: span 2;
+            background-color: var(--whatsapp-green) !important;
+            color: black !important;
+        }
 
-        /* Estilo para el mensaje de administración */
-        #adminOrderHistoryMessage { 
-            text-align: left; 
-            padding: 10px; 
-            background-color: #2e353f;
-            border-left: 3px solid var(--accent-pink);
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-    </style>
+        /* Estilo para el mensaje de administración */
+        #adminOrderHistoryMessage { 
+            text-align: left; 
+            padding: 10px; 
+            background-color: #2e353f;
+            border-left: 3px solid var(--accent-pink);
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="top-info-bar">
-        <div class="info-group">
-            </div>
-    </div>
-
-    <nav class="main-nav">
-        <div class="logo">
-            <span class="klmz">KLMZ</span> UNLOCKER
-        </div>
-        
-        <div class="nav-links">
-            <div class="nav-item" id="navAreaCliente">Area del Cliente</div>
-            
-            <div class="nav-item" id="navPongaOrden">
-                Ponga la orden
-                <div class="dropdown-menu hidden" id="pongaOrdenMenu">
-                    <ul>
-                        <li><a href="#" class="order-type-link" data-service-type="imei">IMEI Service</a></li> 
-                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Box/Dongle/Tool/Credit - Activation</a></li>
-                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Digital Tool Rent & Remote Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
-
-            <div class="nav-item hidden" id="navAdminPanel">Panel de Administración</div>
-            
-            <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
-            <a href="#" id="loginLogoutBtn">Login / Register</a>
-        </div>
-    </nav>
-
-    <main>
-        <div class="modal hidden" id="orderModal">
-            <div class="modal-content">
-                <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
-                
-                <input type="text" id="modalClientName" placeholder="Tu Nombre Completo" class="required-field" required>
-                <input type="text" id="modalWhatsapp" placeholder="Número de WhatsApp (Ej: +50377778888)" class="required-field" required>
-
-                <div class="modal-serial-input">
-                    <p>Ingrese el SN/IMEI para este servicio:</p>
-                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" class="required-field" required>
-                </div>
-                
-                <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
-                <input type="hidden" id="modalServiceId">
-                <input type="hidden" id="modalServiceType"> <div class="modal-footer-actions">
-                    <button id="submitModalOrder">Confirmar Pedido</button>
-                    <button id="closeModal">Cancelar</button>
-                </div>
-                <p id="modalMessage" class="form-message"></p>
-            </div>
-        </div>
-
-        <section class="hidden" id="imeiServiceSection">
-            <h2>IMEI Service</h2>
-            <div id="imeiServiceGridContainer" class="service-grid">
-                <p id="loadingMessageIMEI">Cargando servicios...</p>
-            </div>
-        </section>
-
-        <section class="hidden" id="boxDongleServiceSection">
-            <h2>Box/Dongle/Tool/Credit - Activation</h2>
-            <div id="boxDongleServiceGridContainer" class="service-grid">
-                <p id="loadingMessageBoxDongle">Cargando servicios...</p>
-            </div>
-        </section>
-
-        <section class="hidden" id="digitalRentServiceSection">
-            <h2>Digital Tool Rent & Remote Service</h2>
-            <div id="digitalRentServiceGridContainer" class="service-grid">
-                <p id="loadingMessageDigitalRent">Cargando servicios...</p>
-            </div>
-        </section>
-        <section class="hidden" id="clientOrderHistorySection">
-            <h2>📜 Mi Historial de Pedidos</h2>
-            <div id="clientOrderHistoryContainer" class="order-history-grid">
-                <p>Cargando sus pedidos...</p>
-            </div>
-        </section>
-
-        <section class="hero-section" id="heroSection">
-            <div class="services-content">
-                <div class="services-box">
-                    <div class="services-title">IPHONE SERVICES</div>
-                    <div class="service-item">IPHONE CARRIER UNLOCK</div>
-                    <div class="service-item">IPHONE ICLOUD UNLOCK</div>
-                    <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
-                    <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
-            </div>
-            </div>
-
-            <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
-        </section>
-
-        <section class="login-section hidden" id="loginSection">
-            <h3>Iniciar Sesión / Registrarse</h3>
-            <input type="email" id="loginEmail" placeholder="Email">
-            <input type="password" id="loginPassword" placeholder="Contraseña">
-            <button id="signInButton">Iniciar Sesión</button>
-            <button id="signUpButton">Registrarse</button>
-            <p id="loginMessage" class="form-message" style="color: red;"></p>
-        </section>
-
-        <section class="admin-section hidden" id="adminSection">
-            <h3>Panel de Administración</h3>
-            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold; color: yellow;">Admin</span>! (klmzr230@gmail.com)</p>
-
-            <div class="admin-options">
-                <h4>Gestión de Órdenes</h4>
-                <div class="form-container">
-                    <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
-                    <div id="adminOrderHistoryMessage"></div>
-                    <div id="adminOrderHistory" class="order-history-grid">
-                        <p>Cargando pedidos...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-options" style="margin-top: 30px;">
-                <h4>⚙️ Editar Tarjetas de Servicios</h4>
-                <div class="form-container">
-                    <h4 style="color: var(--accent-pink);">Seleccionar Categoría a Editar:</h4>
-                    <select id="serviceCategorySelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: #333; color: white; border-radius: 4px;">
-                        <option value="imei">IMEI Service</option>
-                        <option value="box-dongle">Box/Dongle/Tool/Credit - Activation</option>
-                        <option value="digital-rent">Digital Tool Rent & Remote Service</option>
-                    </select>
-                    
-                    <p id="editorMessage" class="form-message"></p>
-
-                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px; color: #25d366;">➕ Añadir Nuevo Servicio Rápido</h4>
-                    <form id="newServiceForm">
-                        <div class="full-width">
-                            <label for="newServiceName">Nombre Completo del Servicio:</label>
-                            <input type="text" id="newServiceName" placeholder="Ej: FRPFILE A12+ Bypass iPhone XR To 17ProMax (Windows Tool) OFFER ✅" required>
-                        </div>
-                        <div>
-                            <label for="newServicePrice">Precio (Ej: $5.00):</label>
-                            <input type="text" id="newServicePrice" placeholder="$5" required>
-                        </div>
-                        <div>
-                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 days):</label>
-                            <input type="text" id="newServiceTime" placeholder="Miniutes" required>
-                        </div>
-                        <div class="full-width">
-                            <label for="newServiceCategory">Sub-Categoría (Ej: Hello A12+ iCloud Bypass Windows Tool):</label>
-                            <input type="text" id="newServiceCategory" placeholder="Categoría del servicio" required>
-                        </div>
-                        <button type="submit" id="addServiceButton">Añadir Servicio a <span id="currentCategoryAddBtn">IMEI Service</span></button>
-                    </form>
-                    <p id="addServiceMessage" class="form-message"></p>
-
-                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px;">Lista de Edición</h4>
-                    <ul id="serviceEditorList" class="service-editor-list">
-                    </ul>
-
-                    <button id="saveServiceChanges" style="background-color: #4c4e97; margin-top: 15px;">Guardar Cambios y Sincronizar</button>
-                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
-                        🚨 Eliminar TODOS los Servicios de la Categoría Activa
-                    </button>
-                </div>
-            </div>
-
-            <div class="admin-options" style="margin-top: 30px;">
-                <h4>Gestión de Imágenes (Solo Admin)</h4>
-                <div class="form-container">
-                    <h3>📸 Subir Imagen de Fondo (Hero)</h3>
-                    <input type="file" id="backgroundImageFile" accept="image/*">
-                    <button id="uploadBackgroundButton">Subir Fondo</button>
-                    <p id="backgroundResponseMessage" class="form-message"></p>
-                    <button id="clearBackgroundButton" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
-                </div>
-                    <div class="form-container" style="margin-top: 20px;">
-                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
-                    <input type="file" id="devicesImageFile" accept="image/*">
-                    <button id="uploadDevicesButton">Subir Imagen de Dispositivos</button>
-                    <p id="devicesImageResponseMessage" class="form-message"></p>
-                    <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
-                </div>
-            </div>
-
-        </section>
-    </main>
-    
-    <footer class="site-footer">
-        <div class="footer-bottom">
-            &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
-        </div>
-    </footer>
-    
-    <div class="chat-buttons">
-        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 689957466">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Icon">
-        </a>
-    </div>
-
-    <script>
-        // 🔑 TUS CLAVES SUPABASE (INSERTADAS)
-        const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
-        const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
-        
-        // DECLARACIONES GLOBALES
-        let supabase;
-        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, boxDongleServiceSection, digitalRentServiceSection, clientOrderHistorySection; 
-        let loginLogoutBtn;
-        let loggedInUserName, adminNameDisplay;
-        let backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
-        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
-
-        const BACKGROUND_BUCKET_NAME = 'background-images'; 
-        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
-        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_13_Pro.png/300px-IPhone_13_Pro.png'; 
-        const BACKGROUND_FILE_PATH = 'hero_background.jpg';
-        const DEVICES_FILE_PATH = 'main_devices.png';
-        
-        // IDs para las 3 categorías de servicio en la tabla 'store_services'
-        const SERVICE_TYPES = {
-            'imei': { id: 1, title: 'IMEI Service' },
-            'box-dongle': { id: 2, title: 'Box/Dongle/Tool/Credit - Activation' },
-            'digital-rent': { id: 3, title: 'Digital Tool Rent & Remote Service' }
-        };
-
-        // Almacenamiento local de datos: Object para las 3 listas
-        let serviceDataStore = {
-            'imei': [],
-            'box-dongle': [],
-            'digital-rent': []
-        };
-
-        // Variable para rastrear qué categoría se está editando
-        let currentEditingCategory = 'imei'; 
-
-        // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
-        let currentUser = null; 
-
-        // --- FUNCIONES DE MENSAJERÍA ---
-
-        function displayAdminMessage(message, color = 'var(--red-error)', isError = true) {
-            const container = document.getElementById('adminOrderHistoryMessage');
-            if (container) {
-                container.style.color = color;
-                container.style.borderColor = color;
-                container.innerHTML = `<p>${isError ? '❌ ERROR RLS/API: ' : '✅ INFORMACIÓN: '}${message}</p>`;
-                if (!isError) {
-                    // Mantener mensajes informativos (no error) visibles por 5 segundos
-                    setTimeout(() => {
-                        if (container.innerHTML.includes(message)) {
-                             container.innerHTML = '';
-                             container.style.borderColor = 'var(--accent-pink)';
-                        }
-                    }, 5000);
-                }
-            } else {
-                console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
-            }
-        }
-
-        // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
-        
-        async function getPublicUrl(bucketName, filePath, fallbackUrl) {
-            if (!supabase) return fallbackUrl;
-
-            // 1. Obtener la URL pública de Supabase
-            const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-            let url = data?.publicUrl;
-            
-            if (!url) return fallbackUrl;
-
-            // 2. Add Cache-Buster to force browser to load new version after upsert/update
-            try {
-                const parsedUrl = new URL(url);
-                const cacheBuster = Date.now();
-                parsedUrl.searchParams.set('v', cacheBuster);
-                url = parsedUrl.toString();
-
-            } catch (e) {
-                const cacheBuster = Date.now();
-                const separator = url.includes('?') ? '&' : '?';
-                url = `${url}${separator}v=${cacheBuster}`;
-            }
-
-            return url;
-        }
-
-        async function loadImages() {
-            // 1. Cargar Imagen de Fondo (Se aplica al CSS background-image)
-            const bgUrl = await getPublicUrl(
-                BACKGROUND_BUCKET_NAME, 
-                BACKGROUND_FILE_PATH, 
-                null 
-            );
-
-            // 2. Aplicar el fondo a la sección hero
-            if (bgUrl && heroSection) {
-                heroSection.style.backgroundImage = `url('${bgUrl}')`;
-                heroSection.style.backgroundColor = 'transparent'; 
-                heroSection.style.backgroundSize = 'cover';
-                heroSection.style.backgroundPosition = 'center bottom';
-
-            } else if (heroSection) {
-                heroSection.style.backgroundImage = 'none';
-                heroSection.style.backgroundColor = 'var(--dark-bg)'; // Color definido en CSS :root
-            }
-
-            // 3. Cargar Imagen de Dispositivos (Se aplica al <img> src)
-            const devicesUrl = await getPublicUrl(
-                DEVICES_IMAGE_BUCKET_NAME, 
-                DEVICES_FILE_PATH, 
-                DEFAULT_DEVICES_IMAGE_URL
-            );
-            if (mainDevicesImage) {
-                mainDevicesImage.src = devicesUrl;
-            }
-        }
-        
-        // Funciones de subir y limpiar imagen (no se modifican)
-        async function uploadImage(fileInputId, bucketName, filePath, responseElementId) { 
-            const fileInput = document.getElementById(fileInputId);
-            const messageElement = document.getElementById(responseElementId);
-
-            if (!messageElement) { return; } 
-
-            const file = fileInput.files[0];
-
-            if (!file) {
-                messageElement.style.color = 'var(--red-error)';
-                messageElement.textContent = 'Seleccione un archivo primero.';
-                return;
-            }
-
-            messageElement.style.color = 'yellow';
-            messageElement.textContent = 'Subiendo imagen...';
-
-            const { error: uploadError } = await supabase.storage
-                .from(bucketName)
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: true 
-                });
-
-            if (uploadError) {
-                messageElement.style.color = 'var(--red-error)';
-                if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
-                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
-                } else {
-                    messageElement.textContent = `Error al subir: ${uploadError.message}`;
-                }
-                console.error('Error al subir imagen:', uploadError);
-                return;
-            }
-
-            messageElement.style.color = 'var(--whatsapp-green)';
-            messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
-            await loadImages();
-        }
-        async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
-             const messageElement = document.getElementById(responseElementId);
-            
-            if (!messageElement) { return; } 
-            
-            messageElement.style.color = 'yellow';
-            messageElement.textContent = 'Eliminando imagen...';
-
-            const { error: deleteError } = await supabase.storage
-                .from(bucketName)
-                .remove([filePath]);
-
-            if (deleteError && deleteError.statusCode !== '404') {
-                messageElement.style.color = 'var(--red-error)';
-                if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
-                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
-                } else {
-                    messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
-                }
-                console.error('Error al eliminar imagen:', deleteError);
-                return;
-            }
-            
-            messageElement.style.color = 'var(--whatsapp-green)';
-            messageElement.textContent = isBackground 
-                ? 'Fondo de imagen eliminado y restaurado.' 
-                : 'Imagen de dispositivos restaurada por defecto.';
-            await loadImages();
-        }
-        async function handleUploadBackground() { await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage'); }
-        async function handleClearBackground() { await clearImage(BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true); }
-        async function handleUploadDevices() { await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage'); }
-        async function handleClearDevices() { await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false); }
-
-
-        // --- SINCRONIZACIÓN DE SERVICIOS (MEJORADA PARA 3 CATEGORÍAS) ---
-
-        async function fetchServices() {
-            const loadingMessageIMEI = document.getElementById('loadingMessageIMEI');
-            if (loadingMessageIMEI) loadingMessageIMEI.textContent = 'Cargando servicios de todas las categorías...';
-            
-            // Cargar los 3 records (ID 1, 2, 3)
-            const idsToFetch = Object.values(SERVICE_TYPES).map(type => type.id);
-
-            const { data, error } = await supabase
-                .from('store_services') 
-                .select('id, service_data')
-                .in('id', idsToFetch);
-
-            if (error) { 
-                console.error("Error al cargar servicios de Supabase:", error);
-                if (loadingMessageIMEI) {
-                    loadingMessageIMEI.style.color = 'var(--red-error)';
-                    loadingMessageIMEI.textContent = `ERROR DE ACCESO: Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
-                }
-                return false;
-            }
-            
-            let loadedCount = 0;
-            let missingRecords = [];
-
-            // Mapear los datos cargados al serviceDataStore
-            Object.keys(SERVICE_TYPES).forEach(key => {
-                const serviceType = SERVICE_TYPES[key];
-                const record = data.find(r => r.id === serviceType.id);
-                
-                if (record && record.service_data) {
-                    serviceDataStore[key] = record.service_data;
-                    loadedCount += record.service_data.length;
-                } else {
-                    serviceDataStore[key] = [];
-                    missingRecords.push(serviceType.title);
-                }
-            });
-
-            if (missingRecords.length > 0) {
-                 // Si faltan records, intentamos crearlos (solo si es Admin, pero se hace con ANON key por ahora)
-                 console.warn(`Registros de servicios faltantes (${missingRecords.join(', ')}). Inicializando...`);
-                 await initializeMissingRecords(missingRecords);
-            }
-
-
-            if (loadingMessageIMEI) {
-                loadingMessageIMEI.textContent = `✅ ${loadedCount} servicios cargados correctamente.`;
-            }
-            return true;
-        }
-
-        async function initializeMissingRecords(missingTitles) {
-             const updates = [];
-             Object.keys(SERVICE_TYPES).forEach(key => {
-                 if (missingTitles.some(title => title === SERVICE_TYPES[key].title)) {
-                     updates.push({
-                         id: SERVICE_TYPES[key].id,
-                         service_data: [] // Crea un array vacío
-                     });
-                 }
-             });
-
-             if (updates.length > 0) {
-                 const { error } = await supabase
-                     .from('store_services')
-                     .upsert(updates, { onConflict: 'id' });
-
-                 if (error) {
-                     console.error("Error al inicializar records faltantes:", error);
-                     displayAdminMessage(`Error al inicializar records (${missingTitles.join(', ')}). Verifique RLS de INSERT/UPDATE.`, 'var(--red-error)', true);
-                     return false;
-                 }
-                 console.log(`Registros inicializados para: ${missingTitles.join(', ')}`);
-                 return true;
-             }
-             return false;
-        }
-
-        
-        async function updateServiceInSupabase(dataToSave, categoryKey) {
-            const editorMessageElement = document.getElementById('editorMessage') || document.getElementById('addServiceMessage') || document.getElementById('loadingMessageIMEI');
-            
-            if (!editorMessageElement) {
-                console.error("Error: Elemento de mensaje de sincronización no encontrado.");
-                return false;
-            }
-
-            const recordId = SERVICE_TYPES[categoryKey].id;
-
-            editorMessageElement.style.color = 'yellow';
-            editorMessageElement.textContent = `Guardando cambios en la categoría ${SERVICE_TYPES[categoryKey].title}...`;
-
-            const { error } = await supabase
-                .from('store_services')
-                .upsert([
-                    {
-                        id: recordId,
-                        service_data: dataToSave
-                    }
-                ], { onConflict: 'id' });
-
-            if (error) {
-                console.error(`Error al guardar servicios (${categoryKey}) en Supabase:`, error);
-                editorMessageElement.style.color = 'var(--red-error)';
-                editorMessageElement.textContent = `Error al guardar: ${error.message}. Verifique la política RLS (UPDATE/INSERT para admin) en 'store_services'.`;
-                return false;
-            }
-            return true;
-        }
-
-
-        // --- FUNCIONES DE LA APLICACIÓN (GLOBAL) ---
-
-        function hideAllSections() {
-            if (heroSection) heroSection.classList.add('hidden');
-            if (loginSection) loginSection.classList.add('hidden');
-            if (adminSection) adminSection.classList.add('hidden');
-            if (clientOrderHistorySection) clientOrderHistorySection.classList.add('hidden');
-            
-            // Ocultar todas las secciones de servicios
-            if (imeiServiceSection) imeiServiceSection.classList.add('hidden');
-            if (boxDongleServiceSection) boxDongleServiceSection.classList.add('hidden');
-            if (digitalRentServiceSection) digitalRentServiceSection.classList.add('hidden');
-        }
-
-        /**
-         * Función genérica para renderizar servicios en una sección específica.
-         * @param {string} categoryKey - 'imei', 'box-dongle', o 'digital-rent'.
-         */
-        function renderServices(categoryKey) {
-            const data = serviceDataStore[categoryKey] || [];
-            // Las IDs de los contenedores son diferentes
-            const containerId = `${categoryKey.replace(/-/g, '')}ServiceGridContainer`;
-            const section = document.getElementById(`${categoryKey.replace(/-/g, '')}ServiceSection`);
-            
-            const container = document.getElementById(containerId);
-            
-            if (!container || !section) {
-                 console.error(`Error al renderizar: Contenedor (${containerId}) o Sección no encontrados.`);
-                 return;
-            }
-
-            container.innerHTML = ''; 
-            
-            if (data.length === 0) {
-                container.innerHTML = `<p style="color:orange;">No hay servicios cargados para ${SERVICE_TYPES[categoryKey].title}. Si eres administrador, usa el Panel para agregar tarjetas.</p>`;
-            } else {
-                data.forEach(service => {
-                    const card = document.createElement('div');
-                    card.className = 'service-card';
-                    card.dataset.serviceId = service.id; 
-                    card.dataset.serviceType = categoryKey; // Importante para el modal
-                    
-                    const isNew = service.name.toLowerCase().includes('nuevo');
-                    
-                    card.innerHTML = `
-                        <h3>
-                            ${service.name.replace('Nuevo', '').trim()}
-                            ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
-                            <span class="card-icon-check">✅</span>
-                        </h3>
-                        <div class="card-details">
-                            Categoría: <strong>${service.category}</strong>
-                        </div>
-                        <div class="card-footer">
-                            <span class="price">${service.price}</span>
-                            <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-            
-            // Asegurar que solo los cards de esta sección tengan el listener
-            document.querySelectorAll(`#${containerId} .service-card`).forEach(card => {
-                // Eliminar cualquier listener previo para evitar duplicados
-                card.removeEventListener('click', openOrderModal); 
-                card.addEventListener('click', openOrderModal);
-            });
-
-            hideAllSections();
-            section.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-
-        function displayOrders(containerElement, orders, isAdminView = false) {
-             containerElement.innerHTML = '';
-
-            if (orders.length === 0) {
-                containerElement.innerHTML = '<p>No hay pedidos registrados en su historial.</p>';
-                return;
-            }
-
-            orders.forEach(order => {
-                const card = document.createElement('div');
-                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
-                card.dataset.orderId = order.id;
-
-                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
-                
-                let orderActionsHtml = '';
-                if (isAdminView) {
-                    // FIX: El select llama a la función global window.updateOrderStatus
-                    orderActionsHtml = `
-                        <select onchange="window.updateOrderStatus(${order.id}, this.value)"> 
-                            ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
-                        </select>
-                        <div class="admin-order-buttons">
-                            <button onclick="window.deleteOrder(${order.id})">Eliminar</button>
-                        </div>
-                    `;
-                } else {
-                    orderActionsHtml = `<span class="status-badge ${order.status.replace(/[^a-zA-Z0-9]/g, '')}">${order.status}</span>`;
-                }
-                
-                let extraDetails = isAdminView ? `<p><strong>Cliente:</strong> ${order.client_name || 'N/A'}</p><p><strong>WhatsApp:</strong> ${order.whatsapp || 'N/A'}</p>` : '';
-
-
-                card.innerHTML = `
-                    <div class="order-details">
-                        <p><strong>Servicio:</strong> ${order.service_name}</p>
-                        <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
-                        ${extraDetails}
-                        ${isAdminView ? `<p><strong>Contacto Email:</strong> ${order.contact_email}</p>` : ''}
-                        <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
-                    </div>
-                    <div class="order-actions">
-                        ${orderActionsHtml}
-                    </div>
-                `;
-                containerElement.appendChild(card);
-            });
-        }
-
-        // Funciones de historial (se dejan en el script para completar)
-        async function fetchAdminOrdersHistory() {
-             const container = document.getElementById('adminOrderHistory');
-            if (!container) return;
-            
-            displayAdminMessage('Cargando historial de todos los pedidos...', 'yellow', false);
-
-            const { data: orders, error } = await supabase
-                .from('orders')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                displayAdminMessage(`❌ Error al cargar pedidos del Admin: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado para ver todos los pedidos (auth.email() = '${ADMIN_EMAIL}').`, 'var(--red-error)', true);
-                console.error("RLS/API Error al cargar pedidos del Admin:", error);
-                container.innerHTML = '<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error de RLS arriba.</p>';
-                return;
-            }
-            displayAdminMessage(`✅ ${orders.length} pedidos cargados.`, 'var(--whatsapp-green)', false);
-            displayOrders(container, orders, true);
-        }
-        async function fetchClientOrdersHistory() {
-             const container = document.getElementById('clientOrderHistoryContainer');
-            if (!container) return;
-            
-            container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
-
-            if (!currentUser) {
-                container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
-                return;
-            }
-            const userId = currentUser.id;
-
-            const { data: orders, error } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('user_id', userId) 
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                container.innerHTML = `<p style="color:red;">Error al cargar su historial: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado en 'orders' permitiendo ver solo sus propios pedidos (user_id = auth.uid()).</p>`;
-                return;
-            }
-
-            displayOrders(container, orders, false);
-
-            hideAllSections();
-            if (clientOrderHistorySection) clientOrderHistorySection.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        window.updateOrderStatus = async function(orderId, newStatus) {
-             displayAdminMessage(`Actualizando pedido #${orderId} a ${newStatus}...`, 'yellow', false);
-
-            const { error } = await supabase
-                .from('orders')
-                .update({ status: newStatus })
-                .eq('id', orderId);
-
-            if (error) {
-                displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
-            } else {
-                displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
-                fetchAdminOrdersHistory(); 
-            }
-        }
-        window.executeDeleteOrder = async function(orderId) {
-             displayAdminMessage(`Eliminando pedido #${orderId} permanentemente...`, 'yellow', false);
-            
-            const msgEl = document.getElementById('adminOrderHistoryMessage');
-            if (msgEl) {
-                msgEl.onclick = null; 
-                msgEl.style.cursor = 'default';
-            }
-
-            try {
-                const { error } = await supabase
-                    .from('orders')
-                    .delete()
-                    .eq('id', orderId);
-
-                if (error) {
-                    displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders' para el ADMIN.`, 'var(--red-error)', true);
-                    console.error("Error al eliminar pedido (RLS o API):", error);
-                } else {
-                    displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
-                    fetchAdminOrdersHistory(); 
-                }
-            } catch (e) {
-                const genericErrorMessage = `Error de red/seguridad: ${e.message}. Esto a menudo indica que RLS está bloqueando la solicitud o un problema de red. Por favor, asegúrese de que la política RLS de DELETE está habilitada para el Administrador.`;
-                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${genericErrorMessage}`, 'var(--red-error)', true);
-                console.error("Error de red/fetch al eliminar pedido:", e);
-            }
-        }
-        window.deleteOrder = function(orderId) {
-             const container = document.getElementById('adminOrderHistoryMessage');
-            if (!container) return;
-
-            const confirmationHTML = `
-                <p style="margin-bottom: 10px; color: var(--orange-pending);">
-                    ⚠️ **CONFIRME**: ¿Está seguro de eliminar el Pedido #${orderId}? ¡Esta acción es irreversible!
-                </p>
-                <button onclick="window.executeDeleteOrder(${orderId});" 
-                        style="background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">
-                    Confirmar Eliminación
-                </button>
-                <button onclick="document.getElementById('adminOrderHistoryMessage').innerHTML='';"
-                        style="background-color: var(--button-bg); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    Cancelar
-                </button>
-            `;
-            
-            container.style.color = 'var(--text-light)';
-            container.style.borderColor = 'var(--red-error)';
-            container.innerHTML = confirmationHTML;
-        }
-        
-
-        // --- LÓGICA DEL MODAL DE PEDIDO (ACTUALIZADA) ---
-        
-        async function openOrderModal(event) {
-            const serviceId = event.currentTarget.dataset.serviceId;
-            const serviceType = event.currentTarget.dataset.serviceType; // Nuevo: obtener el tipo de servicio
-            
-            // Buscar el servicio en el almacén de datos correcto
-            const serviceList = serviceDataStore[serviceType] || [];
-            const service = serviceList.find(s => s.id == serviceId);
-
-            if (!currentUser) {
-                hideAllSections();
-                if (loginSection) loginSection.classList.remove('hidden');
-                if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
-                if (loginMessage) {
-                    loginMessage.style.color = 'var(--orange-pending)';
-                    loginMessage.textContent = 'Inicia sesión para realizar un pedido.';
-                }
-                return;
-            }
-            
-            const user = currentUser; 
-
-            if (!service) return;
-
-            document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
-            document.getElementById('modalEmail').value = user.email || '';
-            document.getElementById('modalSerial').value = ''; 
-            document.getElementById('modalClientName').value = '';
-            document.getElementById('modalWhatsapp').value = '';
-            
-            document.getElementById('modalServiceId').value = service.id;
-            document.getElementById('modalServiceType').value = serviceType; // Guardar el tipo de servicio en el hidden input
-
-            if (document.getElementById('modalMessage')) document.getElementById('modalMessage').textContent = '';
-            if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.remove('hidden');
-        }
-
-        async function submitBypassOrder() {
-            const sn = document.getElementById('modalSerial').value.trim();
-            const email = document.getElementById('modalEmail').value.trim();
-            const clientName = document.getElementById('modalClientName').value.trim();
-            const whatsapp = document.getElementById('modalWhatsapp').value.trim();
-            
-            const serviceId = document.getElementById('modalServiceId').value;
-            const serviceType = document.getElementById('modalServiceType').value; // Obtener el tipo de servicio
-            
-            // Buscar el servicio en el almacén de datos correcto
-            const serviceList = serviceDataStore[serviceType] || [];
-            const service = serviceList.find(s => s.id == serviceId);
-            
-            const user = currentUser;
-
-            const modalMessage = document.getElementById('modalMessage');
-            
-            if (!user) {
-                if (modalMessage) {
-                    modalMessage.style.color = 'var(--red-error)';
-                    modalMessage.textContent = 'Error de sesión. Por favor, vuelva a iniciar sesión.';
-                }
-                return;
-            }
-
-            if (!sn || !email || !clientName || !whatsapp) {
-                if (modalMessage) {
-                    modalMessage.style.color = 'var(--red-error)';
-                    modalMessage.textContent = 'Complete todos los campos (Nombre, WhatsApp, SN/IMEI, Email).';
-                }
-                return;
-            }
-            if (!service) {
-                if (modalMessage) {
-                    modalMessage.style.color = 'var(--red-error)';
-                    modalMessage.textContent = `Error: Servicio de tipo ${serviceType} no encontrado.`;
-                }
-                return;
-            }
-
-            if (modalMessage) {
-                modalMessage.style.color = 'yellow';
-                modalMessage.textContent = 'Enviando orden...';
-            }
-
-            const { error } = await supabase
-                .from('orders')
-                .insert([{
-                    user_id: user.id, 
-                    service_id: serviceId,
-                    service_type: serviceType, // Nuevo campo en orders
-                    service_name: service.name,
-                    device_name: sn, 
-                    imei: sn, 
-                    contact_email: email,
-                    client_name: clientName, 
-                    whatsapp: whatsapp,
-                    status: 'Pendiente', 
-                }]);
-
-            if (error) {
-                if (modalMessage) {
-                    modalMessage.style.color = 'var(--red-error)';
-                    if (error.status === 429) {
-                        modalMessage.textContent = 'Error 429 (Too Many Requests). La API está sobrecargada. Por favor, espere un momento antes de intentarlo de nuevo.';
-                    } else {
-                        modalMessage.textContent = `Error: ${error.message}. Revise sus políticas RLS de INSERT en la tabla 'orders'.`;
-                    }
-                }
-                console.error(error);
-            } else {
-                if (modalMessage) {
-                    modalMessage.style.color = 'var(--whatsapp-green)';
-                    modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
-                }
-                
-                setTimeout(() => {
-                    if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden');
-                    fetchClientOrdersHistory();
-                }, 2000);
-            }
-        }
-        
-        // --- LÓGICA DE ADMINISTRACIÓN DE SERVICIOS (ACTUALIZADA) ---
-
-        async function addNewService(event) {
-            event.preventDefault(); 
-
-            const categoryKey = currentEditingCategory; // Usar la categoría activa
-            const dataList = serviceDataStore[categoryKey];
-
-            const name = document.getElementById('newServiceName').value.trim();
-            const price = document.getElementById('newServicePrice').value.trim();
-            const time = document.getElementById('newServiceTime').value.trim();
-            const category = document.getElementById('newServiceCategory').value.trim();
-
-            if (!name || !price || !time || !category) {
-                if (addServiceMessage) {
-                    addServiceMessage.style.color = 'var(--red-error)';
-                    addServiceMessage.textContent = 'Todos los campos deben ser completados.';
-                }
-                return;
-            }
-
-            if (addServiceMessage) {
-                addServiceMessage.style.color = 'yellow';
-                addServiceMessage.textContent = 'Añadiendo servicio...';
-            }
-            
-            const nextId = dataList.length > 0
-                ? Math.max(...dataList.map(s => s.id)) + 1 
-                : 1;
-
-            const newService = {
-                id: nextId,
-                name: name,
-                price: price.startsWith('$') ? price : `$${price}`,
-                time: time,
-                category: category
-            };
-
-            dataList.push(newService);
-
-            const success = await updateServiceInSupabase(dataList, categoryKey);
-
-            if (success) {
-                if (addServiceMessage) {
-                    addServiceMessage.style.color = 'var(--whatsapp-green)';
-                    addServiceMessage.textContent = `✅ Servicio "${newService.name.substring(0, 30)}..." añadido a ${SERVICE_TYPES[categoryKey].title} y guardado!`;
-                }
-                
-                if (document.getElementById('newServiceForm')) document.getElementById('newServiceForm').reset();
-                
-                renderServiceEditor(); 
-            } else {
-                if (addServiceMessage) addServiceMessage.style.color = 'var(--red-error)';
-                dataList.pop(); 
-            }
-        }
-
-
-        function renderServiceEditor() {
-            const editorList = document.getElementById('serviceEditorList');
-            if (!editorList) return;
-
-            const categoryKey = currentEditingCategory;
-            const dataList = serviceDataStore[categoryKey];
-            const categoryTitle = SERVICE_TYPES[categoryKey].title;
-
-            editorList.innerHTML = '';
-            
-            editorMessage = document.getElementById('editorMessage');
-            if (!editorMessage) return;
-
-            // Actualizar botón de Añadir
-            document.getElementById('currentCategoryAddBtn').textContent = categoryTitle;
-
-            editorMessage.textContent = `Lista de Edición para: ${categoryTitle}`;
-            
-            if (dataList.length === 0) {
-                editorList.innerHTML = `<p style="color:orange; padding: 10px; text-align: center;">No hay servicios para editar en ${categoryTitle}. Usa la sección "Añadir Nuevo Servicio Rápido" para empezar.</p>`;
-                return;
-            }
-
-            dataList.forEach((service) => {
-                const listItem = document.createElement('li');
-                // FIX: El botón de eliminar llama a la función global window.deleteService
-                listItem.innerHTML = `
-                    <div style="flex-grow: 1; margin-right: 15px;">
-                        <div class="input-group">
-                            <p>Nombre Completo (ID: ${service.id}):</p>
-                            <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                            <div class="input-group">
-                                <p>Precio:</p>
-                                <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
-                            </div>
-                            <div class="input-group">
-                                <p>Tiempo:</p>
-                                <input type="text" id="time-${service.id}" value="${service.time}" data-field="time" data-id="${service.id}" style="width: 100px;" />
-                            </div>
-                            <div class="input-group">
-                                <p>Sub-Categoría:</p>
-                                <input type="text" id="category-${service.id}" value="${service.category}" data-field="category" data-id="${service.id}" style="width: 120px;" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="service-editor-actions">
-                        <button onclick="window.deleteService(${service.id})">Eliminar</button>
-                    </div>
-                `;
-                listItem.classList.add('service-editor-item');
-                editorList.appendChild(listItem);
-            });
-            
-            if (editorMessage) editorMessage.textContent = `${dataList.length} servicios listados para ${categoryTitle}.`;
-        }
-        
-        // FIX: Se adjunta al objeto window para ser accesible desde el atributo onclick del HTML.
-        window.deleteService = function(id) {
-            const categoryKey = currentEditingCategory;
-            let dataList = serviceDataStore[categoryKey];
-
-            // Filtrar y actualizar el array localmente
-            serviceDataStore[categoryKey] = dataList.filter(s => s.id !== id);
-
-            renderServiceEditor(); 
-            if (editorMessage) {
-                editorMessage.style.color = 'yellow';
-                editorMessage.textContent = `Servicio ID ${id} eliminado de la lista local de ${SERVICE_TYPES[categoryKey].title}. Pulse GUARDAR para sincronizar.`;
-            }
-        }
-
-        async function clearAllServices() {
-            const categoryKey = currentEditingCategory;
-            const editorMessageElement = document.getElementById('editorMessage');
-            
-            if (!editorMessageElement) {
-                console.error("Error: Elemento de mensaje del editor no encontrado.");
-                return;
-            }
-            
-            if (!confirm(`🚨 ¿Está SEGURO que desea ELIMINAR TODOS los servicios de la categoría "${SERVICE_TYPES[categoryKey].title}"? Esta acción es IRREVERSIBLE.`)) {
-                return;
-            }
-
-            editorMessageElement.style.color = 'yellow';
-            editorMessageElement.textContent = `Eliminando todos los servicios de ${SERVICE_TYPES[categoryKey].title}...`;
-            
-            serviceDataStore[categoryKey] = []; 
-            
-            const success = await updateServiceInSupabase([], categoryKey);
-            
-            if (success) {
-                editorMessageElement.style.color = 'var(--whatsapp-green)';
-                editorMessageElement.textContent = `✅ ¡Todos los servicios de ${SERVICE_TYPES[categoryKey].title} eliminados y sincronizados con éxito!`;
-                renderServiceEditor(); 
-                // Renderizar la vista de cliente para reflejar cambios inmediatamente
-                renderServices(categoryKey); 
-            } else {
-                editorMessageElement.style.color = 'var(--red-error)';
-            }
-        }
-        
-        async function saveServiceChanges() {
-            const categoryKey = currentEditingCategory;
-            const editorMessageElement = document.getElementById('editorMessage');
-            
-            if (!editorMessageElement) {
-                console.error("Error: Elemento de mensaje del editor no encontrado.");
-                return;
-            }
-
-            editorMessageElement.style.color = 'yellow';
-            editorMessageElement.textContent = `Guardando cambios en ${SERVICE_TYPES[categoryKey].title}...`;
-
-            const updatedData = [];
-            const serviceEditorList = document.getElementById('serviceEditorList');
-            
-            // Recoger datos del DOM (ya actualizados por la lógica de edición)
-            serviceEditorList.querySelectorAll('.service-editor-item').forEach(listItem => {
-                const id = parseInt(listItem.querySelector('input[data-field="name"]').dataset.id);
-                const nameInput = listItem.querySelector(`#name-${id}`).value.trim();
-                const priceInput = listItem.querySelector(`#price-${id}`).value.trim();
-                const timeInput = listItem.querySelector(`#time-${id}`).value.trim();
-                const categoryInput = listItem.querySelector(`#category-${id}`).value.trim();
-
-                updatedData.push({
-                    id: id,
-                    name: nameInput,
-                    price: priceInput,
-                    time: timeInput,
-                    category: categoryInput
-                });
-            });
-            
-            const success = await updateServiceInSupabase(updatedData, categoryKey);
-
-            if (success) {
-                serviceDataStore[categoryKey] = updatedData; // Sincronizar el store local
-                editorMessageElement.style.color = 'var(--whatsapp-green)';
-                editorMessageElement.textContent = `✅ ¡Cambios guardados y sincronizados con éxito en ${SERVICE_TYPES[categoryKey].title}!`;
-                renderServiceEditor(); 
-                renderServices(categoryKey); // Forzar recarga de tarjetas de cliente
-            } else {
-                editorMessageElement.style.color = 'var(--red-error)';
-            }
-        }
-
-
-        async function checkUser(userSession) {
-            const user = userSession?.user;
-            
-            currentUser = user || null;
-            
-            hideAllSections();
-
-            if (navAdminPanel) navAdminPanel.classList.add('hidden');
-            if (adminNameDisplay) adminNameDisplay.classList.add('hidden');
-
-            if (user) {
-                const isAdmin = user.email === ADMIN_EMAIL;
-                
-                if (loginLogoutBtn) {
-                    loginLogoutBtn.textContent = 'Logout';
-                    loginLogoutBtn.onclick = signOut;
-                }
-                
-                if (isAdmin) { 
-                    if (navAdminPanel) navAdminPanel.classList.remove('hidden'); 
-                    if (adminNameDisplay) adminNameDisplay.classList.remove('hidden'); 
-                    if (loggedInUserName) loggedInUserName.textContent = 'Admin';
-                    if (adminNameDisplay) adminNameDisplay.textContent = `(${user.email})`;
-                }
-                
-                // Mostrar la sección Hero por defecto, a menos que ya se esté mostrando una sección de servicio.
-                if (heroSection) heroSection.classList.remove('hidden');
-            } else {
-                if (heroSection) heroSection.classList.remove('hidden'); 
-                if (loginLogoutBtn) {
-                    loginLogoutBtn.textContent = 'Login / Register';
-                    loginLogoutBtn.onclick = () => {
-                        hideAllSections();
-                        if (loginSection) loginSection.classList.remove('hidden');
-                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
-                    };
-                }
-            }
-            
-            // Si no hay ninguna sección activa, mostrar Hero (lógica redundante, pero segura)
-            if (document.querySelectorAll('section:not(.hidden)').length === 0) {
-                 if (heroSection) heroSection.classList.remove('hidden');
-            }
-        }
-
-        async function handleNavigationClick(event) {
-            const clickedElement = event.currentTarget;
-            if (!clickedElement || !clickedElement.id) { return; }
-            
-            const elementId = clickedElement.id;
-            
-            // Ocultar el menú desplegable si se hace clic en otro elemento de la barra de navegación.
-            if (elementId !== 'navPongaOrden') {
-                if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden');
-            }
-
-            const isLoggedIn = !!currentUser; 
-            const isAdmin = isLoggedIn && currentUser.email === ADMIN_EMAIL;
-            
-            hideAllSections();
-            
-            let shouldScrollToTop = true; 
-            
-            switch (elementId) {
-                case 'navPongaOrden':
-                    if (isLoggedIn) {
-                        // CORREGIDO: Solo alternar la visibilidad del menú.
-                        if (pongaOrdenMenu) pongaOrdenMenu.classList.toggle('hidden');
-                        shouldScrollToTop = false; 
-                        // Asegurar que hero se vea si el menú se oculta o si el menú está visible sin sección de servicio
-                        if (heroSection) heroSection.classList.remove('hidden'); 
-                    } else {
-                        if (loginSection) loginSection.classList.remove('hidden');
-                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
-                        if (loginMessage) {
-                            loginMessage.style.color = 'var(--orange-pending)';
-                            loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
-                        }
-                    }
-                    break;
-                case 'navAdminPanel':
-                    if (isAdmin) {
-                        await fetchServices(); // Refrescar todos los datos de servicios
-                        fetchAdminOrdersHistory(); 
-                        renderServiceEditor(); // Renderizar el editor con la categoría activa
-                        if (adminSection) adminSection.classList.remove('hidden');
-                    } else if (isLoggedIn) {
-                        if (heroSection) heroSection.classList.remove('hidden'); 
-                        displayAdminMessage('No tienes permisos de administrador para acceder a este panel.', 'var(--red-error)', true);
-                    } else {
-                        if (loginSection) loginSection.classList.remove('hidden');
-                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                    break;
-                case 'navHistorialPedidos':
-                    if (isLoggedIn) {
-                        if (isAdmin) {
-                            fetchAdminOrdersHistory(); 
-                            if (adminSection) adminSection.classList.remove('hidden');
-                        } else {
-                            fetchClientOrdersHistory();
-                        }
-                    } else {
-                        if (loginSection) loginSection.classList.remove('hidden');
-                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
-                        if (loginMessage) {
-                            loginMessage.textContent = 'Inicia sesión para ver tu historial de pedidos.';
-                            loginMessage.style.color = 'var(--orange-pending)';
-                        }
-                    }
-                    break;
-                case 'navAreaCliente':
-                    if (isLoggedIn) { if (heroSection) heroSection.classList.remove('hidden'); } else { if (loginSection) loginSection.classList.remove('hidden'); if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' }); if (loginMessage) loginMessage.textContent = ''; }
-                    break;
-                default:
-                    if (heroSection) heroSection.classList.remove('hidden');
-                    break;
-            }
-            
-            if (shouldScrollToTop) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-        
-        // Funciones de Auth (no se modifican)
-        async function signInWithEmail() { 
-             const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (loginMessage) {
-                loginMessage.style.color = 'yellow';
-                loginMessage.textContent = 'Iniciando sesión...';
-            }
-
-            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Error de inicialización de la API.'; } return; }
-            
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                console.error('Error al hacer login:', error);
-                if (loginMessage) loginMessage.style.color = 'var(--red-error)';
-                let msg = error.message;
-                
-                if (error.status === 429) {
-                    msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
-                } 
-                else if (error.message.includes('Invalid login credentials')) { 
-                    msg = '❌ Credenciales de inicio de sesión inválidas. Comprueba el correo y la contraseña.'; 
-                } 
-                else if (error.message.includes('Email not confirmed')) { 
-                    msg = '📧 Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
-                }
-                
-                if (loginMessage) loginMessage.textContent = `Error de inicio: ${msg}`;
-            } else if (data.user) {
-                if (loginMessage) {
-                    loginMessage.style.color = 'var(--whatsapp-green)';
-                    loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
-                }
-            } else {
-                if (loginMessage) {
-                    loginMessage.style.color = 'var(--red-error)';
-                    loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
-                }
-            }
-        }
-        async function signUpWithEmail() { 
-             const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (loginMessage) {
-                loginMessage.style.color = 'yellow';
-                loginMessage.textContent = 'Registrando usuario...';
-            }
-            
-            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Erro de inicialización de la API.'; } return; }
-            
-            const { error } = await supabase.auth.signUp({ email, password });
-            if (error) {
-                console.error('Error al registrar:', error);
-                if (loginMessage) {
-                    loginMessage.style.color = 'var(--red-error)';
-                    loginMessage.textContent = `Error: ${error.message}`;
-                }
-            } else {
-                if (loginMessage) {
-                    loginMessage.style.color = '#4dc2f2'; 
-                    loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
-                }
-            }
-        }
-        async function signOut() { 
-            if (!supabase) return;
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error al hacer logout:', error);
-            } else {
-                if (loginMessage) loginMessage.textContent = '';
-            }
-        }
-
-        // --- Inicialización (IIFE para evitar Race Condition) ---
-        (async function initApp() {
-            
-            if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'manual'; 
-            }
-
-            if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else {
-                console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
-                return; 
-            }
-
-            // Mapeo de Elementos DOM
-            heroSection = document.getElementById('heroSection');
-            mainDevicesImage = document.getElementById('mainDevicesImage');
-            loginSection = document.getElementById('loginSection');
-            adminSection = document.getElementById('adminSection');
-            // Mapeo de las 3 secciones
-            imeiServiceSection = document.getElementById('imeiServiceSection'); 
-            boxDongleServiceSection = document.getElementById('boxDongleServiceSection'); 
-            digitalRentServiceSection = document.getElementById('digitalRentServiceSection'); 
-            clientOrderHistorySection = document.getElementById('clientOrderHistorySection');
-            
-            loadingMessage = document.getElementById('loadingMessageIMEI'); 
-            editorMessage = document.getElementById('editorMessage'); 
-            adminOrderHistory = document.getElementById('adminOrderHistory'); 
-            clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
-            addServiceMessage = document.getElementById('addServiceMessage');
-            adminOrderHistoryMessage = document.getElementById('adminOrderHistoryMessage');
-
-            loginLogoutBtn = document.getElementById('loginLogoutBtn');
-            loggedInUserName = document.getElementById('loggedInUserName');
-            adminNameDisplay = document.getElementById('adminNameDisplay');
-            
-            navAreaCliente = document.getElementById('navAreaCliente');
-            navPongaOrden = document.getElementById('navPongaOrden');
-            navHistorialPedidos = document.getElementById('navHistorialPedidos');
-            pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); 
-            navAdminPanel = document.getElementById('navAdminPanel'); 
-
-            backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
-            devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
-            loginMessage = document.getElementById('loginMessage');
-            
-            // --- CARGA DE IMAGENES (Persistente) ---
-            await loadImages();
-            
-            // --- CARGA DE DATOS ---
-            await fetchServices(); 
-            
-            // Listeners de Autenticación y Modal
-            document.getElementById('signInButton').addEventListener('click', signInWithEmail);
-            document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
-            document.getElementById('closeModal').addEventListener('click', () => { if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden'); });
-            
-            document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
-            
-            // Listeners de Navegación y Admin
-            document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
-            document.getElementById('clearAllServicesButton').addEventListener('click', clearAllServices);
-            
-            document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
-            navAreaCliente.addEventListener('click', handleNavigationClick);
-            // CORREGIDO: navPongaOrden solo debe alternar el menú y asegurar que la hero section no se oculte al abrirlo
-            navPongaOrden.addEventListener('click', (e) => {
-                const isLoggedIn = !!currentUser; 
-                if (isLoggedIn) {
-                    if (pongaOrdenMenu) pongaOrdenMenu.classList.toggle('hidden');
-                    if (pongaOrdenMenu?.classList.contains('hidden')) {
-                        // Si se cierra el menú, se muestra la hero section si no hay otra sección abierta
-                        hideAllSections();
-                        if (heroSection) heroSection.classList.remove('hidden');
-                    } else {
-                        // Asegurar que la hero section se muestre si no hay una sección de servicio activa (solo para fines visuales)
-                        hideAllSections();
-                        if (heroSection) heroSection.classList.remove('hidden');
-                    }
-                } else {
-                    // Si no está logueado, redirige a login y muestra mensaje.
-                    handleNavigationClick(e); // Llama al manejador para la lógica de login/redirect
-                }
-            });
-            navHistorialPedidos.addEventListener('click', handleNavigationClick);
-            navAdminPanel.addEventListener('click', handleNavigationClick); 
-
-            // Listeners de Gestión de Imágenes
-            document.getElementById('uploadBackgroundButton').addEventListener('click', handleUploadBackground);
-            document.getElementById('clearBackgroundButton').addEventListener('click', handleClearBackground);
-            document.getElementById('uploadDevicesButton').addEventListener('click', handleUploadDevices);
-            document.getElementById('clearDevicesButton').addEventListener('click', handleClearDevices);
-
-            // NUEVO: Listener para el selector de categoría en el Admin
-            const categorySelector = document.getElementById('serviceCategorySelector');
-            if (categorySelector) {
-                categorySelector.addEventListener('change', (e) => {
-                    currentEditingCategory = e.target.value;
-                    renderServiceEditor();
-                });
-            }
-
-            // CORRECCIÓN CLAVE: Este listener ahora maneja la visualización de la sección
-            document.querySelectorAll('.order-type-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation(); 
-                    
-                    if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden'); // Ocultar menú inmediatamente
-                    
-                    const serviceType = this.dataset.serviceType;
-                    
-                    if (!currentUser) {
-                        hideAllSections();
-                        if (loginSection) loginSection.classList.remove('hidden');
-                        if (loginMessage) {
-                            loginMessage.textContent = 'Inicia sesión para ver los servicios.';
-                            loginMessage.style.color = 'var(--orange-pending)';
-                        }
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        return;
-                    }
-                    
-                    // CORRECCIÓN: Llamar a la función genérica de renderizado
-                    renderServices(serviceType); 
-                });
-            });
-
-            // PASO CRÍTICO: Obtener la sesión inicial y usar el listener para las actualizaciones.
-            const { data: { session } } = await supabase.auth.getSession();
-            checkUser(session); 
-            
-            // Establecer la sección por defecto al cargar (IMEI Service si está logueado, sino Hero)
-            if (currentUser) {
-                 renderServices('imei');
-            }
-
-
-            supabase.auth.onAuthStateChange((event, session) => {
-                checkUser(session);
-                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección IMEI por defecto
-                if (session && event === 'SIGNED_IN') {
-                    renderServices('imei');
-                }
-            });
-        })();
-    </script>
+    <div class="top-info-bar">
+        <div class="info-group">
+            </div>
+    </div>
+
+    <nav class="main-nav">
+        <div class="logo">
+            <span class="klmz">KLMZ</span> UNLOCKER
+        </div>
+        
+        <div class="nav-links">
+            <div class="nav-item" id="navAreaCliente">Area del Cliente</div>
+            
+            <div class="nav-item" id="navPongaOrden">
+                Ponga la orden
+                <div class="dropdown-menu hidden" id="pongaOrdenMenu">
+                    <ul>
+                        <li><a href="#" class="order-type-link" data-service-type="imei">IMEI Service</a></li> 
+                        <li><a href="#" class="order-type-link" data-service-type="box-dongle">Box/Dongle/Tool/Credit - Activation</a></li>
+                        <li><a href="#" class="order-type-link" data-service-type="digital-rent">Digital Tool Rent & Remote Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="nav-item" id="navHistorialPedidos">Historial de pedidos</div>
+
+            <div class="nav-item hidden" id="navAdminPanel">Panel de Administración</div>
+            
+            <span id="adminNameDisplay" class="hidden" style="margin-left: 25px; font-weight: bold; color: yellow;"></span>
+            <a href="#" id="loginLogoutBtn">Login / Register</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="modal hidden" id="orderModal">
+            <div class="modal-content">
+                <h3 id="modalServiceName">Realizar Nuevo Pedido</h3>
+                
+                <input type="text" id="modalClientName" placeholder="Tu Nombre Completo" class="required-field" required>
+                <input type="text" id="modalWhatsapp" placeholder="Número de WhatsApp (Ej: +50377778888)" class="required-field" required>
+
+                <div class="modal-serial-input">
+                    <p>Ingrese el SN/IMEI para este servicio:</p>
+                    <input type="text" id="modalSerial" placeholder="Número de Serie (SN/IMEI)" class="required-field" required>
+                </div>
+                
+                <input type="email" id="modalEmail" placeholder="Correo Electrónico de Contacto" readonly>
+                <input type="hidden" id="modalServiceId">
+                <input type="hidden" id="modalServiceType"> <div class="modal-footer-actions">
+                    <button id="submitModalOrder">Confirmar Pedido</button>
+                    <button id="closeModal">Cancelar</button>
+                </div>
+                <p id="modalMessage" class="form-message"></p>
+            </div>
+        </div>
+
+        <section class="hidden" id="imeiServiceSection">
+            <h2>IMEI Service</h2>
+            <div id="imeiServiceGridContainer" class="service-grid">
+                <p id="loadingMessageIMEI">Cargando servicios...</p>
+            </div>
+        </section>
+
+        <section class="hidden" id="boxDongleServiceSection">
+            <h2>Box/Dongle/Tool/Credit - Activation</h2>
+            <div id="boxDongleServiceGridContainer" class="service-grid">
+                <p id="loadingMessageBoxDongle">Cargando servicios...</p>
+            </div>
+        </section>
+
+        <section class="hidden" id="digitalRentServiceSection">
+            <h2>Digital Tool Rent & Remote Service</h2>
+            <div id="digitalRentServiceGridContainer" class="service-grid">
+                <p id="loadingMessageDigitalRent">Cargando servicios...</p>
+            </div>
+        </section>
+        <section class="hidden" id="clientOrderHistorySection">
+            <h2>📜 Mi Historial de Pedidos</h2>
+            <div id="clientOrderHistoryContainer" class="order-history-grid">
+                <p>Cargando sus pedidos...</p>
+            </div>
+        </section>
+
+        <section class="hero-section" id="heroSection">
+            <div class="services-content">
+                <div class="services-box">
+                    <div class="services-title">IPHONE SERVICES</div>
+                    <div class="service-item">IPHONE CARRIER UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD UNLOCK</div>
+                    <div class="service-item">IPHONE ICLOUD BYPASS WITH SIM WORKING</div>
+                    <div class="service-item">IPHONE MDM BYPASS SERVICE</div>
+                </div>
+            </div>
+
+            <img id="mainDevicesImage" src="" alt="Dispositivos Apple">
+        </section>
+
+        <section class="login-section hidden" id="loginSection">
+            <h3>Iniciar Sesión / Registrarse</h3>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Contraseña">
+            <button id="signInButton">Iniciar Sesión</button>
+            <button id="signUpButton">Registrarse</button>
+            <p id="loginMessage" class="form-message" style="color: red;"></p>
+        </section>
+
+        <section class="admin-section hidden" id="adminSection">
+            <h3>Panel de Administración</h3>
+            <p>Bienvenido, <span id="loggedInUserName" style="font-weight: bold; color: yellow;">Admin</span>! (klmzr230@gmail.com)</p>
+
+            <div class="admin-options">
+                <h4>Gestión de Órdenes</h4>
+                <div class="form-container">
+                    <h3 style="color: #4dc2f2; border-bottom: 1px solid #444; padding-bottom: 10px;">Historial de Pedidos (TODOS)</h3>
+                    <div id="adminOrderHistoryMessage"></div>
+                    <div id="adminOrderHistory" class="order-history-grid">
+                        <p>Cargando pedidos...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>⚙️ Editar Tarjetas de Servicios</h4>
+                <div class="form-container">
+                    <h4 style="color: var(--accent-pink);">Seleccionar Categoría a Editar:</h4>
+                    <select id="serviceCategorySelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: #333; color: white; border-radius: 4px;">
+                        <option value="imei">IMEI Service</option>
+                        <option value="box-dongle">Box/Dongle/Tool/Credit - Activation</option>
+                        <option value="digital-rent">Digital Tool Rent & Remote Service</option>
+                    </select>
+                    
+                    <p id="editorMessage" class="form-message"></p>
+
+                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px; color: #25d366;">➕ Añadir Nuevo Servicio Rápido</h4>
+                    <form id="newServiceForm">
+                        <div class="full-width">
+                            <label for="newServiceName">Nombre Completo del Servicio:</label>
+                            <input type="text" id="newServiceName" placeholder="Ej: FRPFILE A12+ Bypass iPhone XR To 17ProMax (Windows Tool) OFFER ✅" required>
+                        </div>
+                        <div>
+                            <label for="newServicePrice">Precio (Ej: $5.00):</label>
+                            <input type="text" id="newServicePrice" placeholder="$5" required>
+                        </div>
+                        <div>
+                            <label for="newServiceTime">Tiempo (Ej: Miniutes, 1-7 days):</label>
+                            <input type="text" id="newServiceTime" placeholder="Miniutes" required>
+                        </div>
+                        <div class="full-width">
+                            <label for="newServiceCategory">Sub-Categoría (Ej: Hello A12+ iCloud Bypass Windows Tool):</label>
+                            <input type="text" id="newServiceCategory" placeholder="Categoría del servicio" required>
+                        </div>
+                        <button type="submit" id="addServiceButton">Añadir Servicio a <span id="currentCategoryAddBtn">IMEI Service</span></button>
+                    </form>
+                    <p id="addServiceMessage" class="form-message"></p>
+
+                    <h4 style="border-top: 1px solid #333; padding-top: 15px; margin-top: 15px;">Lista de Edición</h4>
+                    <ul id="serviceEditorList" class="service-editor-list">
+                    </ul>
+
+                    <button id="saveServiceChanges" style="background-color: #4c4e97; margin-top: 15px;">Guardar Cambios y Sincronizar</button>
+                    <button id="clearAllServicesButton" style="background-color: #f44336; margin-top: 10px;">
+                        🚨 Eliminar TODOS los Servicios de la Categoría Activa
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-options" style="margin-top: 30px;">
+                <h4>Gestión de Imágenes (Solo Admin)</h4>
+                <div class="form-container">
+                    <h3>📸 Subir Imagen de Fondo (Hero)</h3>
+                    <input type="file" id="backgroundImageFile" accept="image/*">
+                    <button id="uploadBackgroundButton">Subir Fondo</button>
+                    <p id="backgroundResponseMessage" class="form-message"></p>
+                    <button id="clearBackgroundButton" style="background-color: #666; margin-top: 10px;">Limpiar Fondo</button>
+                </div>
+                    <div class="form-container" style="margin-top: 20px;">
+                    <h3>🖼️ Cambiar Imagen de Dispositivos (Hero)</h3>
+                    <input type="file" id="devicesImageFile" accept="image/*">
+                    <button id="uploadDevicesButton">Subir Imagen de Dispositivos</button>
+                    <p id="devicesImageResponseMessage" class="form-message"></p>
+                    <button id="clearDevicesButton" style="background-color: #666; margin-top: 10px;">Restaurar Imagen por Defecto</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-bottom">
+            &copy; 2025 KLMZ Unlocker. Todos los derechos reservados. Desarrollado por Freddy Granados.
+        </div>
+    </footer>
+    
+    <div class="chat-buttons">
+        <a href="https://wa.me/50368957466" class="chat-button whatsapp" target="_blank" title="WhatsApp: +503 689957466">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/1200px-WhatsApp.svg.png" alt="WhatsApp Icon">
+        </a>
+    </div>
+
+    <script>
+        // 🔑 TUS CLAVES SUPABASE (INSERTADAS)
+        const SUPABASE_URL = 'https://suedecrtpmfgblzfcdhv.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1ZWRlY3J0cG1mZ2JsemZjZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MTI1NDUsImV4cCI6MjA3ODI4ODU0NX0.pQbqJTZgc2xMpd9cZH-sOnS-6wfGp-qUGv0938kr3UQ';
+        const ADMIN_EMAIL = 'klmzr230@gmail.com'; 
+        
+        // DECLARACIONES GLOBALES
+        let supabase;
+        let heroSection, mainDevicesImage, loginSection, adminSection, imeiServiceSection, boxDongleServiceSection, digitalRentServiceSection, clientOrderHistorySection; 
+        let loginLogoutBtn;
+        let loggedInUserName, adminNameDisplay;
+        let backgroundResponseMessage, devicesImageResponseMessage, loginMessage, loadingMessage, editorMessage, addServiceMessage, adminOrderHistoryMessage;
+        let navAreaCliente, navPongaOrden, navHistorialPedidos, pongaOrdenMenu, navAdminPanel, adminOrderHistory, clientOrderHistoryContainer;
+
+        const BACKGROUND_BUCKET_NAME = 'background-images'; 
+        const DEVICES_IMAGE_BUCKET_NAME = 'devices-images'; 
+        const DEFAULT_DEVICES_IMAGE_URL = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/IPhone_13_Pro.png/300px-IPhone_13_Pro.png'; 
+        const BACKGROUND_FILE_PATH = 'hero_background.jpg';
+        const DEVICES_FILE_PATH = 'main_devices.png';
+        
+        // IDs para las 3 categorías de servicio en la tabla 'store_services'
+        const SERVICE_TYPES = {
+            'imei': { id: 1, title: 'IMEI Service' },
+            'box-dongle': { id: 2, title: 'Box/Dongle/Tool/Credit - Activation' },
+            'digital-rent': { id: 3, title: 'Digital Tool Rent & Remote Service' }
+        };
+
+        // Almacenamiento local de datos: Object para las 3 listas
+        let serviceDataStore = {
+            'imei': [],
+            'box-dongle': [],
+            'digital-rent': []
+        };
+
+        // Variable para rastrear qué categoría se está editando
+        let currentEditingCategory = 'imei'; 
+
+        // VARIABLE GLOBAL CRÍTICA PARA EL ESTADO DE SESIÓN INSTANTÁNEA
+        let currentUser = null; 
+
+        // --- FUNCIONES DE MENSAJERÍA ---
+
+        function displayAdminMessage(message, color = 'var(--red-error)', isError = true) {
+            const container = document.getElementById('adminOrderHistoryMessage');
+            if (container) {
+                container.style.color = color;
+                container.style.borderColor = color;
+                container.innerHTML = `<p>${isError ? '❌ ERROR RLS/API: ' : '✅ INFORMACIÓN: '}${message}</p>`;
+                if (!isError) {
+                    // Mantener mensajes informativos (no error) visibles por 5 segundos
+                    setTimeout(() => {
+                        if (container.innerHTML.includes(message)) {
+                             container.innerHTML = '';
+                             container.style.borderColor = 'var(--accent-pink)';
+                        }
+                    }, 5000);
+                }
+            } else {
+                console.error(`ADMIN MESSAGE (${isError ? 'ERROR' : 'INFO'}):`, message);
+            }
+        }
+
+        // --- UTILIDADES DE IMAGEN (CARGA DESDE SUPABASE STORAGE) ---
+        
+        async function getPublicUrl(bucketName, filePath, fallbackUrl) {
+            if (!supabase) return fallbackUrl;
+
+            // 1. Obtener la URL pública de Supabase
+            const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+            let url = data?.publicUrl;
+            
+            if (!url) return fallbackUrl;
+
+            // 2. Add Cache-Buster to force browser to load new version after upsert/update
+            try {
+                const parsedUrl = new URL(url);
+                const cacheBuster = Date.now();
+                parsedUrl.searchParams.set('v', cacheBuster);
+                url = parsedUrl.toString();
+
+            } catch (e) {
+                const cacheBuster = Date.now();
+                const separator = url.includes('?') ? '&' : '?';
+                url = `${url}${separator}v=${cacheBuster}`;
+            }
+
+            return url;
+        }
+
+        async function loadImages() {
+            // 1. Cargar Imagen de Fondo (Se aplica al CSS background-image)
+            const bgUrl = await getPublicUrl(
+                BACKGROUND_BUCKET_NAME, 
+                BACKGROUND_FILE_PATH, 
+                null 
+            );
+
+            // 2. Aplicar el fondo a la sección hero
+            if (bgUrl && heroSection) {
+                heroSection.style.backgroundImage = `url('${bgUrl}')`;
+                heroSection.style.backgroundColor = 'transparent'; 
+                heroSection.style.backgroundSize = 'cover';
+                heroSection.style.backgroundPosition = 'center bottom';
+
+            } else if (heroSection) {
+                heroSection.style.backgroundImage = 'none';
+                heroSection.style.backgroundColor = 'var(--dark-bg)'; // Color definido en CSS :root
+            }
+
+            // 3. Cargar Imagen de Dispositivos (Se aplica al <img> src)
+            const devicesUrl = await getPublicUrl(
+                DEVICES_IMAGE_BUCKET_NAME, 
+                DEVICES_FILE_PATH, 
+                DEFAULT_DEVICES_IMAGE_URL
+            );
+            if (mainDevicesImage) {
+                mainDevicesImage.src = devicesUrl;
+            }
+        }
+        
+        // Funciones de subir y limpiar imagen (no se modifican)
+        async function uploadImage(fileInputId, bucketName, filePath, responseElementId) { 
+            const fileInput = document.getElementById(fileInputId);
+            const messageElement = document.getElementById(responseElementId);
+
+            if (!messageElement) { return; } 
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+                messageElement.style.color = 'var(--red-error)';
+                messageElement.textContent = 'Seleccione un archivo primero.';
+                return;
+            }
+
+            messageElement.style.color = 'yellow';
+            messageElement.textContent = 'Subiendo imagen...';
+
+            const { error: uploadError } = await supabase.storage
+                .from(bucketName)
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true 
+                });
+
+            if (uploadError) {
+                messageElement.style.color = 'var(--red-error)';
+                if (uploadError.status === 400 || (uploadError.message && uploadError.message.includes('row-level security'))) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de INSERT/UPDATE en el BUCKET DE STORAGE permita la subida al administrador.';
+                } else {
+                    messageElement.textContent = `Error al subir: ${uploadError.message}`;
+                }
+                console.error('Error al subir imagen:', uploadError);
+                return;
+            }
+
+            messageElement.style.color = 'var(--whatsapp-green)';
+            messageElement.textContent = '✅ Imagen subida y actualizada con éxito.';
+            await loadImages();
+        }
+        async function clearImage(bucketName, filePath, responseElementId, isBackground = false) {
+             const messageElement = document.getElementById(responseElementId);
+            
+            if (!messageElement) { return; } 
+            
+            messageElement.style.color = 'yellow';
+            messageElement.textContent = 'Eliminando imagen...';
+
+            const { error: deleteError } = await supabase.storage
+                .from(bucketName)
+                .remove([filePath]);
+
+            if (deleteError && deleteError.statusCode !== '404') {
+                messageElement.style.color = 'var(--red-error)';
+                if (deleteError.status === 400 || (deleteError.message && deleteError.message.includes('row-level security'))) {
+                    messageElement.textContent = '🚨 ¡Fallo de Seguridad (RLS 400)! Verifique que la política RLS de DELETE en el BUCKET DE STORAGE permita al administrador eliminar archivos.';
+                } else {
+                    messageElement.textContent = `Error al eliminar: ${deleteError.message}`;
+                }
+                console.error('Error al eliminar imagen:', deleteError);
+                return;
+            }
+            
+            messageElement.style.color = 'var(--whatsapp-green)';
+            messageElement.textContent = isBackground 
+                ? 'Fondo de imagen eliminado y restaurado.' 
+                : 'Imagen de dispositivos restaurada por defecto.';
+            await loadImages();
+        }
+        async function handleUploadBackground() { await uploadImage('backgroundImageFile', BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage'); }
+        async function handleClearBackground() { await clearImage(BACKGROUND_BUCKET_NAME, BACKGROUND_FILE_PATH, 'backgroundResponseMessage', true); }
+        async function handleUploadDevices() { await uploadImage('devicesImageFile', DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage'); }
+        async function handleClearDevices() { await clearImage(DEVICES_IMAGE_BUCKET_NAME, DEVICES_FILE_PATH, 'devicesImageResponseMessage', false); }
+
+
+        // --- SINCRONIZACIÓN DE SERVICIOS (MEJORADA PARA 3 CATEGORÍAS) ---
+
+        async function fetchServices() {
+            const loadingMessageIMEI = document.getElementById('loadingMessageIMEI');
+            if (loadingMessageIMEI) loadingMessageIMEI.textContent = 'Cargando servicios de todas las categorías...';
+            
+            // Cargar los 3 records (ID 1, 2, 3)
+            const idsToFetch = Object.values(SERVICE_TYPES).map(type => type.id);
+
+            const { data, error } = await supabase
+                .from('store_services') 
+                .select('id, service_data')
+                .in('id', idsToFetch);
+
+            if (error) { 
+                console.error("Error al cargar servicios de Supabase:", error);
+                if (loadingMessageIMEI) {
+                    loadingMessageIMEI.style.color = 'var(--red-error)';
+                    loadingMessageIMEI.textContent = `ERROR DE ACCESO: Verifique la política RLS (SELECT para anon) en 'store_services'. Error: ${error.message}`;
+                }
+                return false;
+            }
+            
+            let loadedCount = 0;
+            let missingRecords = [];
+
+            // Mapear los datos cargados al serviceDataStore
+            Object.keys(SERVICE_TYPES).forEach(key => {
+                const serviceType = SERVICE_TYPES[key];
+                const record = data.find(r => r.id === serviceType.id);
+                
+                if (record && record.service_data) {
+                    serviceDataStore[key] = record.service_data;
+                    loadedCount += record.service_data.length;
+                } else {
+                    serviceDataStore[key] = [];
+                    missingRecords.push(serviceType.title);
+                }
+            });
+
+            if (missingRecords.length > 0) {
+                 // Si faltan records, intentamos crearlos (solo si es Admin, pero se hace con ANON key por ahora)
+                 console.warn(`Registros de servicios faltantes (${missingRecords.join(', ')}). Inicializando...`);
+                 await initializeMissingRecords(missingRecords);
+            }
+
+
+            if (loadingMessageIMEI) {
+                loadingMessageIMEI.textContent = `✅ ${loadedCount} servicios cargados correctamente.`;
+            }
+            return true;
+        }
+
+        async function initializeMissingRecords(missingTitles) {
+             const updates = [];
+             Object.keys(SERVICE_TYPES).forEach(key => {
+                 if (missingTitles.some(title => title === SERVICE_TYPES[key].title)) {
+                     updates.push({
+                         id: SERVICE_TYPES[key].id,
+                         service_data: [] // Crea un array vacío
+                     });
+                 }
+             });
+
+             if (updates.length > 0) {
+                 const { error } = await supabase
+                     .from('store_services')
+                     .upsert(updates, { onConflict: 'id' });
+
+                 if (error) {
+                     console.error("Error al inicializar records faltantes:", error);
+                     displayAdminMessage(`Error al inicializar records (${missingTitles.join(', ')}). Verifique RLS de INSERT/UPDATE.`, 'var(--red-error)', true);
+                     return false;
+                 }
+                 console.log(`Registros inicializados para: ${missingTitles.join(', ')}`);
+                 return true;
+             }
+             return false;
+        }
+
+        
+        async function updateServiceInSupabase(dataToSave, categoryKey) {
+            const editorMessageElement = document.getElementById('editorMessage') || document.getElementById('addServiceMessage') || document.getElementById('loadingMessageIMEI');
+            
+            if (!editorMessageElement) {
+                console.error("Error: Elemento de mensaje de sincronización no encontrado.");
+                return false;
+            }
+
+            const recordId = SERVICE_TYPES[categoryKey].id;
+
+            editorMessageElement.style.color = 'yellow';
+            editorMessageElement.textContent = `Guardando cambios en la categoría ${SERVICE_TYPES[categoryKey].title}...`;
+
+            const { error } = await supabase
+                .from('store_services')
+                .upsert([
+                    {
+                        id: recordId,
+                        service_data: dataToSave
+                    }
+                ], { onConflict: 'id' });
+
+            if (error) {
+                console.error(`Error al guardar servicios (${categoryKey}) en Supabase:`, error);
+                editorMessageElement.style.color = 'var(--red-error)';
+                editorMessageElement.textContent = `Error al guardar: ${error.message}. Verifique la política RLS (UPDATE/INSERT para admin) en 'store_services'.`;
+                return false;
+            }
+            return true;
+        }
+
+
+        // --- FUNCIONES DE LA APLICACIÓN (GLOBAL) ---
+
+        function hideAllSections() {
+            if (heroSection) heroSection.classList.add('hidden');
+            if (loginSection) loginSection.classList.add('hidden');
+            if (adminSection) adminSection.classList.add('hidden');
+            if (clientOrderHistorySection) clientOrderHistorySection.classList.add('hidden');
+            
+            // Ocultar todas las secciones de servicios
+            if (imeiServiceSection) imeiServiceSection.classList.add('hidden');
+            if (boxDongleServiceSection) boxDongleServiceSection.classList.add('hidden');
+            if (digitalRentServiceSection) digitalRentServiceSection.classList.add('hidden');
+        }
+
+        /**
+         * Función genérica para renderizar servicios en una sección específica.
+         * @param {string} categoryKey - 'imei', 'box-dongle', o 'digital-rent'.
+         */
+        function renderServices(categoryKey) {
+            const data = serviceDataStore[categoryKey] || [];
+            // Las IDs de los contenedores son diferentes
+            const containerId = `${categoryKey.replace(/-/g, '')}ServiceGridContainer`;
+            const section = document.getElementById(`${categoryKey.replace(/-/g, '')}ServiceSection`);
+            
+            const container = document.getElementById(containerId);
+            
+            if (!container || !section) {
+                 console.error(`Error al renderizar: Contenedor (${containerId}) o Sección no encontrados.`);
+                 return;
+            }
+
+            container.innerHTML = ''; 
+            
+            if (data.length === 0) {
+                container.innerHTML = `<p style="color:orange;">No hay servicios cargados para ${SERVICE_TYPES[categoryKey].title}. Si eres administrador, usa el Panel para agregar tarjetas.</p>`;
+            } else {
+                data.forEach(service => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card';
+                    card.dataset.serviceId = service.id; 
+                    card.dataset.serviceType = categoryKey; // Importante para el modal
+                    
+                    const isNew = service.name.toLowerCase().includes('nuevo');
+                    
+                    card.innerHTML = `
+                        <h3>
+                            ${service.name.replace('Nuevo', '').trim()}
+                            ${isNew ? `<span class="new-tag">Nuevo</span>` : ''}
+                            <span class="card-icon-check">✅</span>
+                        </h3>
+                        <div class="card-details">
+                            Categoría: <strong>${service.category}</strong>
+                        </div>
+                        <div class="card-footer">
+                            <span class="price">${service.price}</span>
+                            <span class="time">${service.time.replace('Miniutes', 'Minutos').replace('Hours', 'Horas').replace('days', 'días')}</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+            
+            // Asegurar que solo los cards de esta sección tengan el listener
+            document.querySelectorAll(`#${containerId} .service-card`).forEach(card => {
+                // Eliminar cualquier listener previo para evitar duplicados
+                card.removeEventListener('click', openOrderModal); 
+                card.addEventListener('click', openOrderModal);
+            });
+
+            hideAllSections();
+            section.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+        function displayOrders(containerElement, orders, isAdminView = false) {
+             containerElement.innerHTML = '';
+
+            if (orders.length === 0) {
+                containerElement.innerHTML = '<p>No hay pedidos registrados en su historial.</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = `order-card ${order.status.replace(/[^a-zA-Z0-9]/g, '')}`; 
+                card.dataset.orderId = order.id;
+
+                const statusOptions = ['Pendiente', 'Exitoso', 'Rechazado'];
+                
+                let orderActionsHtml = '';
+                if (isAdminView) {
+                    // FIX: El select llama a la función global window.updateOrderStatus
+                    orderActionsHtml = `
+                        <select onchange="window.updateOrderStatus(${order.id}, this.value)"> 
+                            ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                        </select>
+                        <div class="admin-order-buttons">
+                            <button onclick="window.deleteOrder(${order.id})">Eliminar</button>
+                        </div>
+                    `;
+                } else {
+                    orderActionsHtml = `<span class="status-badge ${order.status.replace(/[^a-zA-Z0-9]/g, '')}">${order.status}</span>`;
+                }
+                
+                let extraDetails = isAdminView ? `<p><strong>Cliente:</strong> ${order.client_name || 'N/A'}</p><p><strong>WhatsApp:</strong> ${order.whatsapp || 'N/A'}</p>` : '';
+
+
+                card.innerHTML = `
+                    <div class="order-details">
+                        <p><strong>Servicio:</strong> ${order.service_name}</p>
+                        <p><strong>SN/IMEI:</strong> ${order.device_name}</p>
+                        ${extraDetails}
+                        ${isAdminView ? `<p><strong>Contacto Email:</strong> ${order.contact_email}</p>` : ''}
+                        <p style="font-size: 10px; color: #777;">Pedido: ${new Date(order.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="order-actions">
+                        ${orderActionsHtml}
+                    </div>
+                `;
+                containerElement.appendChild(card);
+            });
+        }
+
+        // Funciones de historial (se dejan en el script para completar)
+        async function fetchAdminOrdersHistory() {
+             const container = document.getElementById('adminOrderHistory');
+            if (!container) return;
+            
+            displayAdminMessage('Cargando historial de todos los pedidos...', 'yellow', false);
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                displayAdminMessage(`❌ Error al cargar pedidos del Admin: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado para ver todos los pedidos (auth.email() = '${ADMIN_EMAIL}').`, 'var(--red-error)', true);
+                console.error("RLS/API Error al cargar pedidos del Admin:", error);
+                container.innerHTML = '<p style="color: red;">No se pudieron cargar los pedidos. Verifique el mensaje de error de RLS arriba.</p>';
+                return;
+            }
+            displayAdminMessage(`✅ ${orders.length} pedidos cargados.`, 'var(--whatsapp-green)', false);
+            displayOrders(container, orders, true);
+        }
+        async function fetchClientOrdersHistory() {
+             const container = document.getElementById('clientOrderHistoryContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<p>Cargando su historial de pedidos...</p>';
+
+            if (!currentUser) {
+                container.innerHTML = `<p style="color:red;">No ha iniciado sesión.</p>`;
+                return;
+            }
+            const userId = currentUser.id;
+
+            const { data: orders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('user_id', userId) 
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                container.innerHTML = `<p style="color:red;">Error al cargar su historial: ${error.message}. Asegúrese de que RLS (SELECT para autenticados) esté configurado en 'orders' permitiendo ver solo sus propios pedidos (user_id = auth.uid()).</p>`;
+                return;
+            }
+
+            displayOrders(container, orders, false);
+
+            hideAllSections();
+            if (clientOrderHistorySection) clientOrderHistorySection.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.updateOrderStatus = async function(orderId, newStatus) {
+             displayAdminMessage(`Actualizando pedido #${orderId} a ${newStatus}...`, 'yellow', false);
+
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (error) {
+                displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
+            } else {
+                displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
+                fetchAdminOrdersHistory(); 
+            }
+        }
+        window.executeDeleteOrder = async function(orderId) {
+             displayAdminMessage(`Eliminando pedido #${orderId} permanentemente...`, 'yellow', false);
+            
+            const msgEl = document.getElementById('adminOrderHistoryMessage');
+            if (msgEl) {
+                msgEl.onclick = null; 
+                msgEl.style.cursor = 'default';
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .delete()
+                    .eq('id', orderId);
+
+                if (error) {
+                    displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders' para el ADMIN.`, 'var(--red-error)', true);
+                    console.error("Error al eliminar pedido (RLS o API):", error);
+                } else {
+                    displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
+                    fetchAdminOrdersHistory(); 
+                }
+            } catch (e) {
+                const genericErrorMessage = `Error de red/seguridad: ${e.message}. Esto a menudo indica que RLS está bloqueando la solicitud o un problema de red. Por favor, asegúrese de que la política RLS de DELETE está habilitada para el Administrador.`;
+                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${genericErrorMessage}`, 'var(--red-error)', true);
+                console.error("Error de red/fetch al eliminar pedido:", e);
+            }
+        }
+        window.deleteOrder = function(orderId) {
+             const container = document.getElementById('adminOrderHistoryMessage');
+            if (!container) return;
+
+            const confirmationHTML = `
+                <p style="margin-bottom: 10px; color: var(--orange-pending);">
+                    ⚠️ **CONFIRME**: ¿Está seguro de eliminar el Pedido #${orderId}? ¡Esta acción es irreversible!
+                </p>
+                <button onclick="window.executeDeleteOrder(${orderId});" 
+                        style="background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">
+                    Confirmar Eliminación
+                </button>
+                <button onclick="document.getElementById('adminOrderHistoryMessage').innerHTML='';"
+                        style="background-color: var(--button-bg); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Cancelar
+                </button>
+            `;
+            
+            container.style.color = 'var(--text-light)';
+            container.style.borderColor = 'var(--red-error)';
+            container.innerHTML = confirmationHTML;
+        }
+        
+
+        // --- LÓGICA DEL MODAL DE PEDIDO (ACTUALIZADA) ---
+        
+        async function openOrderModal(event) {
+            const serviceId = event.currentTarget.dataset.serviceId;
+            const serviceType = event.currentTarget.dataset.serviceType; // Nuevo: obtener el tipo de servicio
+            
+            // Buscar el servicio en el almacén de datos correcto
+            const serviceList = serviceDataStore[serviceType] || [];
+            const service = serviceList.find(s => s.id == serviceId);
+
+            if (!currentUser) {
+                hideAllSections();
+                if (loginSection) loginSection.classList.remove('hidden');
+                if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--orange-pending)';
+                    loginMessage.textContent = 'Inicia sesión para realizar un pedido.';
+                }
+                return;
+            }
+            
+            const user = currentUser; 
+
+            if (!service) return;
+
+            document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
+            document.getElementById('modalEmail').value = user.email || '';
+            document.getElementById('modalSerial').value = ''; 
+            document.getElementById('modalClientName').value = '';
+            document.getElementById('modalWhatsapp').value = '';
+            
+            document.getElementById('modalServiceId').value = service.id;
+            document.getElementById('modalServiceType').value = serviceType; // Guardar el tipo de servicio en el hidden input
+
+            if (document.getElementById('modalMessage')) document.getElementById('modalMessage').textContent = '';
+            if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        async function submitBypassOrder() {
+            const sn = document.getElementById('modalSerial').value.trim();
+            const email = document.getElementById('modalEmail').value.trim();
+            const clientName = document.getElementById('modalClientName').value.trim();
+            const whatsapp = document.getElementById('modalWhatsapp').value.trim();
+            
+            const serviceId = document.getElementById('modalServiceId').value;
+            const serviceType = document.getElementById('modalServiceType').value; // Obtener el tipo de servicio
+            
+            // Buscar el servicio en el almacén de datos correcto
+            const serviceList = serviceDataStore[serviceType] || [];
+            const service = serviceList.find(s => s.id == serviceId);
+            
+            const user = currentUser;
+
+            const modalMessage = document.getElementById('modalMessage');
+            
+            if (!user) {
+                if (modalMessage) {
+                    modalMessage.style.color = 'var(--red-error)';
+                    modalMessage.textContent = 'Error de sesión. Por favor, vuelva a iniciar sesión.';
+                }
+                return;
+            }
+
+            if (!sn || !email || !clientName || !whatsapp) {
+                if (modalMessage) {
+                    modalMessage.style.color = 'var(--red-error)';
+                    modalMessage.textContent = 'Complete todos los campos (Nombre, WhatsApp, SN/IMEI, Email).';
+                }
+                return;
+            }
+            if (!service) {
+                if (modalMessage) {
+                    modalMessage.style.color = 'var(--red-error)';
+                    modalMessage.textContent = `Error: Servicio de tipo ${serviceType} no encontrado.`;
+                }
+                return;
+            }
+
+            if (modalMessage) {
+                modalMessage.style.color = 'yellow';
+                modalMessage.textContent = 'Enviando orden...';
+            }
+
+            const { error } = await supabase
+                .from('orders')
+                .insert([{
+                    user_id: user.id, 
+                    service_id: serviceId,
+                    service_type: serviceType, // Nuevo campo en orders
+                    service_name: service.name,
+                    device_name: sn, 
+                    imei: sn, 
+                    contact_email: email,
+                    client_name: clientName, 
+                    whatsapp: whatsapp,
+                    status: 'Pendiente', 
+                }]);
+
+            if (error) {
+                if (modalMessage) {
+                    modalMessage.style.color = 'var(--red-error)';
+                    if (error.status === 429) {
+                        modalMessage.textContent = 'Error 429 (Too Many Requests). La API está sobrecargada. Por favor, espere un momento antes de intentarlo de nuevo.';
+                    } else {
+                        modalMessage.textContent = `Error: ${error.message}. Revise sus políticas RLS de INSERT en la tabla 'orders'.`;
+                    }
+                }
+                console.error(error);
+            } else {
+                if (modalMessage) {
+                    modalMessage.style.color = 'var(--whatsapp-green)';
+                    modalMessage.textContent = `✅ ¡Pedido de ${service.name} enviado con éxito!`;
+                }
+                
+                setTimeout(() => {
+                    if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden');
+                    fetchClientOrdersHistory();
+                }, 2000);
+            }
+        }
+        
+        // --- LÓGICA DE ADMINISTRACIÓN DE SERVICIOS (ACTUALIZADA) ---
+
+        async function addNewService(event) {
+            event.preventDefault(); 
+
+            const categoryKey = currentEditingCategory; // Usar la categoría activa
+            const dataList = serviceDataStore[categoryKey];
+
+            const name = document.getElementById('newServiceName').value.trim();
+            const price = document.getElementById('newServicePrice').value.trim();
+            const time = document.getElementById('newServiceTime').value.trim();
+            const category = document.getElementById('newServiceCategory').value.trim();
+
+            if (!name || !price || !time || !category) {
+                if (addServiceMessage) {
+                    addServiceMessage.style.color = 'var(--red-error)';
+                    addServiceMessage.textContent = 'Todos los campos deben ser completados.';
+                }
+                return;
+            }
+
+            if (addServiceMessage) {
+                addServiceMessage.style.color = 'yellow';
+                addServiceMessage.textContent = 'Añadiendo servicio...';
+            }
+            
+            const nextId = dataList.length > 0
+                ? Math.max(...dataList.map(s => s.id)) + 1 
+                : 1;
+
+            const newService = {
+                id: nextId,
+                name: name,
+                price: price.startsWith('$') ? price : `$${price}`,
+                time: time,
+                category: category
+            };
+
+            dataList.push(newService);
+
+            const success = await updateServiceInSupabase(dataList, categoryKey);
+
+            if (success) {
+                if (addServiceMessage) {
+                    addServiceMessage.style.color = 'var(--whatsapp-green)';
+                    addServiceMessage.textContent = `✅ Servicio "${newService.name.substring(0, 30)}..." añadido a ${SERVICE_TYPES[categoryKey].title} y guardado!`;
+                }
+                
+                if (document.getElementById('newServiceForm')) document.getElementById('newServiceForm').reset();
+                
+                renderServiceEditor(); 
+            } else {
+                if (addServiceMessage) addServiceMessage.style.color = 'var(--red-error)';
+                dataList.pop(); 
+            }
+        }
+
+
+        function renderServiceEditor() {
+            const editorList = document.getElementById('serviceEditorList');
+            if (!editorList) return;
+
+            const categoryKey = currentEditingCategory;
+            const dataList = serviceDataStore[categoryKey];
+            const categoryTitle = SERVICE_TYPES[categoryKey].title;
+
+            editorList.innerHTML = '';
+            
+            editorMessage = document.getElementById('editorMessage');
+            if (!editorMessage) return;
+
+            // Actualizar botón de Añadir
+            document.getElementById('currentCategoryAddBtn').textContent = categoryTitle;
+
+            editorMessage.textContent = `Lista de Edición para: ${categoryTitle}`;
+            
+            if (dataList.length === 0) {
+                editorList.innerHTML = `<p style="color:orange; padding: 10px; text-align: center;">No hay servicios para editar en ${categoryTitle}. Usa la sección "Añadir Nuevo Servicio Rápido" para empezar.</p>`;
+                return;
+            }
+
+            dataList.forEach((service) => {
+                const listItem = document.createElement('li');
+                // FIX: El botón de eliminar llama a la función global window.deleteService
+                listItem.innerHTML = `
+                    <div style="flex-grow: 1; margin-right: 15px;">
+                        <div class="input-group">
+                            <p>Nombre Completo (ID: ${service.id}):</p>
+                            <input type="text" id="name-${service.id}" value="${service.name.replace(/"/g, '&quot;')}" data-field="name" data-id="${service.id}" class="full-name-input" />
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                            <div class="input-group">
+                                <p>Precio:</p>
+                                <input type="text" id="price-${service.id}" value="${service.price}" data-field="price" data-id="${service.id}" style="width: 80px;" />
+                            </div>
+                            <div class="input-group">
+                                <p>Tiempo:</p>
+                                <input type="text" id="time-${service.id}" value="${service.time}" data-field="time" data-id="${service.id}" style="width: 100px;" />
+                            </div>
+                            <div class="input-group">
+                                <p>Sub-Categoría:</p>
+                                <input type="text" id="category-${service.id}" value="${service.category}" data-field="category" data-id="${service.id}" style="width: 120px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="service-editor-actions">
+                        <button onclick="window.deleteService(${service.id})">Eliminar</button>
+                    </div>
+                `;
+                listItem.classList.add('service-editor-item');
+                editorList.appendChild(listItem);
+            });
+            
+            if (editorMessage) editorMessage.textContent = `${dataList.length} servicios listados para ${categoryTitle}.`;
+        }
+        
+        // FIX: Se adjunta al objeto window para ser accesible desde el atributo onclick del HTML.
+        window.deleteService = function(id) {
+            const categoryKey = currentEditingCategory;
+            let dataList = serviceDataStore[categoryKey];
+
+            // Filtrar y actualizar el array localmente
+            serviceDataStore[categoryKey] = dataList.filter(s => s.id !== id);
+
+            renderServiceEditor(); 
+            if (editorMessage) {
+                editorMessage.style.color = 'yellow';
+                editorMessage.textContent = `Servicio ID ${id} eliminado de la lista local de ${SERVICE_TYPES[categoryKey].title}. Pulse GUARDAR para sincronizar.`;
+            }
+        }
+
+        async function clearAllServices() {
+            const categoryKey = currentEditingCategory;
+            const editorMessageElement = document.getElementById('editorMessage');
+            
+            if (!editorMessageElement) {
+                console.error("Error: Elemento de mensaje del editor no encontrado.");
+                return;
+            }
+            
+            if (!confirm(`🚨 ¿Está SEGURO que desea ELIMINAR TODOS los servicios de la categoría "${SERVICE_TYPES[categoryKey].title}"? Esta acción es IRREVERSIBLE.`)) {
+                return;
+            }
+
+            editorMessageElement.style.color = 'yellow';
+            editorMessageElement.textContent = `Eliminando todos los servicios de ${SERVICE_TYPES[categoryKey].title}...`;
+            
+            serviceDataStore[categoryKey] = []; 
+            
+            const success = await updateServiceInSupabase([], categoryKey);
+            
+            if (success) {
+                editorMessageElement.style.color = 'var(--whatsapp-green)';
+                editorMessageElement.textContent = `✅ ¡Todos los servicios de ${SERVICE_TYPES[categoryKey].title} eliminados y sincronizados con éxito!`;
+                renderServiceEditor(); 
+                // Renderizar la vista de cliente para reflejar cambios inmediatamente
+                renderServices(categoryKey); 
+            } else {
+                editorMessageElement.style.color = 'var(--red-error)';
+            }
+        }
+        
+        async function saveServiceChanges() {
+            const categoryKey = currentEditingCategory;
+            const editorMessageElement = document.getElementById('editorMessage');
+            
+            if (!editorMessageElement) {
+                console.error("Error: Elemento de mensaje del editor no encontrado.");
+                return;
+            }
+
+            editorMessageElement.style.color = 'yellow';
+            editorMessageElement.textContent = `Guardando cambios en ${SERVICE_TYPES[categoryKey].title}...`;
+
+            const updatedData = [];
+            const serviceEditorList = document.getElementById('serviceEditorList');
+            
+            // Recoger datos del DOM (ya actualizados por la lógica de edición)
+            serviceEditorList.querySelectorAll('.service-editor-item').forEach(listItem => {
+                const id = parseInt(listItem.querySelector('input[data-field="name"]').dataset.id);
+                const nameInput = listItem.querySelector(`#name-${id}`).value.trim();
+                const priceInput = listItem.querySelector(`#price-${id}`).value.trim();
+                const timeInput = listItem.querySelector(`#time-${id}`).value.trim();
+                const categoryInput = listItem.querySelector(`#category-${id}`).value.trim();
+
+                updatedData.push({
+                    id: id,
+                    name: nameInput,
+                    price: priceInput,
+                    time: timeInput,
+                    category: categoryInput
+                });
+            });
+            
+            const success = await updateServiceInSupabase(updatedData, categoryKey);
+
+            if (success) {
+                serviceDataStore[categoryKey] = updatedData; // Sincronizar el store local
+                editorMessageElement.style.color = 'var(--whatsapp-green)';
+                editorMessageElement.textContent = `✅ ¡Cambios guardados y sincronizados con éxito en ${SERVICE_TYPES[categoryKey].title}!`;
+                renderServiceEditor(); 
+                renderServices(categoryKey); // Forzar recarga de tarjetas de cliente
+            } else {
+                editorMessageElement.style.color = 'var(--red-error)';
+            }
+        }
+
+
+        async function checkUser(userSession) {
+            const user = userSession?.user;
+            
+            currentUser = user || null;
+            
+            // Ocultar solo si se cambia de estado o se navega explícitamente a un login/admin
+            // No ocultar aquí para permitir que initApp decida qué mostrar.
+            // hideAllSections(); 
+
+            if (navAdminPanel) navAdminPanel.classList.add('hidden');
+            if (adminNameDisplay) adminNameDisplay.classList.add('hidden');
+
+            if (user) {
+                const isAdmin = user.email === ADMIN_EMAIL;
+                
+                if (loginLogoutBtn) {
+                    loginLogoutBtn.textContent = 'Logout';
+                    loginLogoutBtn.onclick = signOut;
+                }
+                
+                if (isAdmin) { 
+                    if (navAdminPanel) navAdminPanel.classList.remove('hidden'); 
+                    if (adminNameDisplay) adminNameDisplay.classList.remove('hidden'); 
+                    if (loggedInUserName) loggedInUserName.textContent = 'Admin';
+                    if (adminNameDisplay) adminNameDisplay.textContent = `(${user.email})`;
+                }
+                
+            } else {
+                if (loginLogoutBtn) {
+                    loginLogoutBtn.textContent = 'Login / Register';
+                    loginLogoutBtn.onclick = () => {
+                        hideAllSections();
+                        if (loginSection) loginSection.classList.remove('hidden');
+                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
+                    };
+                }
+            }
+            
+            // Esta lógica ahora está en initApp y onAuthStateChange para manejar la visualización inicial.
+        }
+
+        async function handleNavigationClick(event) {
+            const clickedElement = event.currentTarget;
+            if (!clickedElement || !clickedElement.id) { return; }
+            
+            const elementId = clickedElement.id;
+            
+            // Ocultar el menú desplegable si se hace clic en otro elemento de la barra de navegación.
+            if (elementId !== 'navPongaOrden') {
+                if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden');
+            }
+
+            const isLoggedIn = !!currentUser; 
+            const isAdmin = isLoggedIn && currentUser.email === ADMIN_EMAIL;
+            
+            hideAllSections();
+            
+            let shouldScrollToTop = true; 
+            
+            switch (elementId) {
+                case 'navPongaOrden':
+                    if (isLoggedIn) {
+                        // Solo alternar la visibilidad del menú. El clic en los enlaces del menú disparará renderServices.
+                        if (pongaOrdenMenu) pongaOrdenMenu.classList.toggle('hidden');
+                        shouldScrollToTop = false; 
+                        // Mantenemos la hero visible si cerramos el menú o no estamos en una sección de servicios.
+                        if (heroSection) heroSection.classList.remove('hidden');
+                    } else {
+                        if (loginSection) loginSection.classList.remove('hidden');
+                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
+                        if (loginMessage) {
+                            loginMessage.style.color = 'var(--orange-pending)';
+                            loginMessage.textContent = 'Inicia sesión o regístrate para ver las opciones de órdenes.';
+                        }
+                    }
+                    break;
+                case 'navAdminPanel':
+                    if (isAdmin) {
+                        await fetchServices(); // Refrescar todos los datos de servicios
+                        fetchAdminOrdersHistory(); 
+                        renderServiceEditor(); // Renderizar el editor con la categoría activa
+                        if (adminSection) adminSection.classList.remove('hidden');
+                    } else if (isLoggedIn) {
+                        if (heroSection) heroSection.classList.remove('hidden'); 
+                        displayAdminMessage('No tienes permisos de administrador para acceder a este panel.', 'var(--red-error)', true);
+                    } else {
+                        if (loginSection) loginSection.classList.remove('hidden');
+                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    break;
+                case 'navHistorialPedidos':
+                    if (isLoggedIn) {
+                        if (isAdmin) {
+                            fetchAdminOrdersHistory(); 
+                            if (adminSection) adminSection.classList.remove('hidden');
+                        } else {
+                            fetchClientOrdersHistory();
+                        }
+                    } else {
+                        if (loginSection) loginSection.classList.remove('hidden');
+                        if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' });
+                        if (loginMessage) {
+                            loginMessage.textContent = 'Inicia sesión para ver tu historial de pedidos.';
+                            loginMessage.style.color = 'var(--orange-pending)';
+                        }
+                    }
+                    break;
+                case 'navAreaCliente':
+                    if (isLoggedIn) { if (heroSection) heroSection.classList.remove('hidden'); } else { if (loginSection) loginSection.classList.remove('hidden'); if (loginSection) loginSection.scrollIntoView({ behavior: 'smooth' }); if (loginMessage) loginMessage.textContent = ''; }
+                    break;
+                default:
+                    if (heroSection) heroSection.classList.remove('hidden');
+                    break;
+            }
+            
+            if (shouldScrollToTop) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        // Funciones de Auth (no se modifican)
+        async function signInWithEmail() { 
+             const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (loginMessage) {
+                loginMessage.style.color = 'yellow';
+                loginMessage.textContent = 'Iniciando sesión...';
+            }
+
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Error de inicialización de la API.'; } return; }
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                console.error('Error al hacer login:', error);
+                if (loginMessage) loginMessage.style.color = 'var(--red-error)';
+                let msg = error.message;
+                
+                if (error.status === 429) {
+                    msg = '⛔ Límite de solicitudes alcanzado (Error 429). Por favor, espera 60 segundos antes de volver a intentarlo.';
+                } 
+                else if (error.message.includes('Invalid login credentials')) { 
+                    msg = '❌ Credenciales de inicio de sesión inválidas. Comprueba el correo y la contraseña.'; 
+                } 
+                else if (error.message.includes('Email not confirmed')) { 
+                    msg = '📧 Correo electrónico no confirmado. Por favor, revisa tu bandeja de entrada.'; 
+                }
+                
+                if (loginMessage) loginMessage.textContent = `Error de inicio: ${msg}`;
+            } else if (data.user) {
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--whatsapp-green)';
+                    loginMessage.textContent = '✅ Sesión iniciada con éxito! Redirigiendo...';
+                }
+            } else {
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--red-error)';
+                    loginMessage.textContent = 'Error desconocido. Comprueba la confirmación del correo.';
+                }
+            }
+        }
+        async function signUpWithEmail() { 
+             const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (loginMessage) {
+                loginMessage.style.color = 'yellow';
+                loginMessage.textContent = 'Registrando usuario...';
+            }
+            
+            if (!supabase) { if (loginMessage) { loginMessage.style.color = 'var(--red-error)'; loginMessage.textContent = 'Erro de inicialización de la API.'; } return; }
+            
+            const { error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                console.error('Error al registrar:', error);
+                if (loginMessage) {
+                    loginMessage.style.color = 'var(--red-error)';
+                    loginMessage.textContent = `Error: ${error.message}`;
+                }
+            } else {
+                if (loginMessage) {
+                    loginMessage.style.color = '#4dc2f2'; 
+                    loginMessage.textContent = '✅ Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta antes de iniciar sesión.';
+                }
+            }
+        }
+        async function signOut() { 
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error al hacer logout:', error);
+            } else {
+                if (loginMessage) loginMessage.textContent = '';
+            }
+        }
+
+        // --- Inicialización (IIFE para evitar Race Condition) ---
+        (async function initApp() {
+            
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual'; 
+            }
+
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.error("Error: La biblioteca Supabase no fue cargada. Verifique el link CDN.");
+                return; 
+            }
+
+            // Mapeo de Elementos DOM
+            heroSection = document.getElementById('heroSection');
+            mainDevicesImage = document.getElementById('mainDevicesImage');
+            loginSection = document.getElementById('loginSection');
+            adminSection = document.getElementById('adminSection');
+            // Mapeo de las 3 secciones
+            imeiServiceSection = document.getElementById('imeiServiceSection'); 
+            boxDongleServiceSection = document.getElementById('boxDongleServiceSection'); 
+            digitalRentServiceSection = document.getElementById('digitalRentServiceSection'); 
+            clientOrderHistorySection = document.getElementById('clientOrderHistorySection');
+            
+            loadingMessage = document.getElementById('loadingMessageIMEI'); 
+            editorMessage = document.getElementById('editorMessage'); 
+            adminOrderHistory = document.getElementById('adminOrderHistory'); 
+            clientOrderHistoryContainer = document.getElementById('clientOrderHistoryContainer');
+            addServiceMessage = document.getElementById('addServiceMessage');
+            adminOrderHistoryMessage = document.getElementById('adminOrderHistoryMessage');
+
+            loginLogoutBtn = document.getElementById('loginLogoutBtn');
+            loggedInUserName = document.getElementById('loggedInUserName');
+            adminNameDisplay = document.getElementById('adminNameDisplay');
+            
+            navAreaCliente = document.getElementById('navAreaCliente');
+            navPongaOrden = document.getElementById('navPongaOrden');
+            navHistorialPedidos = document.getElementById('navHistorialPedidos');
+            pongaOrdenMenu = document.getElementById('pongaOrdenMenu'); 
+            navAdminPanel = document.getElementById('navAdminPanel'); 
+
+            backgroundResponseMessage = document.getElementById('backgroundResponseMessage');
+            devicesImageResponseMessage = document.getElementById('devicesImageResponseMessage');
+            loginMessage = document.getElementById('loginMessage');
+            
+            // --- CARGA DE IMAGENES (Persistente) ---
+            await loadImages();
+            
+            // --- CARGA DE DATOS ---
+            await fetchServices(); 
+            
+            // Listeners de Autenticación y Modal
+            document.getElementById('signInButton').addEventListener('click', signInWithEmail);
+            document.getElementById('signUpButton').addEventListener('click', signUpWithEmail);
+            document.getElementById('closeModal').addEventListener('click', () => { if (document.getElementById('orderModal')) document.getElementById('orderModal').classList.add('hidden'); });
+            
+            document.getElementById('submitModalOrder').addEventListener('click', submitBypassOrder);
+            
+            // Listeners de Navegación y Admin
+            document.getElementById('saveServiceChanges').addEventListener('click', saveServiceChanges);
+            document.getElementById('clearAllServicesButton').addEventListener('click', clearAllServices);
+            
+            document.getElementById('newServiceForm').addEventListener('submit', addNewService); 
+            navAreaCliente.addEventListener('click', handleNavigationClick);
+            navPongaOrden.addEventListener('click', handleNavigationClick); // Vuelve al manejador principal para el clic del menú principal
+            navHistorialPedidos.addEventListener('click', handleNavigationClick);
+            navAdminPanel.addEventListener('click', handleNavigationClick); 
+
+            // Listeners de Gestión de Imágenes
+            document.getElementById('uploadBackgroundButton').addEventListener('click', handleUploadBackground);
+            document.getElementById('clearBackgroundButton').addEventListener('click', handleClearBackground);
+            document.getElementById('uploadDevicesButton').addEventListener('click', handleUploadDevices);
+            document.getElementById('clearDevicesButton').addEventListener('click', handleClearDevices);
+
+            // NUEVO: Listener para el selector de categoría en el Admin
+            const categorySelector = document.getElementById('serviceCategorySelector');
+            if (categorySelector) {
+                categorySelector.addEventListener('change', (e) => {
+                    currentEditingCategory = e.target.value;
+                    renderServiceEditor();
+                });
+            }
+
+            // CORRECCIÓN CLAVE: Este listener ahora maneja la visualización de la sección para el menú desplegable
+            document.querySelectorAll('.order-type-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); 
+                    
+                    if (pongaOrdenMenu) pongaOrdenMenu.classList.add('hidden'); // Ocultar menú inmediatamente
+                    
+                    const serviceType = this.dataset.serviceType;
+                    
+                    if (!currentUser) {
+                        hideAllSections();
+                        if (loginSection) loginSection.classList.remove('hidden');
+                        if (loginMessage) {
+                            loginMessage.textContent = 'Inicia sesión para ver los servicios.';
+                            loginMessage.style.color = 'var(--orange-pending)';
+                        }
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    
+                    // LLAMADA CORREGIDA: renderServices se encarga de mostrar la sección y ocultar las demás.
+                    renderServices(serviceType); 
+                });
+            });
+
+            // PASO CRÍTICO: Obtener la sesión inicial y usar el listener para las actualizaciones.
+            const { data: { session } } = await supabase.auth.getSession();
+            await checkUser(session); 
+            
+            // LÓGICA INICIAL: Mostrar la sección IMEI por defecto si está logueado, sino Hero.
+            if (currentUser) {
+                renderServices('imei');
+            } else {
+                 if (heroSection) heroSection.classList.remove('hidden');
+            }
+
+
+            supabase.auth.onAuthStateChange((event, session) => {
+                checkUser(session);
+                // Si el usuario acaba de iniciar sesión, redirigirlo a la sección IMEI por defecto
+                if (session && event === 'SIGNED_IN') {
+                    renderServices('imei');
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
