@@ -794,9 +794,7 @@
         function renderServices(categoryKey) {
             const data = serviceDataStore[categoryKey] || [];
             
-            // CORRECCIÓN CLAVE: Mapear directamente las claves a los IDs exactos del HTML.
-            // Esto asegura que se encuentren los elementos con mayúsculas/minúsculas correctas:
-            // imeiServiceSection, boxDongleServiceSection, digitalRentServiceSection.
+            // Mapear directamente las claves a los IDs exactos del HTML.
             let sectionId;
             let containerId;
 
@@ -1042,6 +1040,9 @@
             const serviceList = serviceDataStore[serviceType] || [];
             const service = serviceList.find(s => s.id == serviceId);
 
+            const modalSerialInput = document.querySelector('.modal-serial-input');
+            const modalSerialField = document.getElementById('modalSerial');
+
             if (!currentUser) {
                 hideAllSections();
                 if (loginSection) loginSection.classList.remove('hidden');
@@ -1056,6 +1057,17 @@
             const user = currentUser; 
 
             if (!service) return;
+
+            // --- Lógica para mostrar/ocultar SN/IMEI ---
+            if (serviceType === 'digital-rent') {
+                if (modalSerialInput) modalSerialInput.classList.add('hidden');
+                // IMPORTANTE: Si ocultas el campo, también remueve el atributo 'required' para que el envío funcione.
+                if (modalSerialField) modalSerialField.removeAttribute('required');
+            } else {
+                if (modalSerialInput) modalSerialInput.classList.remove('hidden');
+                if (modalSerialField) modalSerialField.setAttribute('required', 'required');
+            }
+            // ------------------------------------------
 
             document.getElementById('modalServiceName').textContent = `Pedido: ${service.name}`;
             document.getElementById('modalEmail').value = user.email || '';
@@ -1095,13 +1107,15 @@
                 return;
             }
 
-            if (!sn || !email || !clientName || !whatsapp) {
+            // Validación ajustada: SN solo es requerido si NO es digital-rent
+            if (!email || !clientName || !whatsapp || (serviceType !== 'digital-rent' && !sn)) {
                 if (modalMessage) {
                     modalMessage.style.color = 'var(--red-error)';
-                    modalMessage.textContent = 'Complete todos los campos (Nombre, WhatsApp, SN/IMEI, Email).';
+                    modalMessage.textContent = 'Complete todos los campos requeridos (Nombre, WhatsApp, Email, y SN/IMEI si aplica).';
                 }
                 return;
             }
+            
             if (!service) {
                 if (modalMessage) {
                     modalMessage.style.color = 'var(--red-error)';
@@ -1120,10 +1134,11 @@
                 .insert([{
                     user_id: user.id, 
                     service_id: serviceId,
-                    service_type: serviceType, // Nuevo campo en orders
+                    service_type: serviceType, 
                     service_name: service.name,
-                    device_name: sn, 
-                    imei: sn, 
+                    // Si es digital-rent, device_name/imei será vacío, sino será el valor de SN
+                    device_name: serviceType === 'digital-rent' ? 'N/A - Digital Rent' : sn, 
+                    imei: serviceType === 'digital-rent' ? 'N/A' : sn, 
                     contact_email: email,
                     client_name: clientName, 
                     whatsapp: whatsapp,
@@ -1675,7 +1690,7 @@
             const { data: { session } } = await supabase.auth.getSession();
             await checkUser(session); 
             
-            // LÓGICA INICIAL CORREGIDA: Siempre mostrar la Hero Section/Area del Cliente al inicio.
+            // LÓGICA INICIAL: Siempre mostrar la Hero Section/Area del Cliente al inicio.
             hideAllSections();
             if (heroSection) heroSection.classList.remove('hidden');
 
