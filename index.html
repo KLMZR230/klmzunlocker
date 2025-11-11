@@ -299,16 +299,16 @@
                 flex-direction: column; 
                 align-items: flex-start;
                 padding: 10px 20px;
-                height: auto; /* Permite que la nav crezca */
+                height: auto; 
             }
             .logo { 
-                height: 70px; /* Reducido un poco para móvil */
+                height: 70px; 
                 width: 100%;
                 justify-content: center;
                 margin-bottom: 5px;
             }
             .logo #siteLogo {
-                height: 65px; /* Tamaño del logo en móvil */
+                height: 65px; 
                 width: 65px;
                 min-height: 65px;
                 max-height: 65px;
@@ -349,10 +349,10 @@
                 padding: 15px;
             }
             #mainDevicesImage {
-                display: none; /* Ocultar imagen de fondo en móviles para ahorrar espacio */
+                display: none; 
             }
             .service-grid {
-                grid-template-columns: 1fr; /* Una columna para las tarjetas de servicio */
+                grid-template-columns: 1fr; 
             }
             .order-card {
                 flex-direction: column;
@@ -1123,7 +1123,7 @@
                 displayAdminMessage(`Error al actualizar estado: ${error.message}. Revise los permisos RLS de UPDATE.`, 'var(--red-error)', true);
             } else {
                 // Al actualizar exitosamente, forzamos la recarga del admin.
-                // Esto dispara el evento Realtime que actualiza al cliente.
+                // Esta recarga dispara el evento Realtime que actualiza al cliente.
                 displayAdminMessage(`✅ Estado de pedido #${orderId} actualizado a ${newStatus}.`, 'var(--whatsapp-green)', false);
                 fetchAdminOrdersHistory(); 
             }
@@ -1742,28 +1742,36 @@
             // Cancela cualquier suscripción anterior para evitar duplicados
             supabase.removeAllChannels();
 
-            // Suscribirse a los cambios en la tabla 'orders'
-            supabase.channel('orders_changes')
+            const ordersChannel = supabase.channel('orders_changes');
+
+            // 1. Suscripción a Cambios en la tabla 'orders'
+            ordersChannel
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
                     console.log('Cambio en pedidos detectado:', payload.eventType, payload.new?.status);
                     
-                    const currentSectionId = document.querySelector('section:not(.hidden)')?.id;
+                    const currentSection = document.querySelector('section:not(.hidden)');
+                    const currentSectionId = currentSection?.id;
                     
                     if (currentUser) {
                         const isAdmin = currentUser.email === ADMIN_EMAIL;
 
-                        // Si el cambio proviene del admin (o cualquier lado) y el admin tiene abierta su vista
+                        // Si el cambio ocurre y estamos en la vista de Admin, recargar
                         if (isAdmin && currentSectionId === 'adminSection') {
                             fetchAdminOrdersHistory();
                         } 
                         // Si es cualquier usuario (incluyendo el admin) y tiene abierta la vista de historial de cliente
                         if (currentSectionId === 'clientOrderHistorySection') {
-                            // ESTA ES LA RECARGA CRÍTICA PARA EL CLIENTE
                             fetchClientOrdersHistory();
                         }
                     }
                 })
                 .subscribe();
+            
+            // 2. Control de estado de conexión
+            ordersChannel
+                .on('channel_state', (state) => {
+                    console.log('Estado del canal Realtime:', state);
+                });
         }
 
 
@@ -1822,7 +1830,7 @@
             await fetchServices(); 
             
             // --- SUSCRIPCIÓN EN TIEMPO REAL ---
-            subscribeToOrders();
+            subscribeToOrders(); // Inicia la suscripción al cargar la app
 
             // Listeners de Autenticación y Modal
             document.getElementById('signInButton').addEventListener('click', signInWithEmail);
