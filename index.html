@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KLMZ UNLOCKER - Pedidos Funcionales</title>
+    <!-- Cargamos la librería Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -146,6 +147,7 @@
         
         .order-details p { margin: 2px 0; }
         .order-actions { text-align: right; }
+        /* FIX: Asegurar que el select llama a la función global */
         .order-actions select { padding: 5px; border-radius: 3px; background-color: #333; color: white; border: 1px solid #555; cursor: pointer; margin-bottom: 5px; }
         .order-actions .admin-order-buttons { display: flex; flex-direction: column; align-items: flex-end; }
         .order-actions .admin-order-buttons button { margin-top: 5px; background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; }
@@ -774,8 +776,9 @@
                 
                 let orderActionsHtml = '';
                 if (isAdminView) {
+                    // FIX: El select llama a la función global window.updateOrderStatus
                     orderActionsHtml = `
-                        <select onchange="updateOrderStatus(${order.id}, this.value)">
+                        <select onchange="window.updateOrderStatus(${order.id}, this.value)"> 
                             ${statusOptions.map(status => `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`).join('')}
                         </select>
                         <div class="admin-order-buttons">
@@ -854,7 +857,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        async function updateOrderStatus(orderId, newStatus) {
+        // FIX: Se adjunta al objeto window para ser accesible desde el atributo onchange del HTML.
+        window.updateOrderStatus = async function(orderId, newStatus) {
             displayAdminMessage(`Actualizando pedido #${orderId} a ${newStatus}...`, 'yellow', false);
 
             const { error } = await supabase
@@ -870,23 +874,70 @@
             }
         }
 
-        // FUNCIÓN GLOBAL PARA ELIMINAR PEDIDO (ACCESIBLE DESDE EL HTML)
-        window.deleteOrder = async function(orderId) {
+        // --- LÓGICA DE ELIMINACIÓN DE PEDIDO CON CONFIRMACIÓN ---
+        
+        // 1. FUNCIÓN QUE EJECUTA LA ELIMINACIÓN REAL (Internal/Private)
+        window.executeDeleteOrder = async function(orderId) {
             displayAdminMessage(`Eliminando pedido #${orderId} permanentemente...`, 'yellow', false);
+            
+            // Limpiar la barra de mensaje (por si acaso había un listener de cancelación)
+            const msgEl = document.getElementById('adminOrderHistoryMessage');
+            if (msgEl) {
+                msgEl.onclick = null; 
+                msgEl.style.cursor = 'default';
+            }
 
-            const { error } = await supabase
-                .from('orders')
-                .delete()
-                .eq('id', orderId);
+            try {
+                // FIX: Usamos un bloque try/catch para manejar el TypeError: Failed to fetch
+                const { error } = await supabase
+                    .from('orders')
+                    .delete()
+                    .eq('id', orderId);
 
-            if (error) {
-                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders'.`, 'var(--red-error)', true);
-                console.error("Error al eliminar pedido:", error);
-            } else {
-                displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
-                fetchAdminOrdersHistory(); 
+                if (error) {
+                    // Supabase devolvió un error (generalmente RLS 403 o similar)
+                    displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${error.message}. **VERIFIQUE RLS DE DELETE** en la tabla 'orders' para el ADMIN.`, 'var(--red-error)', true);
+                    console.error("Error al eliminar pedido (RLS o API):", error);
+                } else {
+                    // Success
+                    displayAdminMessage(`🗑️ Pedido #${orderId} eliminado con éxito.`, 'var(--whatsapp-green)', false);
+                    fetchAdminOrdersHistory(); 
+                }
+            } catch (e) {
+                // Network error (Failed to fetch) or other unexpected JS error
+                const genericErrorMessage = `Error de red/seguridad: ${e.message}. Esto a menudo indica que RLS está bloqueando la solicitud o un problema de red. Por favor, asegúrese de que la política RLS de DELETE está habilitada para el Administrador.`;
+                displayAdminMessage(`❌ Error al eliminar pedido #${orderId}: ${genericErrorMessage}`, 'var(--red-error)', true);
+                console.error("Error de red/fetch al eliminar pedido:", e);
             }
         }
+
+        // 2. FUNCIÓN DE ENTRADA QUE PIDE CONFIRMACIÓN (Public)
+        window.deleteOrder = function(orderId) {
+            const container = document.getElementById('adminOrderHistoryMessage');
+            if (!container) return;
+
+            // HTML con botones para la confirmación
+            const confirmationHTML = `
+                <p style="margin-bottom: 10px; color: var(--orange-pending);">
+                    ⚠️ **CONFIRME**: ¿Está seguro de eliminar el Pedido #${orderId}? ¡Esta acción es irreversible!
+                </p>
+                <button onclick="window.executeDeleteOrder(${orderId});" 
+                        style="background-color: var(--red-error); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;">
+                    Confirmar Eliminación
+                </button>
+                <button onclick="document.getElementById('adminOrderHistoryMessage').innerHTML='';"
+                        style="background-color: var(--button-bg); color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Cancelar
+                </button>
+            `;
+            
+            // Mostrar la confirmación en el área de mensajes de administración
+            container.style.color = 'var(--text-light)';
+            container.style.borderColor = 'var(--red-error)';
+            container.innerHTML = confirmationHTML;
+        }
+
+        // --- FIN LÓGICA DE ELIMINACIÓN ---
         
         async function openOrderModal(event) {
             const serviceId = event.currentTarget.dataset.serviceId;
@@ -1063,6 +1114,7 @@
 
             imeiServicesData.forEach((service) => {
                 const listItem = document.createElement('li');
+                // FIX: El botón de eliminar llama a la función global window.deleteService
                 listItem.innerHTML = `
                     <div style="flex-grow: 1; margin-right: 15px;">
                         <div class="input-group">
@@ -1085,9 +1137,10 @@
                         </div>
                     </div>
                     <div class="service-editor-actions">
-                        <button onclick="deleteService(${service.id})">Eliminar</button>
+                        <button onclick="window.deleteService(${service.id})">Eliminar</button>
                     </div>
                 `;
+                listItem.classList.add('service-editor-item');
                 editorList.appendChild(listItem);
             });
             
@@ -1097,7 +1150,8 @@
             if (editorMessage) editorMessage.textContent = `${imeiServicesData.length} servicios listados y listos para editar.`;
         }
         
-        function deleteService(id) {
+        // FIX: Se adjunta al objeto window para ser accesible desde el atributo onclick del HTML.
+        window.deleteService = function(id) {
             imeiServicesData = imeiServicesData.filter(s => s.id !== id);
             renderServiceEditor(); 
             if (editorMessage) {
@@ -1144,7 +1198,7 @@
             const updatedData = [];
             const serviceEditorList = document.getElementById('serviceEditorList');
             
-            serviceEditorList.querySelectorAll('li').forEach(listItem => {
+            serviceEditorList.querySelectorAll('.service-editor-item').forEach(listItem => {
                 const id = parseInt(listItem.querySelector('input[data-field="name"]').dataset.id);
                 const nameInput = listItem.querySelector(`#name-${id}`).value.trim();
                 const priceInput = listItem.querySelector(`#price-${id}`).value.trim();
@@ -1461,7 +1515,7 @@
                         hideAllSections();
                         if (heroSection) heroSection.classList.remove('hidden');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                        displayAdminMessage(`La función para ${this.textContent} aún no está implementada.`, 'var(--orange-pending)', true);
+                        displayAdminMessage(`La función para ${this.textContent} aún no está implementada.`, 'var(--orange-pending)', false);
                     }
                 });
             });
